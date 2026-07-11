@@ -5,16 +5,49 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
     <title>Flow: A Water Sanctuary by HomeFlow</title>
-    <link rel="icon" type="image/png" href="/manus-storage/flow_logo_amber_6f6c25e6.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/assets/index-B99jnoi0.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CjC6R-1E.css">
-    <script src="/__manus__/debug-collector.js" defer></script>
-  </head>
+    <link rel="icon" type="image/png" href="./manus-storage/flow_logo_amber_6f6c25e6.png" />
+    
+    
+    
+    <script type="module" crossorigin src="./assets/index-B99jnoi0.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CjC6R-1E.css">
+    
+  
+  <style>
+    /* Font fallbacks if Google Fonts unavailable (offline) */
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Inter+Tight:wght@400;500;600&display=swap');
+
+    /* Safe area insets for notch / Dynamic Island / home indicator */
+    :root {
+      --safe-area-top: env(safe-area-inset-top, 0px);
+      --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-area-left: env(safe-area-inset-left, 0px);
+      --safe-area-right: env(safe-area-inset-right, 0px);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a1a1a;
+      /* Extend content behind notch */
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+
+    #root {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+</head>
 
   <body>
     <script id="manus-runtime">window.__MANUS_HOST_DEV__ = false;

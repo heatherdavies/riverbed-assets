@@ -18,23 +18,48 @@ import { StyleSheet, View, StatusBar, Platform, BackHandler } from "react-native
 import { WebView } from "react-native-webview";
 import { useKeepAwake } from "expo-keep-awake";
 import * as SplashScreen from "expo-splash-screen";
+import { Asset } from "expo-asset";
+import * as FileSystem from "expo-file-system/legacy";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   useKeepAwake();
   const webViewRef = useRef<WebView>(null);
-  const [appIsReady, setAppIsReady] = useState(false);
+  const [webUri, setWebUri] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAppIsReady(true);
-      SplashScreen.hideAsync();
-    }, 300);
-    return () => clearTimeout(timer);
+    async function loadWebApp() {
+      try {
+        // Download the bundled index.html to a local URI that WKWebView can load
+        const asset = Asset.fromModule(require("./assets/web/index.html"));
+        await asset.downloadAsync();
+
+        if (asset.localUri) {
+          // Copy to the document directory so relative asset paths resolve correctly
+          const webDir = FileSystem.documentDirectory + "web/";
+          const destUri = webDir + "index.html";
+          const dirInfo = await FileSystem.getInfoAsync(webDir);
+          if (!dirInfo.exists) {
+            await FileSystem.makeDirectoryAsync(webDir, { intermediates: true });
+          }
+          await FileSystem.copyAsync({ from: asset.localUri, to: destUri });
+          setWebUri(destUri);
+        }
+      } catch (e) {
+        console.warn("Failed to load web app:", e);
+        // Fallback: load directly from asset URI
+        const asset = Asset.fromModule(require("./assets/web/index.html"));
+        await asset.downloadAsync();
+        if (asset.localUri) setWebUri(asset.localUri);
+      } finally {
+        SplashScreen.hideAsync();
+      }
+    }
+    loadWebApp();
   }, []);
 
-  // Android back button — navigate back in WebView history if possible
+  // Android back button
   useEffect(() => {
     if (Platform.OS !== "android") return;
     const handler = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -47,7 +72,7 @@ export default function App() {
     return () => handler.remove();
   }, []);
 
-  if (!appIsReady) {
+  if (!webUri) {
     return <View style={styles.container} />;
   }
 
@@ -56,28 +81,20 @@ export default function App() {
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <WebView
         ref={webViewRef}
-        // Load the bundled HTML from local assets — no internet required
-        source={require("./assets/web/index.html")}
+        source={{ uri: webUri }}
         style={styles.webview}
-        // Allow local file access for backgrounds, audio, and all bundled assets
         allowFileAccess
         allowFileAccessFromFileURLs
         allowUniversalAccessFromFileURLs
-        // JavaScript and storage
         javaScriptEnabled
         domStorageEnabled
-        // Disable bouncy scroll — the water canvas handles its own touch
         scrollEnabled={false}
         bounces={false}
         overScrollMode="never"
-        // Prevent white flash on load
         backgroundColor="#0a1a1a"
-        // Allow audio to play without user interaction (meditation app)
         mediaPlaybackRequiresUserAction={false}
         allowsInlineMediaPlayback
-        // Hardware acceleration on Android
         androidHardwareAccelerationDisabled={false}
-        // Ensure full-screen viewport including notch/home indicator
         injectedJavaScriptBeforeContentLoaded={`
           (function() {
             var meta = document.createElement('meta');
@@ -88,6 +105,7 @@ export default function App() {
           true;
         `}
         onError={(e) => console.warn("WebView error:", e.nativeEvent)}
+        onHttpError={(e) => console.warn("WebView HTTP error:", e.nativeEvent)}
       />
     </View>
   );
