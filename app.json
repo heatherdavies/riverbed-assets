@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Flow: A Water Sanctuary",
+    "slug": "flow-water-sanctuary",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "owner": "heatherdavies",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "ca.homeflowapp.flow",
+      "buildNumber": "1",
+      "requireFullScreen": true,
+      "infoPlist": {
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent"
+      }
+    },
+    "android": {
+      "package": "ca.homeflowapp.flow",
+      "adaptiveIcon": {
+        "backgroundColor": "#0a1a1a",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-web-browser",
+      "expo-status-bar",
+      "expo-splash-screen"
+    ]
+  }
+}
