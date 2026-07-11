@@ -20,6 +20,10 @@ const path = require("path");
 const htmlPath = path.join(__dirname, "../assets/web/index.html");
 let html = fs.readFileSync(htmlPath, "utf8");
 
+// 0. Remove type="module" and crossorigin attributes — iOS WKWebView blocks module scripts from file:// URIs
+html = html.replace(/<script type="module" crossorigin src="/g, '<script src="');
+html = html.replace(/<link rel="stylesheet" crossorigin href="/g, '<link rel="stylesheet" href="');
+
 // 1. Convert absolute paths to relative paths
 //    /assets/ → ./assets/
 //    /manus-storage/ → ./manus-storage/
