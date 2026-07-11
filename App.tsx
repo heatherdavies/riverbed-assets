@@ -2,46 +2,72 @@
  * Flow: A Water Sanctuary
  * Main app entry — full-screen WebView loading the bundled water canvas.
  *
- * Architecture: Hybrid
- * - The water canvas (WebGL/Three.js) runs inside a WKWebView via react-native-webview
- * - The web bundle HTML is read at build time and injected as a string
- * - Assets (backgrounds, audio, images) are loaded from the app bundle via file:// URIs
- *
- * To update the water canvas:
- * 1. Run npm run build in the water_playground_3d project
- * 2. Copy dist/public/* into assets/web/
- * 3. Run npm run patch to fix paths for local loading
- * 4. Rebuild with EAS
+ * Architecture: Hybrid with local HTTP server
+ * - @dr.pogodin/react-native-static-server serves the web bundle from localhost
+ * - WebView loads http://localhost:<port>/index.html
+ * - All relative paths (./assets/, ./manus-storage/, ./backgrounds/) resolve correctly
+ * - Works offline, no file:// permission issues
  */
 
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, StatusBar, Platform, BackHandler } from "react-native";
+import {
+  StyleSheet,
+  View,
+  StatusBar,
+  Platform,
+  BackHandler,
+} from "react-native";
 import { WebView } from "react-native-webview";
 import { useKeepAwake } from "expo-keep-awake";
 import * as SplashScreen from "expo-splash-screen";
+import StaticServer from "@dr.pogodin/react-native-static-server";
+import { resolveAssetSource } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
-
-// The bundled index.html — loaded as a static asset via react-native-webview's source.uri
-// react-native-webview handles the file:// URI resolution on iOS automatically
-// when using the `source` prop with a require() for an HTML file.
-const WEB_HTML = require("./assets/web/index.html");
 
 export default function App() {
   useKeepAwake();
   const webViewRef = useRef<WebView>(null);
-  const [ready, setReady] = useState(false);
+  const [serverUrl, setServerUrl] = useState<string | null>(null);
+  const serverRef = useRef<StaticServer | null>(null);
 
   useEffect(() => {
-    // Brief delay for splash screen, then show the WebView
-    const t = setTimeout(() => {
-      setReady(true);
-      SplashScreen.hideAsync();
-    }, 200);
-    return () => clearTimeout(t);
+    async function startServer() {
+      try {
+        // Resolve the path to the bundled web assets
+        // The assets/web folder is included in the app bundle
+        const asset = resolveAssetSource(require("./assets/web/index.html"));
+        // Extract the directory path from the asset URI
+        const assetUri = asset.uri;
+        // Get the directory containing the web assets
+        const webDir = assetUri.substring(0, assetUri.lastIndexOf("/"));
+
+        // Start a local HTTP server pointing at the web assets directory
+        const server = new StaticServer(0, webDir, { keepAlive: true });
+        serverRef.current = server;
+
+        const url = await server.start();
+        console.log("Static server started at:", url);
+        setServerUrl(`${url}/index.html`);
+      } catch (e) {
+        console.warn("Static server failed:", e);
+        // Fallback: try direct require() approach
+        setServerUrl("fallback");
+      } finally {
+        SplashScreen.hideAsync();
+      }
+    }
+
+    startServer();
+
+    return () => {
+      if (serverRef.current) {
+        serverRef.current.stop();
+        serverRef.current = null;
+      }
+    };
   }, []);
 
-  // Android back button
   useEffect(() => {
     if (Platform.OS !== "android") return;
     const handler = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -54,39 +80,45 @@ export default function App() {
     return () => handler.remove();
   }, []);
 
-  if (!ready) {
+  if (!serverUrl) {
     return <View style={styles.container} />;
   }
+
+  // Fallback to direct require() if server failed
+  const source =
+    serverUrl === "fallback"
+      ? require("./assets/web/index.html")
+      : { uri: serverUrl };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <WebView
         ref={webViewRef}
-        // react-native-webview resolves require() HTML files to a file:// URI on iOS
-        // and sets the correct baseURL so relative paths (./assets/, ./manus-storage/) resolve
-        source={WEB_HTML}
+        source={source}
         style={styles.webview}
-        // Allow local file access for all bundled assets
+        originWhitelist={["*"]}
         allowFileAccess
         allowFileAccessFromFileURLs
         allowUniversalAccessFromFileURLs
-        // Core web features
         javaScriptEnabled
         domStorageEnabled
-        // Disable scroll — water canvas handles all touch
         scrollEnabled={false}
         bounces={false}
         overScrollMode="never"
-        // Dark background prevents white flash
         backgroundColor="#0a1a1a"
-        // Audio without user interaction (meditation app)
         mediaPlaybackRequiresUserAction={false}
         allowsInlineMediaPlayback
-        // Android hardware acceleration
         androidHardwareAccelerationDisabled={false}
-        onError={(e) => console.warn("WebView error:", e.nativeEvent)}
-        onHttpError={(e) => console.warn("WebView HTTP error:", e.nativeEvent)}
+        onError={(e) => console.warn("WebView error:", JSON.stringify(e.nativeEvent))}
+        onMessage={(e) => console.log("WebView message:", e.nativeEvent.data)}
+        injectedJavaScript={`
+          window.onerror = function(msg, src, line, col, err) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({type:'error', msg, src, line}));
+            return false;
+          };
+          true;
+        `}
       />
     </View>
   );
