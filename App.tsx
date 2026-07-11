@@ -4,13 +4,14 @@
  *
  * Architecture: Hybrid
  * - The water canvas (WebGL/Three.js) runs inside a WKWebView via react-native-webview
- * - The web bundle is loaded from local assets (no internet required)
- * - All interactions (touch, settings, forms) are handled inside the web bundle
+ * - The web bundle HTML is read at build time and injected as a string
+ * - Assets (backgrounds, audio, images) are loaded from the app bundle via file:// URIs
  *
  * To update the water canvas:
  * 1. Run npm run build in the water_playground_3d project
  * 2. Copy dist/public/* into assets/web/
- * 3. Rebuild with EAS
+ * 3. Run npm run patch to fix paths for local loading
+ * 4. Rebuild with EAS
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -18,45 +19,26 @@ import { StyleSheet, View, StatusBar, Platform, BackHandler } from "react-native
 import { WebView } from "react-native-webview";
 import { useKeepAwake } from "expo-keep-awake";
 import * as SplashScreen from "expo-splash-screen";
-import { Asset } from "expo-asset";
-import * as FileSystem from "expo-file-system/legacy";
 
 SplashScreen.preventAutoHideAsync();
+
+// The bundled index.html — loaded as a static asset via react-native-webview's source.uri
+// react-native-webview handles the file:// URI resolution on iOS automatically
+// when using the `source` prop with a require() for an HTML file.
+const WEB_HTML = require("./assets/web/index.html");
 
 export default function App() {
   useKeepAwake();
   const webViewRef = useRef<WebView>(null);
-  const [webUri, setWebUri] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    async function loadWebApp() {
-      try {
-        // Download the bundled index.html to a local URI that WKWebView can load
-        const asset = Asset.fromModule(require("./assets/web/index.html"));
-        await asset.downloadAsync();
-
-        if (asset.localUri) {
-          // Copy to the document directory so relative asset paths resolve correctly
-          const webDir = FileSystem.documentDirectory + "web/";
-          const destUri = webDir + "index.html";
-          const dirInfo = await FileSystem.getInfoAsync(webDir);
-          if (!dirInfo.exists) {
-            await FileSystem.makeDirectoryAsync(webDir, { intermediates: true });
-          }
-          await FileSystem.copyAsync({ from: asset.localUri, to: destUri });
-          setWebUri(destUri);
-        }
-      } catch (e) {
-        console.warn("Failed to load web app:", e);
-        // Fallback: load directly from asset URI
-        const asset = Asset.fromModule(require("./assets/web/index.html"));
-        await asset.downloadAsync();
-        if (asset.localUri) setWebUri(asset.localUri);
-      } finally {
-        SplashScreen.hideAsync();
-      }
-    }
-    loadWebApp();
+    // Brief delay for splash screen, then show the WebView
+    const t = setTimeout(() => {
+      setReady(true);
+      SplashScreen.hideAsync();
+    }, 200);
+    return () => clearTimeout(t);
   }, []);
 
   // Android back button
@@ -72,7 +54,7 @@ export default function App() {
     return () => handler.remove();
   }, []);
 
-  if (!webUri) {
+  if (!ready) {
     return <View style={styles.container} />;
   }
 
@@ -81,29 +63,28 @@ export default function App() {
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <WebView
         ref={webViewRef}
-        source={{ uri: webUri }}
+        // react-native-webview resolves require() HTML files to a file:// URI on iOS
+        // and sets the correct baseURL so relative paths (./assets/, ./manus-storage/) resolve
+        source={WEB_HTML}
         style={styles.webview}
+        // Allow local file access for all bundled assets
         allowFileAccess
         allowFileAccessFromFileURLs
         allowUniversalAccessFromFileURLs
+        // Core web features
         javaScriptEnabled
         domStorageEnabled
+        // Disable scroll — water canvas handles all touch
         scrollEnabled={false}
         bounces={false}
         overScrollMode="never"
+        // Dark background prevents white flash
         backgroundColor="#0a1a1a"
+        // Audio without user interaction (meditation app)
         mediaPlaybackRequiresUserAction={false}
         allowsInlineMediaPlayback
+        // Android hardware acceleration
         androidHardwareAccelerationDisabled={false}
-        injectedJavaScriptBeforeContentLoaded={`
-          (function() {
-            var meta = document.createElement('meta');
-            meta.name = 'viewport';
-            meta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
-            document.head.appendChild(meta);
-          })();
-          true;
-        `}
         onError={(e) => console.warn("WebView error:", e.nativeEvent)}
         onHttpError={(e) => console.warn("WebView HTTP error:", e.nativeEvent)}
       />
