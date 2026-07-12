@@ -32,7 +32,8 @@
     "plugins": [
       "expo-web-browser",
       "expo-status-bar",
-      "expo-splash-screen"
+      "expo-splash-screen",
+      "@dr.pogodin/react-native-static-server"
     ]
   }
 }

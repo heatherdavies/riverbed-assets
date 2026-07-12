@@ -1,6 +1,7 @@
 /**
- * Flow: A Water Sanctuary — DEBUG BUILD
- * Shows errors on screen to diagnose blank WebView issue.
+ * Flow: A Water Sanctuary
+ * Bare workflow — local HTTP server serves the web bundle from localhost.
+ * WebGL works over http://localhost (blocked on file://).
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -16,8 +17,7 @@ import {
 import { WebView } from "react-native-webview";
 import { useKeepAwake } from "expo-keep-awake";
 import * as SplashScreen from "expo-splash-screen";
-import StaticServer from "@dr.pogodin/react-native-static-server";
-import { resolveAssetSource } from "react-native";
+import Server, { resolveAssetsPath } from "@dr.pogodin/react-native-static-server";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,32 +26,29 @@ export default function App() {
   const webViewRef = useRef<WebView>(null);
   const [serverUrl, setServerUrl] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
-  const serverRef = useRef<StaticServer | null>(null);
+  const serverRef = useRef<Server | null>(null);
 
   const addLog = (msg: string) => {
-    setLogs((prev) => [...prev.slice(-20), `${new Date().toISOString().slice(11,19)} ${msg}`]);
+    setLogs((prev) => [...prev.slice(-20), `${new Date().toISOString().slice(11, 19)} ${msg}`]);
   };
 
   useEffect(() => {
     async function startServer() {
       try {
-        addLog("Starting static server...");
-        const asset = resolveAssetSource(require("./assets/web/index.html"));
-        addLog(`Asset URI: ${asset.uri}`);
+        addLog("Resolving assets path...");
+        // resolveAssetsPath resolves the path to bundled assets in bare workflow
+        const fileDir = resolveAssetsPath("assets/web");
+        addLog(`Assets dir: ${fileDir}`);
 
-        const webDir = asset.uri.substring(0, asset.uri.lastIndexOf("/"));
-        addLog(`Web dir: ${webDir}`);
-
-        const server = new StaticServer(0, webDir, { keepAlive: true });
+        const server = new Server({ fileDir, port: 9080 });
         serverRef.current = server;
 
+        addLog("Starting server on port 9080...");
         const url = await server.start();
         addLog(`Server started: ${url}`);
         setServerUrl(`${url}/index.html`);
       } catch (e: any) {
-        addLog(`Server error: ${e?.message ?? String(e)}`);
-        // Fallback
-        setServerUrl("fallback");
+        addLog(`Error: ${e?.message ?? String(e)}`);
       } finally {
         SplashScreen.hideAsync();
       }
@@ -69,16 +66,11 @@ export default function App() {
     return () => handler.remove();
   }, []);
 
-  const source =
-    !serverUrl || serverUrl === "fallback"
-      ? require("./assets/web/index.html")
-      : { uri: serverUrl };
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
-      {/* Debug overlay — shows logs on screen */}
+      {/* Debug overlay */}
       {logs.length > 0 && (
         <View style={styles.debugOverlay}>
           <Text style={styles.debugTitle}>DEBUG LOG</Text>
@@ -93,12 +85,9 @@ export default function App() {
       {serverUrl && (
         <WebView
           ref={webViewRef}
-          source={source}
+          source={{ uri: serverUrl }}
           style={styles.webview}
           originWhitelist={["*"]}
-          allowFileAccess
-          allowFileAccessFromFileURLs
-          allowUniversalAccessFromFileURLs
           javaScriptEnabled
           domStorageEnabled
           scrollEnabled={false}
@@ -111,18 +100,14 @@ export default function App() {
           onLoadStart={() => addLog("WebView: load started")}
           onLoadEnd={() => addLog("WebView: load ended")}
           onError={(e) => addLog(`WebView error: ${JSON.stringify(e.nativeEvent)}`)}
-          onHttpError={(e) => addLog(`HTTP error: ${e.nativeEvent.statusCode} ${e.nativeEvent.url}`)}
           onMessage={(e) => addLog(`JS: ${e.nativeEvent.data}`)}
           injectedJavaScript={`
             window.onerror = function(msg, src, line) {
               window.ReactNativeWebView.postMessage('JS error: ' + msg + ' at ' + src + ':' + line);
               return false;
             };
-            window.addEventListener('unhandledrejection', function(e) {
-              window.ReactNativeWebView.postMessage('Unhandled rejection: ' + e.reason);
-            });
             setTimeout(function() {
-              window.ReactNativeWebView.postMessage('Page loaded, document.title: ' + document.title);
+              window.ReactNativeWebView.postMessage('Loaded: ' + document.title);
             }, 2000);
             true;
           `}
@@ -148,12 +133,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#0ea5c8",
   },
-  debugTitle: {
-    color: "#0ea5c8",
-    fontWeight: "bold",
-    fontSize: 12,
-    marginBottom: 4,
-  },
+  debugTitle: { color: "#0ea5c8", fontWeight: "bold", fontSize: 12, marginBottom: 4 },
   debugText: {
     color: "#fff",
     fontSize: 10,
