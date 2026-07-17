@@ -66,10 +66,49 @@ if (!html.includes('<div id="root">') && !html.includes("<div id='root'>")) {
   html = html.replace('<body>', '<body>\n    <div id="root"></div>');
 }
 
-// Add JS bundle at end of body
+// Add Capacitor image loader patch + JS bundle at end of body
+const capacitorImagePatch = `
+  <script>
+  // Patch Image loading for Capacitor WKWebView
+  // Three.js TextureLoader uses new Image() which may fail on capacitor:// URLs
+  // This patch intercepts image loading and uses fetch+blob instead
+  (function() {
+    var OrigImage = window.Image;
+    function PatchedImage(w, h) {
+      var img = new OrigImage(w, h);
+      var origSrcDescriptor = Object.getOwnPropertyDescriptor(OrigImage.prototype, 'src');
+      var patchedSet = function(val) {
+        if (val && (val.startsWith('capacitor://') || val.startsWith('../') || val.startsWith('./')) && !val.startsWith('data:')) {
+          fetch(val)
+            .then(function(r) { return r.blob(); })
+            .then(function(blob) {
+              var url = URL.createObjectURL(blob);
+              origSrcDescriptor.set.call(img, url);
+            })
+            .catch(function(e) {
+              origSrcDescriptor.set.call(img, val);
+            });
+        } else {
+          origSrcDescriptor.set.call(img, val);
+        }
+      };
+      Object.defineProperty(img, 'src', {
+        set: patchedSet,
+        get: function() { return origSrcDescriptor.get.call(img); },
+        configurable: true
+      });
+      return img;
+    }
+    PatchedImage.prototype = OrigImage.prototype;
+    window.Image = PatchedImage;
+  })();
+  </script>`;
+
 if (jsBundleSrc && !html.includes(jsBundleSrc)) {
   const relativeSrc = jsBundleSrc.startsWith('/') ? '.' + jsBundleSrc : jsBundleSrc;
-  html = html.replace('</body>', `    <script src="${relativeSrc}"></script>\n  </body>`);
+  html = html.replace('</body>', capacitorImagePatch + `\n    <script src="${relativeSrc}"></script>\n  </body>`);
+} else if (!html.includes('PatchedImage')) {
+  html = html.replace('</body>', capacitorImagePatch + '\n  </body>');
 }
 
 fs.writeFileSync(htmlPath, html, 'utf8');
