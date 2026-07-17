@@ -1,0 +1,31 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": false,
+        "buildConfiguration": "Release",
+        "scheme": "App"
+      }
+    },
+    "production": {
+      "ios": {
+        "buildConfiguration": "Release",
+        "scheme": "App"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "heather.davies@shaw.ca",
+        "ascAppId": "6790004388",
+        "appleTeamId": "S6L78K54CJ"
+      }
+    }
+  }
+}

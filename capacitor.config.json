@@ -1,0 +1,15 @@
+{
+  "appId": "ca.homeflowapp.flow",
+  "appName": "Flow: A Water Sanctuary",
+  "webDir": "www",
+  "server": {
+    "iosScheme": "capacitor"
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#0a1a1a",
+    "preferredContentMode": "mobile",
+    "allowsLinkPreview": false,
+    "scrollEnabled": false
+  }
+}
