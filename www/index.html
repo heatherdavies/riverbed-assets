@@ -2,6 +2,7 @@
 <html lang="en">
 
   <head>
+  <base href="capacitor://localhost/">
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -86,6 +87,43 @@ Error generating stack: `+l.message+`
       defer
       src="https://manus-analytics.com/umami"
       data-website-id="5b00e13d-904f-428a-a3d4-21d31fa27276"></script>
+  
+  <script>
+  // Patch Image loading for Capacitor WKWebView
+  // Three.js TextureLoader uses new Image() which may fail on capacitor:// URLs
+  // This patch intercepts image loading and uses fetch+blob instead
+  (function() {
+    var OrigImage = window.Image;
+    function PatchedImage(w, h) {
+      var img = new OrigImage(w, h);
+      var origSrcDescriptor = Object.getOwnPropertyDescriptor(OrigImage.prototype, 'src');
+      var patchedSet = function(val) {
+        if (val && (val.startsWith('capacitor://') || val.startsWith('../') || val.startsWith('./')) && !val.startsWith('data:')) {
+          fetch(val)
+            .then(function(r) { return r.blob(); })
+            .then(function(blob) {
+              var url = URL.createObjectURL(blob);
+              origSrcDescriptor.set.call(img, url);
+            })
+            .catch(function(e) {
+              origSrcDescriptor.set.call(img, val);
+            });
+        } else {
+          origSrcDescriptor.set.call(img, val);
+        }
+      };
+      Object.defineProperty(img, 'src', {
+        set: patchedSet,
+        get: function() { return origSrcDescriptor.get.call(img); },
+        configurable: true
+      });
+      return img;
+    }
+    PatchedImage.prototype = OrigImage.prototype;
+    window.Image = PatchedImage;
+  })();
+  </script>
+    
   
   <script>
   // Patch Image loading for Capacitor WKWebView

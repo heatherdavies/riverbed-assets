@@ -17,6 +17,12 @@ const wwwDir = path.join(__dirname, 'www');
 const htmlPath = path.join(wwwDir, 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
+// Add <base href> so absolute paths like /manus-storage/ resolve correctly in Capacitor
+// This must be the first element in <head>
+if (!html.includes('<base href')) {
+  html = html.replace('<head>', '<head>\n  <base href="capacitor://localhost/">');
+}
+
 // Find the JS bundle filename dynamically
 const jsBundleMatch = html.match(/src="([^"]*assets\/index-[^"]+\.js)"/);
 const jsBundleSrc = jsBundleMatch ? jsBundleMatch[1] : null;
