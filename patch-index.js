@@ -33,10 +33,10 @@ html = html.replace(/<script src="\.\/\/__manus__\/debug-collector\.js"[^>]*><\/
 // Fix absolute paths to relative in HTML
 html = html.replace(/src="\/assets\//g, 'src="./assets/');
 html = html.replace(/href="\/assets\//g, 'href="./assets/');
-html = html.replace(/src="\/manus-storage\//g, 'src="./manus-storage/');
-html = html.replace(/href="\/manus-storage\//g, 'href="./manus-storage/');
-html = html.replace(/src="\/backgrounds\//g, 'src="./backgrounds/');
-html = html.replace(/href="\/backgrounds\//g, 'href="./backgrounds/');
+html = html.replace(/src="\/manus-storage\//g, 'src="../manus-storage/');
+html = html.replace(/href="\/manus-storage\//g, 'href="../manus-storage/');
+html = html.replace(/src="\/backgrounds\//g, 'src="../backgrounds/');
+html = html.replace(/href="\/backgrounds\//g, 'href="../backgrounds/');
 
 // Remove type=module and crossorigin
 html = html.replace(/<script type="module" crossorigin src="/g, '<script src="');
@@ -83,15 +83,15 @@ for (const jsFile of jsFiles) {
   const jsPath = path.join(assetsDir, jsFile);
   let js = fs.readFileSync(jsPath, 'utf8');
 
-  // Replace "/manus-storage/ with "./manus-storage/
+  // Replace "/manus-storage/ with "../manus-storage/
   const before = js.length;
-  js = js.replace(/"\s*\/manus-storage\//g, '"./manus-storage/');
-  js = js.replace(/'\s*\/manus-storage\//g, "'./manus-storage/");
-  js = js.replace(/`\s*\/manus-storage\//g, '`./manus-storage/');
+  js = js.replace(/"\s*\/manus-storage\//g, '"../manus-storage/');
+  js = js.replace(/'\s*\/manus-storage\//g, "'../manus-storage/");
+  js = js.replace(/`\s*\/manus-storage\//g, '`../manus-storage/');
 
-  // Replace "/backgrounds/ with "./backgrounds/
-  js = js.replace(/"\s*\/backgrounds\//g, '"./backgrounds/');
-  js = js.replace(/'\s*\/backgrounds\//g, "'./backgrounds/");
+  // Replace "/backgrounds/ with "../backgrounds/
+  js = js.replace(/"\s*\/backgrounds\//g, '"../backgrounds/');
+  js = js.replace(/'\s*\/backgrounds\//g, "'../backgrounds/");
 
   const after = js.length;
   fs.writeFileSync(jsPath, js, 'utf8');
