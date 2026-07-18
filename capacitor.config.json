@@ -10,6 +10,10 @@
     "backgroundColor": "#0a1a1a",
     "preferredContentMode": "recommended",
     "allowsLinkPreview": false,
-    "scrollEnabled": false
+    "scrollEnabled": false,
+    "infoPlist": {
+      "NSPhotoLibraryUsageDescription": "Flow uses your photo library to set custom background scenes for your water meditation.",
+      "NSPhotoLibraryAddUsageDescription": "Flow uses your photo library to set custom background scenes."
+    }
   }
 }
