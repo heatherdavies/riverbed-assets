@@ -8,7 +8,7 @@
   "ios": {
     "contentInset": "always",
     "backgroundColor": "#0a1a1a",
-    "preferredContentMode": "mobile",
+    "preferredContentMode": "recommended",
     "allowsLinkPreview": false,
     "scrollEnabled": false
   }
