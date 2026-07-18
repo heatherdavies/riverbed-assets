@@ -123,44 +123,7 @@ Error generating stack: `+l.message+`
     window.Image = PatchedImage;
   })();
   </script>
-    
-  
-  <script>
-  // Patch Image loading for Capacitor WKWebView
-  // Three.js TextureLoader uses new Image() which may fail on capacitor:// URLs
-  // This patch intercepts image loading and uses fetch+blob instead
-  (function() {
-    var OrigImage = window.Image;
-    function PatchedImage(w, h) {
-      var img = new OrigImage(w, h);
-      var origSrcDescriptor = Object.getOwnPropertyDescriptor(OrigImage.prototype, 'src');
-      var patchedSet = function(val) {
-        if (val && (val.startsWith('capacitor://') || val.startsWith('../') || val.startsWith('./')) && !val.startsWith('data:')) {
-          fetch(val)
-            .then(function(r) { return r.blob(); })
-            .then(function(blob) {
-              var url = URL.createObjectURL(blob);
-              origSrcDescriptor.set.call(img, url);
-            })
-            .catch(function(e) {
-              origSrcDescriptor.set.call(img, val);
-            });
-        } else {
-          origSrcDescriptor.set.call(img, val);
-        }
-      };
-      Object.defineProperty(img, 'src', {
-        set: patchedSet,
-        get: function() { return origSrcDescriptor.get.call(img); },
-        configurable: true
-      });
-      return img;
-    }
-    PatchedImage.prototype = OrigImage.prototype;
-    window.Image = PatchedImage;
-  })();
-  </script>
-    <script src="./assets/index-SNiHMiTs.js"></script>
+    <script src="./assets/index-BSmvmG7R.js"></script>
   </body>
 
 </html>
