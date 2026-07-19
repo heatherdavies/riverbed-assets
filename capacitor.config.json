@@ -13,7 +13,8 @@
     "scrollEnabled": false,
     "infoPlist": {
       "NSPhotoLibraryUsageDescription": "Flow uses your photo library to set custom background scenes for your water meditation.",
-      "NSPhotoLibraryAddUsageDescription": "Flow uses your photo library to set custom background scenes."
+      "NSPhotoLibraryAddUsageDescription": "Flow uses your photo library to set custom background scenes.",
+      "NSCameraUsageDescription": "Flow uses your camera to capture a photo for use as a custom background scene."
     }
   }
 }
