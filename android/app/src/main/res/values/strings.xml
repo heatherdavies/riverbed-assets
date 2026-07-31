@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Flow: A Water Sanctuary</string>
+    <string name="title_activity_main">Flow: A Water Sanctuary</string>
+    <string name="package_name">ca.homeflowapp.flow</string>
+    <string name="custom_url_scheme">ca.homeflowapp.flow</string>
+</resources>
