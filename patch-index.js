@@ -19,8 +19,9 @@ let html = fs.readFileSync(htmlPath, 'utf8');
 
 // Add <base href> so absolute paths like /manus-storage/ resolve correctly in Capacitor
 // This must be the first element in <head>
+// Use ./ (relative) so it works on both iOS (capacitor://localhost) and Android (https://localhost)
 if (!html.includes('<base href')) {
-  html = html.replace('<head>', '<head>\n  <base href="capacitor://localhost/">');
+  html = html.replace('<head>', '<head>\n  <base href="./">');
 }
 
 // Find the JS bundle filename dynamically
@@ -84,7 +85,7 @@ const capacitorImagePatch = `
       var img = new OrigImage(w, h);
       var origSrcDescriptor = Object.getOwnPropertyDescriptor(OrigImage.prototype, 'src');
       var patchedSet = function(val) {
-        if (val && (val.startsWith('capacitor://') || val.startsWith('../') || val.startsWith('./')) && !val.startsWith('data:')) {
+        if (val && (val.startsWith('capacitor://') || val.startsWith('https://localhost') || val.startsWith('../') || val.startsWith('./')) && !val.startsWith('data:')) {
           fetch(val)
             .then(function(r) { return r.blob(); })
             .then(function(blob) {

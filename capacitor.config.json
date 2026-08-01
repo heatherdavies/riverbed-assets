@@ -3,7 +3,8 @@
   "appName": "Flow: A Water Sanctuary",
   "webDir": "www",
   "server": {
-    "iosScheme": "capacitor"
+    "iosScheme": "capacitor",
+    "androidScheme": "https"
   },
   "ios": {
     "contentInset": "never",
@@ -16,5 +17,8 @@
       "NSPhotoLibraryAddUsageDescription": "Flow uses your photo library to set custom background scenes.",
       "NSCameraUsageDescription": "Flow uses your camera to capture a photo for use as a custom background scene."
     }
+  },
+  "android": {
+    "backgroundColor": "#0a1a1a"
   }
 }
