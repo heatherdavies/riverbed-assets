@@ -18,3 +18,7 @@ A stationary Day 2 touch produced `progress: 0` and cleared its contact state on
 The Day 9 mature pine scene loaded correctly with the intended misted woodland landscape, same review controls, final-day instructional copy, and the side-panel journey context. The high-level visual progression from Day 1 macro soil through Day 9 forest scale is therefore represented in the browser review route.
 
 The Day 1 review scene was revalidated after conversion to WebP. The browser decoded `day-01-rooting-the-seed.webp` successfully at `1080 × 1920`, confirming that the mobile-optimised production asset is served by the review route.
+
+## Day 1 target-clarity correction
+
+The Day 1 review now has a non-interactive, gilt-ring cue centred over the visible seed, labelled `TOUCH THE SEED`. The copy block was moved lower and tightened so it does not occupy the seed’s touch zone. Browser validation confirmed that the cue is `flex`/visible for Day 1 and `none`/hidden for Day 2, so the correction is limited to the affected ritual.

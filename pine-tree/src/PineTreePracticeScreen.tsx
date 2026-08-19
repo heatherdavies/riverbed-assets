@@ -132,9 +132,15 @@ export function PineTreePracticeScreen({
               <Text style={styles.soundText}>SOUND {soundEnabled ? 'ON' : 'OFF'}</Text>
             </Pressable>
           </View>
-          <View style={styles.copy} pointerEvents="box-none">
+          {activeDay === 1 && (
+            <View style={styles.seedTarget} pointerEvents="none">
+              <Text style={styles.seedTargetLabel}>TOUCH THE SEED</Text>
+              <View style={styles.seedTargetRing}><View style={styles.seedTargetCore} /></View>
+            </View>
+          )}
+          <View style={[styles.copy, activeDay === 1 && styles.copyDayOne]} pointerEvents="box-none">
             <Text style={styles.eyebrow}>DAY {String(activeDay).padStart(2, '0')} · {config.stage.toUpperCase()}</Text>
-            <Text style={styles.title}>{config.title}</Text>
+            <Text style={[styles.title, activeDay === 1 && styles.titleDayOne]}>{config.title}</Text>
             <Text style={styles.intent}>{config.emotionalIntent}</Text>
             {snapshot.completed ? (
               <Text style={styles.contemplation}>{config.contemplation}</Text>
@@ -170,8 +176,14 @@ const styles = StyleSheet.create({
   soundButton: { paddingVertical: 10, paddingLeft: 14 },
   soundText: { color: '#f5f0dd', fontSize: 10, fontWeight: '600', letterSpacing: 1.8 },
   copy: { paddingHorizontal: 28, paddingBottom: 46, backgroundColor: 'rgba(2, 17, 11, 0.48)' },
+  copyDayOne: { paddingHorizontal: 26, paddingTop: 17, paddingBottom: 28, backgroundColor: 'rgba(2, 17, 11, 0.62)' },
+  seedTarget: { position: 'absolute', top: '64%', left: '50%', transform: [{ translateX: -47 }, { translateY: -47 }], alignItems: 'center' },
+  seedTargetRing: { width: 94, height: 94, borderRadius: 47, borderWidth: 1, borderColor: 'rgba(221,196,114,0.9)', backgroundColor: 'rgba(17,67,47,0.18)', alignItems: 'center', justifyContent: 'center' },
+  seedTargetCore: { width: 12, height: 12, borderRadius: 6, backgroundColor: 'rgba(245,240,221,0.88)' },
+  seedTargetLabel: { color: '#f5f0dd', fontSize: 9, fontWeight: '600', letterSpacing: 1.5, marginBottom: 9 },
   eyebrow: { color: '#c9b268', fontSize: 10, fontWeight: '600', letterSpacing: 1.7, marginBottom: 10 },
   title: { color: '#f5f0dd', fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif', fontSize: 50, lineHeight: 48, letterSpacing: -1.6 },
+  titleDayOne: { fontSize: 44, lineHeight: 43 },
   intent: { color: 'rgba(245,240,221,0.84)', fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif', fontSize: 19, fontStyle: 'italic', marginTop: 12 },
   instruction: { color: 'rgba(245,240,221,0.76)', fontSize: 14, lineHeight: 21, marginTop: 18, maxWidth: 370 },
   contemplation: { color: '#f5f0dd', fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif', fontSize: 22, fontStyle: 'italic', lineHeight: 27, marginTop: 20, maxWidth: 370 },

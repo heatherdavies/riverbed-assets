@@ -68,6 +68,7 @@
 
   function setDay(day) {
     state.day = clamp(Math.round(day), 1, 9);
+    elements.scene.dataset.day = String(state.day);
     resetMaterial();
     const config = current();
     elements.image.classList.remove('loaded');
