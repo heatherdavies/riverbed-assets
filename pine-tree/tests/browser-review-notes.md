@@ -40,3 +40,9 @@ The scene image is now non-draggable and non-selectable, while the scene suppres
 ## Stationary hold progression
 
 A Day 1 hold was tested without any pointer movement. At 1.7 seconds, the ritual had reached `progress: 0.527` with one active contact. At 3.5 seconds, it reached `progress: 1`, marked Day 1 complete, and clearing the pointer left zero active contacts. The ritual therefore advances from elapsed hold time, not movement.
+
+## Day 1 visible completion
+
+After a 3.4-second stationary Day 1 hold, the review reached `progress: 1`, persisted Day 1 as complete, and activated the dedicated completion state. The completion panel had active pointer events and includes a continuation control for Day 2. Its opacity was transitioning in at the instant of the automated check, as intended by the calm entrance animation.
+
+The completed Day 1 panel was visually inspected after its entrance animation: it presents `Rooted.`, retains an open view of the settled seed, and gives a clear `CONTINUE TO DEEP ANCHOR` action. Activating that control opened Day 2, updated the journey status to `02 / 09`, and correctly retained Day 1’s completed mark.

@@ -30,6 +30,14 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .seed-target-ring { width: 94px; height: 94px; border-radius: 50%; border: 1px solid rgba(221, 196, 114, .9); box-shadow: inset 0 0 0 7px rgba(17, 67, 47, .18), 0 0 0 8px rgba(225, 204, 129, .08), 0 0 28px rgba(205, 176, 96, .32); animation: seed-breathe 3.2s ease-in-out infinite; }
 .seed-target-ring::after { content: ""; display: block; width: 12px; height: 12px; margin: 40px auto; border-radius: 50%; background: rgba(245, 240, 221, .88); box-shadow: 0 0 12px rgba(245, 240, 221, .65); }
 .seed-target-label { order: -1; color: var(--ivory); font-size: 9px; font-weight: 600; letter-spacing: .16em; white-space: nowrap; }
+.day-one-completion { position: absolute; left: 22px; right: 22px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 76px); z-index: 6; max-width: 370px; padding: 19px 20px 17px; border: 1px solid rgba(212, 196, 131, .34); border-radius: 4px; background: linear-gradient(135deg, rgba(4, 31, 21, .92), rgba(4, 22, 15, .73)); box-shadow: 0 14px 38px rgba(0, 0, 0, .28); backdrop-filter: blur(9px); opacity: 0; transform: translateY(16px); pointer-events: none; transition: opacity 900ms ease, transform 900ms ease; }
+.day-one-completion .completion-kicker { margin: 0; color: var(--gilt); font-size: 9px; font-weight: 600; letter-spacing: .17em; }
+.day-one-completion h2 { margin: 7px 0 0; color: var(--ivory); font-family: "Cormorant Garamond", Georgia, serif; font-size: 42px; font-weight: 400; line-height: .9; }
+.day-one-completion p:not(.completion-kicker) { max-width: 300px; margin: 11px 0 0; color: rgba(245, 240, 221, .84); font-family: "Cormorant Garamond", Georgia, serif; font-size: 18px; font-style: italic; line-height: 1.14; }
+.completion-next { appearance: none; margin-top: 17px; padding: 10px 12px; border: 1px solid rgba(230, 214, 153, .56); border-radius: 2px; background: rgba(19, 69, 48, .4); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
+.scene.day-one-complete .day-one-completion { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.scene.day-one-complete .seed-target { opacity: .22; transform: translate(-50%, -50%) scale(.58); transition: opacity 900ms ease, transform 1200ms ease; }
+.scene.day-one-complete .seed-target-label { opacity: 0; }
 
 .topbar { position: absolute; inset: max(22px, env(safe-area-inset-top)) 22px auto; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px; z-index: 3; }
 .mark, .menu-button, .close-panel { appearance: none; border: 1px solid var(--hairline); background: rgba(5, 29, 20, .76); cursor: pointer; }
@@ -99,5 +107,5 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 @keyframes breathe { 0%, 100% { transform: scale(.9); opacity: .58; } 50% { transform: scale(1.13); opacity: 1; } }
 @keyframes intro-arrive { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes seed-breathe { 0%, 100% { transform: scale(.92); opacity: .58; } 50% { transform: scale(1.06); opacity: 1; } }
-@media (min-width: 760px) { .ritual-copy { left: 8vw; bottom: 9vh; } .topbar { inset-left: 5vw; inset-right: 5vw; } .stage-strip, .day-rail { left: 5vw; right: 5vw; } .menu-button { right: 5vw; bottom: 5vh; } .day-one-intro { left: 8vw; right: auto; width: min(410px, 38vw); } }
+@media (min-width: 760px) { .ritual-copy { left: 8vw; bottom: 9vh; } .topbar { inset-left: 5vw; inset-right: 5vw; } .stage-strip, .day-rail { left: 5vw; right: 5vw; } .menu-button { right: 5vw; bottom: 5vh; } .day-one-intro { left: 8vw; right: auto; width: min(410px, 38vw); } .day-one-completion { left: 8vw; right: auto; width: min(370px, 38vw); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }

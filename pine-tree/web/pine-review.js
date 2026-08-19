@@ -21,6 +21,7 @@
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
+    dayOneCompletion: $('#dayOneCompletion'), nextDay: $('#nextDayButton'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
     haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
@@ -55,6 +56,7 @@
   function resetMaterial() {
     state.contacts.clear(); state.progress = 0;
     state.material = { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 };
+    elements.scene.classList.remove('day-one-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
   function current() { return DAYS[state.day - 1]; }
@@ -187,7 +189,13 @@
   function completeDay() {
     if (state.completed.has(state.day)) return;
     state.progress = 1; state.completed.add(state.day); persist(); renderNavigation();
-    elements.copy.classList.add('completed'); elements.completion.textContent = current().contemplation; respond('completion', .9);
+    if (state.day === 1) {
+      state.material.soil = 1;
+      elements.scene.classList.add('day-one-complete');
+    } else {
+      elements.copy.classList.add('completed'); elements.completion.textContent = current().contemplation;
+    }
+    respond('completion', .9);
   }
 
   function respond(kind, strength) {
@@ -225,7 +233,8 @@
     const dt = Math.min(64, timestamp - state.lastTick); state.lastTick = timestamp;
     advanceStationarySeedHold(timestamp);
     const decay = state.reducedMotion ? .08 : .045; const scale = dt / 16.667;
-    state.material.soil += (0 - state.material.soil) * decay * scale;
+    const soilTarget = state.day === 1 && state.completed.has(1) ? .88 : 0;
+    state.material.soil += (soilTarget - state.material.soil) * (state.completed.has(1) ? .09 : decay) * scale;
     state.material.bark += (0 - state.material.bark) * decay * scale;
     state.material.bough += (0 - state.material.bough) * (decay * .58) * scale;
     state.material.root += (0 - state.material.root) * (decay * .2) * scale;
@@ -252,7 +261,7 @@
     const m = state.material; const config = current();
     ctx.save(); ctx.globalCompositeOperation = 'screen';
     if (state.day === 1) {
-      const r = Math.max(35, w * (.08 + m.soil * .13)); const x = w * .51; const y = h * .58;
+      const r = Math.max(35, w * (.08 + m.soil * .13)); const x = w * .51; const y = h * .562;
       const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill();
     } else if (state.day === 2) {
       const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .49, h * .31); const yEnd = h * (.31 + progress * .49); ctx.bezierCurveTo(w * .45, h * .44, w * .56, h * .58, w * .48, yEnd); ctx.stroke();
@@ -295,6 +304,7 @@
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
     elements.assist.addEventListener('click', assistedAdvance);
+    elements.nextDay.addEventListener('click', () => setDay(2));
     const dismissFromControl = (event) => { event.preventDefault(); event.stopPropagation(); dismissIntro(); };
     elements.introDismiss.addEventListener('click', dismissFromControl);
     elements.introDismiss.addEventListener('pointerup', dismissFromControl);
