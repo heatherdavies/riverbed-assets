@@ -17,7 +17,7 @@
 
   const $ = (selector) => document.querySelector(selector);
   const elements = {
-    scene: $('#scene'), image: $('#sceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'),
+    scene: $('#scene'), image: $('#sceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
@@ -103,7 +103,8 @@
     elements.prompt.textContent = config.prompt;
     elements.assist.textContent = `GUIDED ${config.prompt}`;
     elements.panelDay.textContent = `${String(config.day).padStart(2, '0')} / 09`;
-    elements.image.addEventListener('load', () => elements.image.classList.add('loaded'), { once: true });
+    elements.image.addEventListener('load', () => { elements.image.classList.add('loaded'); requestAnimationFrame(positionSeedTarget); }, { once: true });
+    requestAnimationFrame(positionSeedTarget);
     renderNavigation();
     updateDayOneIntro();
     closePanel();
@@ -116,12 +117,29 @@
   }
   function closePanel() { setPanel(false); }
 
+  const DAY_ONE_SEED = { x: 0.51, y: 0.562 };
+
+  function positionSeedTarget() {
+    if (state.day !== 1 || !elements.image.naturalWidth || !elements.image.naturalHeight) return;
+    const rect = elements.scene.getBoundingClientRect();
+    const scale = Math.max(rect.width / elements.image.naturalWidth, rect.height / elements.image.naturalHeight);
+    const renderedWidth = elements.image.naturalWidth * scale;
+    const renderedHeight = elements.image.naturalHeight * scale;
+    const cropX = (renderedWidth - rect.width) / 2;
+    const cropY = (renderedHeight - rect.height) / 2;
+    const left = elements.image.naturalWidth * DAY_ONE_SEED.x * scale - cropX;
+    const top = elements.image.naturalHeight * DAY_ONE_SEED.y * scale - cropY;
+    elements.target.style.left = `${left}px`;
+    elements.target.style.top = `${top}px`;
+  }
+
   function resize() {
     const rect = elements.scene.getBoundingClientRect();
     const scale = Math.min(window.devicePixelRatio || 1, state.quality === 'high' ? 1.65 : 1.25);
     canvas.width = Math.max(1, Math.round(rect.width * scale)); canvas.height = Math.max(1, Math.round(rect.height * scale));
     canvas.style.width = `${rect.width}px`; canvas.style.height = `${rect.height}px`;
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    positionSeedTarget();
   }
 
   function contactFrom(event, phase) {
@@ -258,7 +276,11 @@
     elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || event.target.closest('button')) return; if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
-    elements.assist.addEventListener('click', assistedAdvance); elements.introDismiss.addEventListener('click', dismissIntro);
+    elements.assist.addEventListener('click', assistedAdvance);
+    const dismissFromControl = (event) => { event.preventDefault(); event.stopPropagation(); dismissIntro(); };
+    elements.introDismiss.addEventListener('click', dismissFromControl);
+    elements.introDismiss.addEventListener('pointerup', dismissFromControl);
+    elements.introDismiss.addEventListener('touchend', dismissFromControl, { passive: false });
     elements.menu.addEventListener('click', () => setPanel(true)); elements.closePanel.addEventListener('click', closePanel); elements.scrim.addEventListener('click', closePanel);
     elements.sound.addEventListener('click', toggleSound); elements.panelSound.addEventListener('click', toggleSound);
     elements.haptic.addEventListener('click', () => { state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); persist(); });

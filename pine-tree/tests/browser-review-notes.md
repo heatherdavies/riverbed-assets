@@ -28,3 +28,7 @@ The Day 1 review now has a non-interactive, gilt-ring cue centred over the visib
 The revised Day 1 browser screen places `DAY 01 · GROUNDING & ANCHORING` above the nine-day rail, outside the seed scene. The title, intent, and instruction now appear in a compact upper introduction panel with a `BEGIN WITH THE SEED` dismissal control. Browser validation confirmed that dismissing the panel leaves only the stage label, day rail, seed cue, and control button over an otherwise open soil scene; the seed is no longer covered by persistent copy.
 
 The revised Day 1 tactile sequence was also verified after dismissal. A direct 3.3-second hold at the seed’s visible target reached `progress: 1`, completed Day 1, and left no active contacts. Moving to Day 2 and returning to Day 1 restored the introduction panel, so the opening context remains available whenever the first ritual is revisited.
+
+## Responsive seed anchor and dismissal hardening
+
+The Day 1 cue now derives its position from the rendered image’s actual `object-fit: cover` crop rather than a fixed viewport percentage. The intrinsic seed anchor was calibrated against the full image and verified in the public review to centre the cue on the visible seed. The introduction control now listens for click, pointer-up, and touch-end; public browser validation confirmed that `BEGIN WITH THE SEED` dismisses the panel and leaves the seed scene open.
