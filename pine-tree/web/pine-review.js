@@ -21,7 +21,7 @@
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
-    dayOneCompletion: $('#dayOneCompletion'), nextDay: $('#nextDayButton'),
+    dayOneCompletion: $('#dayOneCompletion'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
     haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
@@ -48,19 +48,51 @@
 
   function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
 
-  function bindControl(element, action) {
-    let lastActivation = -Infinity;
+  function resetToDayOne() {
+    state.completed.clear();
+    persist();
+    setDay(1);
+  }
+
+  function activatePrimaryControl(button) {
+    if (button.dataset.day) return setDay(Number(button.dataset.day));
+    switch (button.id) {
+      case 'assistButton': return assistedAdvance();
+      case 'nextDayButton': return setDay(2);
+      case 'restartDayButton': return resetToDayOne();
+      case 'returnToSeedButton': return resetToDayOne();
+      case 'introDismiss': return dismissIntro();
+      case 'menuButton': return setPanel(true);
+      case 'closePanelButton': return closePanel();
+      case 'scrim': return closePanel();
+      case 'soundButton':
+      case 'panelSoundButton': return toggleSound();
+      case 'hapticButton': state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); return persist();
+      case 'motionButton': state.reducedMotion = !state.reducedMotion; updateSettings(); return persist();
+      case 'resetButton': return resetToDayOne();
+      case 'homeButton': return setDay(1);
+      default: return undefined;
+    }
+  }
+
+  function bindPrimaryControls() {
+    const lastReleaseByButton = new WeakMap();
     const activate = (event) => {
+      const button = event.target instanceof Element ? event.target.closest('button') : null;
+      if (!button || !document.body.contains(button)) return;
       const now = performance.now();
-      if (now - lastActivation < 650) return;
-      lastActivation = now;
+      const lastRelease = lastReleaseByButton.get(button) ?? { time: -Infinity, type: '' };
+      if (!(button.dataset.day || button.id)) return;
+      if (event.type === 'click' && now - lastRelease.time < 750) return;
+      if (event.type !== 'click' && event.type !== lastRelease.type && now - lastRelease.time < 80) return;
+      lastReleaseByButton.set(button, { time: now, type: event.type });
       if (event.cancelable) event.preventDefault();
       event.stopPropagation();
-      action();
+      activatePrimaryControl(button);
     };
-    element.addEventListener('click', activate);
-    element.addEventListener('pointerup', activate);
-    element.addEventListener('touchend', activate, { passive: false });
+    document.addEventListener('touchend', activate, { capture: true, passive: false });
+    document.addEventListener('pointerup', activate, true);
+    document.addEventListener('click', activate, true);
   }
 
   function persist() {
@@ -99,7 +131,6 @@
       const done = state.completed.has(day.day);
       return `<button type="button" class="day-button ${active}" data-day="${day.day}"><span class="day-num">${String(day.day).padStart(2, '0')}</span><span class="day-title">${day.title}</span><span class="day-state">${done ? '✓' : day.day === state.day ? 'NOW' : ''}</span></button>`;
     }).join('');
-    document.querySelectorAll('[data-day]').forEach((button) => bindControl(button, () => setDay(Number(button.dataset.day))));
   }
 
   function setDay(day) {
@@ -331,19 +362,7 @@
     elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
-    bindControl(elements.assist, assistedAdvance);
-    bindControl(elements.nextDay, () => setDay(2));
-    bindControl(elements.returnToSeed, () => setDay(1));
-    bindControl(elements.introDismiss, dismissIntro);
-    bindControl(elements.menu, () => setPanel(true));
-    bindControl(elements.closePanel, closePanel);
-    bindControl(elements.scrim, closePanel);
-    bindControl(elements.sound, toggleSound);
-    bindControl(elements.panelSound, toggleSound);
-    bindControl(elements.haptic, () => { state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); persist(); });
-    bindControl(elements.motion, () => { state.reducedMotion = !state.reducedMotion; updateSettings(); persist(); });
-    bindControl(elements.reset, () => { state.completed.clear(); persist(); renderNavigation(); resetMaterial(); closePanel(); });
-    bindControl(elements.home, () => setDay(1));
+    bindPrimaryControls();
     window.addEventListener('resize', resize);
   }
   function toggleSound() { state.sound = !state.sound; updateSettings(); persist(); }

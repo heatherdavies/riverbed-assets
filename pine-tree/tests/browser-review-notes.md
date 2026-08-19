@@ -68,3 +68,13 @@ The explicit return-to-seed control was activated from Day 2 and restored Day 1�
 All nine days were checked through the review state. Each day opens with the shared introduction panel visible and no persistent ritual-copy overlay. Dismissing the introduction leaves the panel hidden and the ritual copy absent on every day, preserving an open tactile scene across the complete journey.
 
 Touch-style pointer-release checks confirmed that the shared introduction dismisses on Day 2, the Journey menu opens, and the direct return action reaches Day 1. A fresh Day 1 test then dismissed the shared introduction, completed a stationary 3.4-second seed hold, and activated the visible rooted completion state with enabled continuation controls.
+
+## Unified primary-control activation and Day 1 restart
+
+The new `START AGAIN AT DAY 1` control was exercised on the fresh control build. It cleared completed progress, reopened Day 1, and displayed the Day 1 introduction with the `BEGIN WITH THE SEED` primary action and correctly aligned seed cue.
+
+## End-to-end primary controls
+
+The shared mobile activation system was revalidated after refining its duplicate-event logic. The Day 1 Begin action dismissed its introduction, Day 2 opened with its own introduction, the same Begin control dismissed Day 2’s panel, and `START AGAIN AT DAY 1` reset progress and reopened the Day 1 introduction. The full control sequence succeeded with touch-style release events.
+
+A fresh Day 1 flow was also verified from the initial introduction through a stationary seed hold: it reached `progress: 1`, recorded Day 1 as complete, and activated the rooted completion state with usable controls. The completion card’s `START AGAIN AT DAY 1` action then cleared completion data, reset progress to zero, hid the completion state, and reopened the Day 1 introduction.
