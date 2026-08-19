@@ -67,6 +67,8 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 .gesture-orbit { width: 25px; height: 25px; border: 1px solid var(--gilt); border-radius: 50%; position: relative; animation: breathe 2.8s ease-in-out infinite; }
 .gesture-orbit::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1px solid rgba(245,240,221,.55); }
 .assist-button { display: block; pointer-events: auto; margin-top: 16px; padding: 9px 13px; border: 1px solid rgba(242,234,193,.48); background: rgba(4, 28, 19, .55); color: rgba(245,240,221,.86); border-radius: 3px; text-transform: uppercase; letter-spacing: .12em; font-size: 9px; cursor: pointer; }
+.return-to-seed { display: none; pointer-events: auto; margin: 15px 0 0; padding: 4px 0; border: 0; background: transparent; color: rgba(245,240,221,.76); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .12em; text-decoration: underline; text-underline-offset: 4px; }
+.scene:not([data-day="1"]) .return-to-seed { display: block; }
 .completion-copy { display: none; max-width: 390px; margin: 20px 0 0; font-family: "Cormorant Garamond", Georgia, serif; color: var(--ivory); font-size: 23px; font-style: italic; line-height: 1.1; }
 .ritual-copy.completed .instruction, .ritual-copy.completed .gesture-prompt, .ritual-copy.completed .assist-button { display: none; }
 .ritual-copy.completed .completion-copy { display: block; }

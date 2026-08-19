@@ -19,7 +19,7 @@
   const elements = {
     scene: $('#scene'), image: $('#sceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
-    prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'),
+    prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
     dayOneCompletion: $('#dayOneCompletion'), nextDay: $('#nextDayButton'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
@@ -47,6 +47,22 @@
   };
 
   function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
+
+  function bindControl(element, action) {
+    let lastActivation = -Infinity;
+    const activate = (event) => {
+      const now = performance.now();
+      if (now - lastActivation < 650) return;
+      lastActivation = now;
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
+      action();
+    };
+    element.addEventListener('click', activate);
+    element.addEventListener('pointerup', activate);
+    element.addEventListener('touchend', activate, { passive: false });
+  }
+
   function persist() {
     localStorage.setItem('pine-review-completed', JSON.stringify([...state.completed]));
     localStorage.setItem('pine-review-sound', state.sound ? 'on' : 'off');
@@ -83,7 +99,7 @@
       const done = state.completed.has(day.day);
       return `<button type="button" class="day-button ${active}" data-day="${day.day}"><span class="day-num">${String(day.day).padStart(2, '0')}</span><span class="day-title">${day.title}</span><span class="day-state">${done ? '✓' : day.day === state.day ? 'NOW' : ''}</span></button>`;
     }).join('');
-    document.querySelectorAll('[data-day]').forEach((button) => button.addEventListener('click', () => setDay(Number(button.dataset.day))));
+    document.querySelectorAll('[data-day]').forEach((button) => bindControl(button, () => setDay(Number(button.dataset.day))));
   }
 
   function setDay(day) {
@@ -314,18 +330,20 @@
     elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
-    elements.assist.addEventListener('click', assistedAdvance);
-    elements.nextDay.addEventListener('click', () => setDay(2));
-    const dismissFromControl = (event) => { event.preventDefault(); event.stopPropagation(); dismissIntro(); };
-    elements.introDismiss.addEventListener('click', dismissFromControl);
-    elements.introDismiss.addEventListener('pointerup', dismissFromControl);
-    elements.introDismiss.addEventListener('touchend', dismissFromControl, { passive: false });
-    elements.menu.addEventListener('click', () => setPanel(true)); elements.closePanel.addEventListener('click', closePanel); elements.scrim.addEventListener('click', closePanel);
-    elements.sound.addEventListener('click', toggleSound); elements.panelSound.addEventListener('click', toggleSound);
-    elements.haptic.addEventListener('click', () => { state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); persist(); });
-    elements.motion.addEventListener('click', () => { state.reducedMotion = !state.reducedMotion; updateSettings(); persist(); });
-    elements.reset.addEventListener('click', () => { state.completed.clear(); persist(); renderNavigation(); resetMaterial(); closePanel(); });
-    elements.home.addEventListener('click', () => { setDay(1); }); window.addEventListener('resize', resize);
+    bindControl(elements.assist, assistedAdvance);
+    bindControl(elements.nextDay, () => setDay(2));
+    bindControl(elements.returnToSeed, () => setDay(1));
+    bindControl(elements.introDismiss, dismissIntro);
+    bindControl(elements.menu, () => setPanel(true));
+    bindControl(elements.closePanel, closePanel);
+    bindControl(elements.scrim, closePanel);
+    bindControl(elements.sound, toggleSound);
+    bindControl(elements.panelSound, toggleSound);
+    bindControl(elements.haptic, () => { state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); persist(); });
+    bindControl(elements.motion, () => { state.reducedMotion = !state.reducedMotion; updateSettings(); persist(); });
+    bindControl(elements.reset, () => { state.completed.clear(); persist(); renderNavigation(); resetMaterial(); closePanel(); });
+    bindControl(elements.home, () => setDay(1));
+    window.addEventListener('resize', resize);
   }
   function toggleSound() { state.sound = !state.sound; updateSettings(); persist(); }
   function updateSettings() {

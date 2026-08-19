@@ -52,3 +52,13 @@ The completed Day 1 panel was visually inspected after its entrance animation: i
 Validation was run for a fresh review reset, a newly completed stationary hold, and navigation away from and back to Day 1. The fresh state correctly had no saved completion; the completed state reached `progress: 1`; and returning to Day 1 restored `progress: 1` with the Day 1 completion state rather than leaving a bare completed bar. The completion panel’s visual transition was still in progress at the instant of automated state sampling and was queued for a settled-state check.
 
 A settled-state check confirmed that resetting the review removes the completion class, hides the Day 1 completion panel, and restores the introduction panel. A separate completed-and-revisited check confirmed that returning to Day 1 restores `progress: 1`, the `day-one-complete` scene class, full completion-panel opacity, and enabled continuation controls.
+
+## Return-to-Day-1 navigation finding
+
+The existing lower-right Journey control and Day 1 rail dot can navigate between rituals in the review, but neither is sufficiently explicit after the Day 1 completion flow. A direct in-context return control is required on later days so a mobile user is not dependent on small rail dots or the side panel to revisit the seed.
+
+## Direct mobile return path and robust controls
+
+The hardened completion control successfully opened Day 2. Day 2 now displays a clearly labeled `← RETURN TO ROOTING THE SEED` action beneath the guided gesture control, providing an explicit return path without relying on the small day rail or side-panel trigger.
+
+The explicit return-to-seed control was activated from Day 2 and restored Day 1’s rooted completion state. A direct `pointerup` validation confirmed that the action reaches Day 1 and restores the expected completion response without depending on a synthesized browser click.
