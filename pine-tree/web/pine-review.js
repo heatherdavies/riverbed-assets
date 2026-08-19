@@ -211,8 +211,19 @@
     } catch (_) { /* browser may block audio; stay silent */ }
   }
 
+  function advanceStationarySeedHold(timestamp) {
+    if (state.day !== 1 || state.completed.has(1) || state.contacts.size === 0) return;
+    const contact = state.contacts.values().next().value;
+    const elapsed = Math.max(contact.duration, contact.duration + Math.max(0, timestamp - contact.timestamp));
+    const hold = clamp(elapsed / 3200);
+    state.material.soil = Math.max(state.material.soil, hold * (.56 + (contact.pressure || .42) * .3));
+    state.progress = Math.max(state.progress, hold);
+    if (state.progress >= .999) completeDay();
+  }
+
   function draw(timestamp) {
     const dt = Math.min(64, timestamp - state.lastTick); state.lastTick = timestamp;
+    advanceStationarySeedHold(timestamp);
     const decay = state.reducedMotion ? .08 : .045; const scale = dt / 16.667;
     state.material.soil += (0 - state.material.soil) * decay * scale;
     state.material.bark += (0 - state.material.bark) * decay * scale;

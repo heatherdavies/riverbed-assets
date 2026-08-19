@@ -36,3 +36,7 @@ The Day 1 cue now derives its position from the rendered image’s actual `objec
 ## Mobile long-press hardening
 
 The scene image is now non-draggable and non-selectable, while the scene suppresses cancelable context-menu, selection, drag, touch-start, and touch-move events outside controls. Browser validation confirmed that scene-level context-menu and touch-start events are prevented, whereas the introduction button’s touch-start remains unblocked. This preserves standard button interaction while preventing the scene from yielding to native long-press save/selection behaviour.
+
+## Stationary hold progression
+
+A Day 1 hold was tested without any pointer movement. At 1.7 seconds, the ritual had reached `progress: 0.527` with one active contact. At 3.5 seconds, it reached `progress: 1`, marked Day 1 complete, and clearing the pointer left zero active contacts. The ritual therefore advances from elapsed hold time, not movement.
