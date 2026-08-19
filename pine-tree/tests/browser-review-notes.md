@@ -22,3 +22,9 @@ The Day 1 review scene was revalidated after conversion to WebP. The browser dec
 ## Day 1 target-clarity correction
 
 The Day 1 review now has a non-interactive, gilt-ring cue centred over the visible seed, labelled `TOUCH THE SEED`. The copy block was moved lower and tightened so it does not occupy the seed’s touch zone. Browser validation confirmed that the cue is `flex`/visible for Day 1 and `none`/hidden for Day 2, so the correction is limited to the affected ritual.
+
+## Day 1 introduction-panel redesign
+
+The revised Day 1 browser screen places `DAY 01 · GROUNDING & ANCHORING` above the nine-day rail, outside the seed scene. The title, intent, and instruction now appear in a compact upper introduction panel with a `BEGIN WITH THE SEED` dismissal control. Browser validation confirmed that dismissing the panel leaves only the stage label, day rail, seed cue, and control button over an otherwise open soil scene; the seed is no longer covered by persistent copy.
+
+The revised Day 1 tactile sequence was also verified after dismissal. A direct 3.3-second hold at the seed’s visible target reached `progress: 1`, completed Day 1, and left no active contacts. Moving to Day 2 and returning to Day 1 restored the introduction panel, so the opening context remains available whenever the first ritual is revisited.

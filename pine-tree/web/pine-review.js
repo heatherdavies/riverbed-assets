@@ -20,6 +20,7 @@
     scene: $('#scene'), image: $('#sceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'),
+    intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
     haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
@@ -39,6 +40,8 @@
     lastHaptic: 0,
     audio: null,
     panelOpen: false,
+    introVisible: true,
+    introTimer: null,
     quality: window.devicePixelRatio > 2 ? 'standard' : 'high',
   };
 
@@ -56,6 +59,21 @@
   }
   function current() { return DAYS[state.day - 1]; }
 
+  function updateDayOneIntro() {
+    const show = state.day === 1 && state.introVisible;
+    elements.intro.classList.toggle('visible', show);
+    elements.scene.classList.toggle('day-one-intro-open', show);
+    clearTimeout(state.introTimer);
+    state.introTimer = null;
+    if (show && !state.reducedMotion) state.introTimer = setTimeout(dismissIntro, 7200);
+  }
+
+  function dismissIntro() {
+    if (state.day !== 1 || !state.introVisible) return;
+    state.introVisible = false;
+    updateDayOneIntro();
+  }
+
   function renderNavigation() {
     elements.rail.innerHTML = DAYS.map((day) => `<button class="day-dot ${day.day === state.day ? 'active' : ''} ${state.completed.has(day.day) ? 'done' : ''}" type="button" data-day="${day.day}" aria-label="Day ${day.day}: ${day.title}${state.completed.has(day.day) ? ', completed' : ''}"></button>`).join('');
     elements.journey.innerHTML = DAYS.map((day) => {
@@ -69,6 +87,7 @@
   function setDay(day) {
     state.day = clamp(Math.round(day), 1, 9);
     elements.scene.dataset.day = String(state.day);
+    state.introVisible = state.day === 1;
     resetMaterial();
     const config = current();
     elements.image.classList.remove('loaded');
@@ -78,11 +97,15 @@
     elements.title.textContent = config.title;
     elements.intent.textContent = config.intent;
     elements.instruction.textContent = config.instruction;
+    elements.introTitle.textContent = config.title;
+    elements.introIntent.textContent = config.intent;
+    elements.introInstruction.textContent = config.instruction;
     elements.prompt.textContent = config.prompt;
     elements.assist.textContent = `GUIDED ${config.prompt}`;
     elements.panelDay.textContent = `${String(config.day).padStart(2, '0')} / 09`;
     elements.image.addEventListener('load', () => elements.image.classList.add('loaded'), { once: true });
     renderNavigation();
+    updateDayOneIntro();
     closePanel();
   }
 
@@ -232,10 +255,10 @@
   }
 
   function bind() {
-    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || event.target.closest('button')) return; try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
+    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || event.target.closest('button')) return; if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
-    elements.assist.addEventListener('click', assistedAdvance);
+    elements.assist.addEventListener('click', assistedAdvance); elements.introDismiss.addEventListener('click', dismissIntro);
     elements.menu.addEventListener('click', () => setPanel(true)); elements.closePanel.addEventListener('click', closePanel); elements.scrim.addEventListener('click', closePanel);
     elements.sound.addEventListener('click', toggleSound); elements.panelSound.addEventListener('click', toggleSound);
     elements.haptic.addEventListener('click', () => { state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); persist(); });
@@ -251,6 +274,6 @@
     elements.motion.textContent = state.reducedMotion ? 'ON' : 'OFF'; elements.motion.setAttribute('aria-pressed', String(state.reducedMotion));
   }
 
-  window.PineReview = { setDay, assistedAdvance, getState: () => ({ day: state.day, progress: state.progress, completed: [...state.completed], contacts: state.contacts.size }), reset: () => { state.completed.clear(); resetMaterial(); persist(); renderNavigation(); } };
+  window.PineReview = { setDay, assistedAdvance, dismissIntro, getState: () => ({ day: state.day, progress: state.progress, completed: [...state.completed], contacts: state.contacts.size, introVisible: state.introVisible }), reset: () => { state.completed.clear(); resetMaterial(); persist(); renderNavigation(); } };
   bind(); resize(); updateSettings(); setDay(1); requestAnimationFrame(draw);
 })();
