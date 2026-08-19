@@ -88,3 +88,16 @@ A separate fresh sequential run confirmed the expected user flow: each day compl
 Day 4 was reset and opened independently. Its introduction was present with the title `Developing Trunk`, the clear instruction `Trace steadily upward along the forming trunk.`, and the post-dismissal `TRACE UPWARD` gesture cue.
 
 The revised opening-panel behavior was rechecked on Day 4 after an eight-second delay. The instruction remained visible and readable until user dismissal, confirming it no longer disappears before the upward-trace practice begins.
+
+## Seed burial and Day 2 anchor refinement
+
+A fresh stationary Day 1 hold completed successfully and activated the completion state. The seed target transitioned into its settling animation; it is configured to move downward, shrink, and fully fade while the new soil cover is rendered over its prior location.
+Day 2 was opened after the Day 1 completion sequence and now uses the `DRAW DOWNWARD` cue with a root path beginning at the seed-aligned lower anchor rather than above the seed.
+
+## Day 6 branch-line map
+
+The Day 6 scene contains a central vertical trunk with pronounced upper-left, upper-right, mid-left, mid-right, and lower-right branch paths. The branch-reveal overlay will grow outward from the trunk along these main visible directions while retaining completed line segments.
+## Day 3 and Day 6 material validation
+
+Day 3 was exercised through multiple alternating brush passes across the soil layer, reaching completion only after the deliberate sweep sequence while retaining the accumulated clear paths. Day 6 was exercised with outward sweeps toward the main branch directions and completed with retained branch-reveal progress.
+The Day 6 completed scene was visually inspected after outward sweeps. Retained warm-gilt lines extend from the central trunk through the main upper-left, upper-right, mid-left, mid-right, and lower-right visible branch paths, remaining behind the completion card to make the canopy-opening response legible.

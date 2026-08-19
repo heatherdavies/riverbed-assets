@@ -37,7 +37,7 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .completion-next { appearance: none; margin-top: 17px; padding: 10px 12px; border: 1px solid rgba(230, 214, 153, .56); border-radius: 2px; background: rgba(19, 69, 48, .4); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
 .completion-restart { appearance: none; display: block; margin: 12px 0 0; padding: 5px 0; border: 0; background: transparent; color: rgba(245,240,221,.76); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .13em; text-decoration: underline; text-underline-offset: 4px; }
 .scene.practice-complete .day-one-completion { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.scene.day-one-complete .seed-target { opacity: .22; transform: translate(-50%, -50%) scale(.58); transition: opacity 900ms ease, transform 1200ms ease; }
+.scene.day-one-complete .seed-target { opacity: 0; transform: translate(-50%, calc(-50% + 20px)) scale(.42); transition: opacity 1100ms ease, transform 1300ms cubic-bezier(.2,.72,.25,1); }
 .scene.day-one-complete .seed-target-label { opacity: 0; }
 
 .topbar { position: absolute; inset: max(22px, env(safe-area-inset-top)) 22px auto; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px; z-index: 3; }

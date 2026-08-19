@@ -46,6 +46,7 @@
     contacts: new Map(),
     progress: 0,
     material: { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 },
+    brushes: [],
     sound: localStorage.getItem('pine-review-sound') === 'on',
     haptics: localStorage.getItem('pine-review-haptics') || 'subtle',
     reducedMotion: localStorage.getItem('pine-review-motion') === 'on',
@@ -116,6 +117,7 @@
   function resetMaterial() {
     state.contacts.clear(); state.progress = 0;
     state.material = { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 };
+    state.brushes = [];
     elements.scene.classList.remove('day-one-complete', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
@@ -250,8 +252,8 @@
         state.material.soil = Math.max(state.material.soil, hold * (.56 + pressure * .3)); state.progress = Math.max(state.progress, hold); break;
       }
       case 2: {
-        const inRootCorridor = Math.abs(contact.x - .5) < .3 && contact.y > .16 && contact.y < .9;
-        const reachedDepth = clamp((contact.y - .18) / .66);
+        const inRootCorridor = Math.abs(contact.x - .5) < .3 && contact.y > .27 && contact.y < .9;
+        const reachedDepth = clamp((contact.y - .29) / .58);
         if (inRootCorridor && (contact.phase === 'begin' || dy > .002)) {
           state.material.root = Math.max(state.material.root, reachedDepth);
           state.progress = Math.max(state.progress, reachedDepth);
@@ -259,10 +261,12 @@
         break;
       }
       case 3: {
-        const brush = Math.abs(dx) + Math.abs(dy) + Math.min(.08, Math.abs(contact.vx) * .008 + Math.abs(contact.vy) * .008);
-        if (brush > .002) {
-          state.material.soil = clamp(state.material.soil + brush * 2.45);
-          state.material.needles = Math.max(state.material.needles, .14 + state.material.soil * .58);
+        const brush = Math.abs(dx) + Math.abs(dy) + Math.min(.055, Math.abs(contact.vx) * .005 + Math.abs(contact.vy) * .005);
+        if (brush > .002 && contact.phase === 'move') {
+          state.brushes.push({ x: contact.x, y: contact.y, radius: .09 });
+          if (state.brushes.length > 72) state.brushes.shift();
+          state.material.soil = clamp(state.material.soil + brush * .82);
+          state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
           state.progress = Math.max(state.progress, state.material.soil);
         }
         break;
@@ -372,16 +376,40 @@
     if (state.day === 1) {
       const r = Math.max(35, w * (.08 + m.soil * .13)); const x = w * .51; const y = h * .562;
       const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill();
+      if (state.completed.has(1)) { ctx.save(); ctx.globalCompositeOperation = 'source-over'; const soil = ctx.createRadialGradient(x, y, 2, x, y, w * .16); soil.addColorStop(0, 'rgba(24,21,15,.96)'); soil.addColorStop(.48, 'rgba(51,39,25,.8)'); soil.addColorStop(1, 'rgba(15,18,12,0)'); ctx.fillStyle = soil; ctx.beginPath(); ctx.ellipse(x, y, w * .15, w * .105, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
     } else if (state.day === 2) {
-      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .18); const yEnd = h * (.18 + progress * .66); ctx.bezierCurveTo(w * .44, h * .4, w * .56, h * .62, w * .49, yEnd); ctx.stroke();
+      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .29); const yEnd = h * (.29 + progress * .58); ctx.bezierCurveTo(w * .45, h * .46, w * .56, h * .66, w * .49, yEnd); ctx.stroke();
     } else if (state.day === 3) {
-      for (let i = 0; i < Math.round(32 * (1 - m.soil)); i++) { const x = w * (.39 + (i % 7) * .032); const y = h * (.52 + ((i * 29) % 11) * .012); ctx.fillStyle = `rgba(98,72,46,${.25 * (1 - m.soil)})`; ctx.beginPath(); ctx.arc(x, y, 2 + (i % 3), 0, Math.PI * 2); ctx.fill(); }
+      ctx.save(); ctx.globalCompositeOperation = 'source-over'; const soilPatch = ctx.createRadialGradient(w * .5, h * .6, 8, w * .5, h * .6, Math.min(w, h) * .3); soilPatch.addColorStop(0, 'rgba(76,58,39,.88)'); soilPatch.addColorStop(.68, 'rgba(46,34,23,.78)'); soilPatch.addColorStop(1, 'rgba(20,20,13,0)'); ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .6, w * .28, h * .16, 0, 0, Math.PI * 2); ctx.fill(); for (let i = 0; i < 56; i++) { const px = w * (.3 + ((i * 37) % 100) / 250); const py = h * (.48 + ((i * 53) % 100) / 520); ctx.fillStyle = `rgba(103,79,51,${.24 + (i % 4) * .05})`; ctx.beginPath(); ctx.arc(px, py, 2 + (i % 4), 0, Math.PI * 2); ctx.fill(); } ctx.globalCompositeOperation = 'destination-out'; state.brushes.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,.96)'); clear.addColorStop(.66, 'rgba(0,0,0,.72)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); }); ctx.restore(); ctx.strokeStyle = `rgba(161,207,108,${.16 + m.needles * .56})`; ctx.lineWidth = 1.35; for (let i = 0; i < 9; i++) { const nx = w * (.45 + (i % 5) * .026); const ny = h * (.61 + Math.floor(i / 5) * .025); ctx.beginPath(); ctx.moveTo(nx, ny); ctx.quadraticCurveTo(nx + (i % 2 ? 5 : -4), ny - 18 - m.needles * 24, nx + (i % 2 ? 9 : -8), ny - 31 - m.needles * 28); ctx.stroke(); }
     } else if (state.day === 4) {
       ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
     } else if (state.day === 5) {
       ctx.strokeStyle = `rgba(202,176,106,${.12 + state.progress * .36})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(w * .5, h * .51, Math.min(w, h) * (.1 + state.progress * .08), 0, Math.PI * 2); ctx.stroke();
     } else if (state.day === 6) {
-      ctx.strokeStyle = `rgba(220,202,121,${.08 + state.progress * .35})`; ctx.lineWidth = 2; for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.moveTo(w * .5, h * (.5 + i * .055)); ctx.quadraticCurveTo(w * (.53 + i * .06), h * (.46 + i * .05), w * (.72 + i * .02), h * (.42 + i * .05)); ctx.stroke(); }
+      const reveal = Math.max(m.bough, state.progress);
+      const branches = [
+        [[.5,.47],[.43,.4],[.25,.3],[.08,.24]],
+        [[.51,.44],[.61,.37],[.77,.25],[.93,.18]],
+        [[.5,.57],[.38,.51],[.2,.46],[.06,.45]],
+        [[.52,.57],[.66,.5],[.83,.43],[.96,.39]],
+        [[.51,.68],[.64,.68],[.78,.72],[.93,.77]],
+      ];
+      branches.forEach((branch, index) => {
+        const amount = clamp(reveal * branches.length - index);
+        if (amount <= 0) return;
+        ctx.strokeStyle = `rgba(224,207,126,${.16 + amount * .58})`;
+        ctx.lineWidth = 1.2 + amount * 1.8;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        const steps = 28;
+        for (let step = 0; step <= Math.ceil(steps * amount); step += 1) {
+          const t = Math.min(1, step / steps); const q = 1 - t;
+          const x = q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0];
+          const y = q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1];
+          if (step === 0) ctx.moveTo(w * x, h * y); else ctx.lineTo(w * x, h * y);
+        }
+        ctx.stroke();
+      });
     } else if (state.day === 7) {
       ctx.strokeStyle = `rgba(199,220,196,${.07 + m.wind * .24})`; ctx.lineWidth = 1.2; const motion = state.reducedMotion ? 0 : Math.sin(t / 700) * 12; for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
     } else if (state.day === 8) {
