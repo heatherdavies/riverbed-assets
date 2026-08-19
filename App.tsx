@@ -93,10 +93,8 @@ export default function App() {
           scrollEnabled={false}
           bounces={false}
           overScrollMode="never"
-          backgroundColor="#0a1a1a"
           mediaPlaybackRequiresUserAction={false}
           allowsInlineMediaPlayback
-          androidHardwareAccelerationDisabled={false}
           onLoadStart={() => addLog("WebView: load started")}
           onLoadEnd={() => addLog("WebView: load ended")}
           onError={(e) => addLog(`WebView error: ${JSON.stringify(e.nativeEvent)}`)}

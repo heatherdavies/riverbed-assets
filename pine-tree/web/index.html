@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#061e16" />
+    <title>Pine Tree — Strength & Vitality</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="experience" id="experience" aria-label="Pine Rooting Experience">
+      <div class="scene" id="scene" tabindex="0" aria-label="Interactive Pine Rooting scene">
+        <img id="sceneImage" class="scene-image" alt="" />
+        <div class="scene-vignette"></div>
+        <canvas id="materialCanvas" aria-hidden="true"></canvas>
+
+        <header class="topbar" aria-label="Practice controls">
+          <button class="mark" id="homeButton" type="button" aria-label="Return to practice journey">
+            <span class="leaf-mark" aria-hidden="true">◜</span>
+          </button>
+          <div class="brand-lockup">
+            <span>PINE TREE</span>
+            <strong>Strength &amp; Vitality</strong>
+          </div>
+          <button class="sound-toggle" id="soundButton" type="button" aria-pressed="false">SOUND OFF</button>
+        </header>
+
+        <nav class="day-rail" id="dayRail" aria-label="Nine day Pine Tree journey"></nav>
+
+        <section class="ritual-copy" id="ritualCopy" aria-live="polite">
+          <p class="eyebrow" id="stageText"></p>
+          <h1 id="titleText"></h1>
+          <p class="intent" id="intentText"></p>
+          <p class="instruction" id="instructionText"></p>
+          <div class="gesture-prompt" id="gesturePrompt" aria-hidden="true">
+            <span class="gesture-orbit"></span>
+            <span id="gesturePromptText">REST &amp; HOLD</span>
+          </div>
+          <button class="assist-button" id="assistButton" type="button"></button>
+          <p class="completion-copy" id="completionText"></p>
+        </section>
+
+        <button class="menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="sidePanel">
+          <span aria-hidden="true">⌁</span><span class="sr-only">Open practice controls</span>
+        </button>
+      </div>
+
+      <aside class="side-panel" id="sidePanel" aria-hidden="true" aria-label="Pine Tree practice controls">
+        <div class="panel-header">
+          <div>
+            <p class="panel-kicker">PINE TREE</p>
+            <h2>Journey</h2>
+          </div>
+          <button class="close-panel" id="closePanelButton" type="button" aria-label="Close controls">×</button>
+        </div>
+        <div class="panel-divider"></div>
+        <section class="panel-section">
+          <div class="section-heading"><span>DAY</span><span id="panelDayValue">01 / 09</span></div>
+          <div class="journey-list" id="journeyList"></div>
+        </section>
+        <section class="panel-section">
+          <div class="section-heading"><span>ATMOSPHERE</span></div>
+          <div class="setting-row"><span>Sound</span><button id="panelSoundButton" class="setting-toggle" type="button" aria-pressed="false">OFF</button></div>
+          <div class="setting-row"><span>Haptics</span><button id="hapticButton" class="setting-toggle active" type="button">SUBTLE</button></div>
+          <div class="setting-row"><span>Reduced motion</span><button id="motionButton" class="setting-toggle" type="button" aria-pressed="false">OFF</button></div>
+        </section>
+        <section class="panel-section quiet-note">
+          <div class="section-heading"><span>THE PRACTICE</span></div>
+          <p>The same pine grows with you, one day at a time. Complete a ritual to mark its place in the journey.</p>
+        </section>
+        <button class="reset-button" id="resetButton" type="button">RESET REVIEW STATE</button>
+      </aside>
+      <button class="scrim" id="scrim" type="button" aria-label="Close controls"></button>
+    </main>
+    <script src="./pine-review.js"></script>
+  </body>
+</html>

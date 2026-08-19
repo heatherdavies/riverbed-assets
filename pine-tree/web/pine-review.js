@@ -1,0 +1,255 @@
+(() => {
+  'use strict';
+
+  const DAYS = [
+    ['Grounding & Anchoring', 'Rooting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press slowly until the soil yields.', 'What is ready to take root, quietly and without force?', 'REST & HOLD', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
+    ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
+    ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil softly away from the new needles.', 'A first green sign is enough.', 'BRUSH SOFTLY', 'soft-brush', '../assets/day-03-first-light.webp'],
+    ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
+    ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Pinch to notice the whorls, then circle once to strengthen them.', 'Strength can remain responsive.', 'STRENGTHEN', 'pinch-circle', '../assets/day-05-stronger-structure.webp'],
+    ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Sweep outward along the branches toward the light.', 'There is room to extend.', 'SWEEP OUTWARD', 'outward-sweep', '../assets/day-06-branching-out.webp'],
+    ['Weathering & Completing', 'Weathering Growth', 'Mastering resilience.', 'Move with the canopy slowly, letting it bend and return.', 'Flexibility keeps the roots intact.', 'MOVE WITH WIND', 'wind-brush', '../assets/day-07-weathering-growth.webp'],
+    ['Weathering & Completing', 'Forming Features', 'Integrating wisdom and complexity.', 'Notice the sap and young cones with individual, unhurried touches.', 'Detail holds a living history.', 'NOTICE DETAIL', 'feature-touch', '../assets/day-08-forming-features.webp'],
+    ['Weathering & Completing', 'Full Maturity', 'Completed growth, peace, and deep rootedness.', 'Sweep outward to open the tree into its wider landscape.', 'You are rooted, complete, and still becoming.', 'OPEN OUTWARD', 'landscape-release', '../assets/day-09-full-maturity.webp'],
+  ].map(([stage, title, intent, instruction, contemplation, prompt, gesture, image], index) => ({
+    day: index + 1, stage, title, intent, instruction, contemplation, prompt, gesture, image,
+  }));
+
+  const $ = (selector) => document.querySelector(selector);
+  const elements = {
+    scene: $('#scene'), image: $('#sceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'),
+    stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
+    prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'),
+    menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
+    journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
+    haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
+  };
+  const canvas = elements.canvas;
+  const ctx = canvas.getContext('2d');
+  const state = {
+    day: 1,
+    completed: new Set(JSON.parse(localStorage.getItem('pine-review-completed') || '[]')),
+    contacts: new Map(),
+    progress: 0,
+    material: { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 },
+    sound: localStorage.getItem('pine-review-sound') === 'on',
+    haptics: localStorage.getItem('pine-review-haptics') || 'subtle',
+    reducedMotion: localStorage.getItem('pine-review-motion') === 'on',
+    lastTick: performance.now(),
+    lastHaptic: 0,
+    audio: null,
+    panelOpen: false,
+    quality: window.devicePixelRatio > 2 ? 'standard' : 'high',
+  };
+
+  function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
+  function persist() {
+    localStorage.setItem('pine-review-completed', JSON.stringify([...state.completed]));
+    localStorage.setItem('pine-review-sound', state.sound ? 'on' : 'off');
+    localStorage.setItem('pine-review-haptics', state.haptics);
+    localStorage.setItem('pine-review-motion', state.reducedMotion ? 'on' : 'off');
+  }
+  function resetMaterial() {
+    state.contacts.clear(); state.progress = 0;
+    state.material = { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 };
+    elements.copy.classList.remove('completed'); elements.completion.textContent = '';
+  }
+  function current() { return DAYS[state.day - 1]; }
+
+  function renderNavigation() {
+    elements.rail.innerHTML = DAYS.map((day) => `<button class="day-dot ${day.day === state.day ? 'active' : ''} ${state.completed.has(day.day) ? 'done' : ''}" type="button" data-day="${day.day}" aria-label="Day ${day.day}: ${day.title}${state.completed.has(day.day) ? ', completed' : ''}"></button>`).join('');
+    elements.journey.innerHTML = DAYS.map((day) => {
+      const active = day.day === state.day ? 'active' : '';
+      const done = state.completed.has(day.day);
+      return `<button type="button" class="day-button ${active}" data-day="${day.day}"><span class="day-num">${String(day.day).padStart(2, '0')}</span><span class="day-title">${day.title}</span><span class="day-state">${done ? '✓' : day.day === state.day ? 'NOW' : ''}</span></button>`;
+    }).join('');
+    document.querySelectorAll('[data-day]').forEach((button) => button.addEventListener('click', () => setDay(Number(button.dataset.day))));
+  }
+
+  function setDay(day) {
+    state.day = clamp(Math.round(day), 1, 9);
+    resetMaterial();
+    const config = current();
+    elements.image.classList.remove('loaded');
+    elements.image.src = config.image;
+    elements.image.alt = `Day ${config.day}: ${config.title}.`;
+    elements.stage.textContent = `DAY ${String(config.day).padStart(2, '0')} · ${config.stage.toUpperCase()}`;
+    elements.title.textContent = config.title;
+    elements.intent.textContent = config.intent;
+    elements.instruction.textContent = config.instruction;
+    elements.prompt.textContent = config.prompt;
+    elements.assist.textContent = `GUIDED ${config.prompt}`;
+    elements.panelDay.textContent = `${String(config.day).padStart(2, '0')} / 09`;
+    elements.image.addEventListener('load', () => elements.image.classList.add('loaded'), { once: true });
+    renderNavigation();
+    closePanel();
+  }
+
+  function setPanel(open) {
+    state.panelOpen = open;
+    elements.panel.classList.toggle('open', open); elements.scrim.classList.toggle('open', open);
+    elements.panel.setAttribute('aria-hidden', String(!open)); elements.menu.setAttribute('aria-expanded', String(open));
+  }
+  function closePanel() { setPanel(false); }
+
+  function resize() {
+    const rect = elements.scene.getBoundingClientRect();
+    const scale = Math.min(window.devicePixelRatio || 1, state.quality === 'high' ? 1.65 : 1.25);
+    canvas.width = Math.max(1, Math.round(rect.width * scale)); canvas.height = Math.max(1, Math.round(rect.height * scale));
+    canvas.style.width = `${rect.width}px`; canvas.style.height = `${rect.height}px`;
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  }
+
+  function contactFrom(event, phase) {
+    const rect = elements.scene.getBoundingClientRect();
+    const now = Number.isFinite(event.timeStamp) ? event.timeStamp : performance.now();
+    const x = clamp((event.clientX - rect.left) / rect.width);
+    const y = clamp((event.clientY - rect.top) / rect.height);
+    const prior = state.contacts.get(event.pointerId);
+    const px = prior?.x ?? x; const py = prior?.y ?? y;
+    const elapsed = Math.max(1, now - (prior?.timestamp || now));
+    const contact = { id: event.pointerId, phase, x, y, px, py, vx: (x - px) / elapsed * 1000, vy: (y - py) / elapsed * 1000, duration: (prior?.duration || 0) + (prior ? elapsed : 0), timestamp: now, pressure: event.pressure > 0 ? event.pressure : undefined };
+    if (phase === 'end' || phase === 'cancel') state.contacts.delete(event.pointerId); else state.contacts.set(event.pointerId, contact);
+    return contact;
+  }
+
+  function contactResponse(contact) {
+    const dx = contact.x - contact.px; const dy = contact.y - contact.py;
+    const speed = clamp(Math.hypot(contact.vx, contact.vy) * 0.45);
+    const move = clamp(Math.hypot(dx, dy) * 3.4);
+    const pressure = clamp(contact.pressure || 0.42);
+    let before = state.progress;
+    switch (state.day) {
+      case 1: {
+        const hold = clamp(contact.duration / 3200);
+        state.material.soil = Math.max(state.material.soil, hold * (.56 + pressure * .3)); state.progress = Math.max(state.progress, hold); break;
+      }
+      case 2: { const down = Math.max(0, dy) + Math.max(0, contact.vy) * .014; state.material.root = clamp(state.material.root + down * 1.45); state.progress = Math.max(state.progress, state.material.root); break; }
+      case 3: { const brush = Math.abs(dx) + Math.abs(contact.vx) * .011; state.material.soil = clamp(state.material.soil + brush * 1.7); state.material.needles = Math.max(state.material.needles, .18 + move * .2); state.progress = Math.max(state.progress, state.material.soil); break; }
+      case 4: { const up = Math.max(0, -dy) + Math.max(0, -contact.vy) * .014; state.material.bark = Math.max(state.material.bark, .08 + pressure * .15); state.progress = clamp(state.progress + up * 1.45); break; }
+      case 5: { const energy = move + Math.min(.14, speed * .1); state.material.bough = Math.max(state.material.bough, energy * .85); state.progress = clamp(state.progress + energy * .2); break; }
+      case 6: { const out = Math.max(0, dx) + Math.max(0, contact.vx) * .014; state.material.bough = clamp(state.material.bough + out * 1.25); state.material.needles = Math.max(state.material.needles, .17 + out * .45); state.progress = clamp(state.progress + out * 1.2); break; }
+      case 7: { const brush = Math.abs(dx) + Math.abs(dy) + speed * .05; state.material.bough = Math.max(state.material.bough, brush * .52); state.material.wind = Math.max(state.material.wind, .08 + brush * .36); state.progress = clamp(state.progress + brush * .62); break; }
+      case 8: { if (contact.phase === 'begin') { state.material.bark = Math.max(state.material.bark, .22 + pressure * .12); state.progress = clamp(state.progress + .16); } break; }
+      case 9: { const release = Math.max(0, dx) + Math.max(0, contact.vx) * .017; state.material.bough = Math.max(state.material.bough, release * .2); state.progress = clamp(state.progress + release * 1.05); break; }
+    }
+    if (state.progress > before + .015 || contact.phase === 'begin') respond('contact', Math.max(move, speed, .18));
+    if (state.progress >= .999) completeDay();
+  }
+
+  function assistedAdvance() {
+    state.progress = clamp(state.progress + .16); state.material.soil = Math.max(state.material.soil, state.progress * .75); state.material.root = Math.max(state.material.root, state.progress * .75); state.material.bark = Math.max(state.material.bark, state.progress * .35); state.material.bough = Math.max(state.material.bough, state.progress * .3); state.material.needles = Math.max(state.material.needles, .16 + state.progress * .18);
+    respond('movement', .35); if (state.progress >= .999) completeDay();
+  }
+
+  function completeDay() {
+    if (state.completed.has(state.day)) return;
+    state.progress = 1; state.completed.add(state.day); persist(); renderNavigation();
+    elements.copy.classList.add('completed'); elements.completion.textContent = current().contemplation; respond('completion', .9);
+  }
+
+  function respond(kind, strength) {
+    if (state.sound) playTone(kind, strength);
+    if (state.haptics === 'off' || !navigator.vibrate) return;
+    const now = performance.now(); if (now - state.lastHaptic < 115 && kind !== 'completion') return;
+    state.lastHaptic = now;
+    const day = state.day; const base = day <= 2 ? 17 : day <= 6 ? 10 : 7; const factor = state.haptics === 'on' ? 1 : .64;
+    const duration = Math.max(5, Math.round(base * factor * (.75 + strength)));
+    try { navigator.vibrate(kind === 'completion' ? [duration + 13, 40, duration] : [duration]); } catch (_) { /* visual feedback remains */ }
+  }
+
+  function playTone(kind, strength) {
+    try {
+      const Context = window.AudioContext || window.webkitAudioContext; if (!Context) return;
+      state.audio ||= new Context(); if (state.audio.state === 'suspended') state.audio.resume();
+      const now = state.audio.currentTime; const oscillator = state.audio.createOscillator(); const gain = state.audio.createGain();
+      const base = state.day <= 2 ? 54 : state.day >= 7 ? 240 : 120;
+      oscillator.type = state.day <= 2 ? 'sine' : state.day >= 7 ? 'triangle' : 'sine'; oscillator.frequency.setValueAtTime(base * (kind === 'completion' ? 1.5 : 1), now); oscillator.frequency.exponentialRampToValueAtTime(Math.max(30, base * .76), now + .23);
+      gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(.011 * strength, now + .02); gain.gain.exponentialRampToValueAtTime(.0001, now + .28); oscillator.connect(gain).connect(state.audio.destination); oscillator.start(now); oscillator.stop(now + .3);
+    } catch (_) { /* browser may block audio; stay silent */ }
+  }
+
+  function draw(timestamp) {
+    const dt = Math.min(64, timestamp - state.lastTick); state.lastTick = timestamp;
+    const decay = state.reducedMotion ? .08 : .045; const scale = dt / 16.667;
+    state.material.soil += (0 - state.material.soil) * decay * scale;
+    state.material.bark += (0 - state.material.bark) * decay * scale;
+    state.material.bough += (0 - state.material.bough) * (decay * .58) * scale;
+    state.material.root += (0 - state.material.root) * (decay * .2) * scale;
+    const baseline = state.reducedMotion ? .025 : state.day >= 7 ? .13 : .07;
+    const held = [...state.contacts.values()].some((c) => c.duration > 480);
+    const needleTarget = held && state.day >= 7 ? .045 : baseline;
+    state.material.wind += (baseline - state.material.wind) * .018 * scale;
+    state.material.needles += (needleTarget + state.material.bough * .38 - state.material.needles) * .06 * scale;
+
+    const width = canvas.clientWidth; const height = canvas.clientHeight; ctx.clearRect(0, 0, width, height);
+    drawAtmosphere(width, height, timestamp); drawMaterial(width, height, timestamp); drawContacts(width, height, timestamp);
+    requestAnimationFrame(draw);
+  }
+
+  function drawAtmosphere(w, h, t) {
+    if (state.day < 7) return;
+    const drift = state.reducedMotion ? 0 : Math.sin(t / 9500) * 18;
+    const mist = ctx.createLinearGradient(0, h * .28, 0, h * .76);
+    mist.addColorStop(0, 'rgba(175,205,192,0)'); mist.addColorStop(.45, `rgba(176,204,190,${.06 + state.material.wind * .12})`); mist.addColorStop(1, 'rgba(2,23,16,0)');
+    ctx.fillStyle = mist; ctx.fillRect(drift - 20, h * .2, w + 40, h * .62);
+  }
+
+  function drawMaterial(w, h, t) {
+    const m = state.material; const config = current();
+    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    if (state.day === 1) {
+      const r = Math.max(35, w * (.08 + m.soil * .13)); const x = w * .51; const y = h * .58;
+      const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill();
+    } else if (state.day === 2) {
+      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .49, h * .31); const yEnd = h * (.31 + progress * .49); ctx.bezierCurveTo(w * .45, h * .44, w * .56, h * .58, w * .48, yEnd); ctx.stroke();
+    } else if (state.day === 3) {
+      for (let i = 0; i < Math.round(32 * (1 - m.soil)); i++) { const x = w * (.39 + (i % 7) * .032); const y = h * (.52 + ((i * 29) % 11) * .012); ctx.fillStyle = `rgba(98,72,46,${.25 * (1 - m.soil)})`; ctx.beginPath(); ctx.arc(x, y, 2 + (i % 3), 0, Math.PI * 2); ctx.fill(); }
+    } else if (state.day === 4) {
+      ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
+    } else if (state.day === 5) {
+      ctx.strokeStyle = `rgba(202,176,106,${.12 + state.progress * .36})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(w * .5, h * .51, Math.min(w, h) * (.1 + state.progress * .08), 0, Math.PI * 2); ctx.stroke();
+    } else if (state.day === 6) {
+      ctx.strokeStyle = `rgba(220,202,121,${.08 + state.progress * .35})`; ctx.lineWidth = 2; for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.moveTo(w * .5, h * (.5 + i * .055)); ctx.quadraticCurveTo(w * (.53 + i * .06), h * (.46 + i * .05), w * (.72 + i * .02), h * (.42 + i * .05)); ctx.stroke(); }
+    } else if (state.day === 7) {
+      ctx.strokeStyle = `rgba(199,220,196,${.07 + m.wind * .24})`; ctx.lineWidth = 1.2; const motion = state.reducedMotion ? 0 : Math.sin(t / 700) * 12; for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
+    } else if (state.day === 8) {
+      const points = [[.63,.44],[.72,.56],[.48,.63],[.78,.35],[.38,.48]]; points.slice(0, Math.ceil(state.progress * 5)).forEach(([x,y], index) => { const glow = ctx.createRadialGradient(w*x,h*y,0,w*x,h*y,36); glow.addColorStop(0, `rgba(216,177,91,${.38 - index*.03})`); glow.addColorStop(1,'rgba(216,177,91,0)'); ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(w*x,h*y,36,0,Math.PI*2); ctx.fill(); });
+    } else if (state.day === 9) {
+      ctx.fillStyle = `rgba(227,235,222,${state.progress * .12})`; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = `rgba(235,221,169,${state.progress * .42})`; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(w * (.5 - state.progress * .25), h * .57); ctx.quadraticCurveTo(w*.5,h*.5,w*(.5 + state.progress*.27),h*.47); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawContacts(w, h, t) {
+    state.contacts.forEach((contact) => {
+      const x = contact.x * w; const y = contact.y * h; const pulse = state.reducedMotion ? 0 : (Math.sin(t / 220 + contact.id) + 1) * .5;
+      const radius = 16 + pulse * 7;
+      const g = ctx.createRadialGradient(x, y, 1, x, y, radius); g.addColorStop(0, 'rgba(241,229,182,.42)'); g.addColorStop(.5,'rgba(177,190,119,.14)'); g.addColorStop(1,'rgba(177,190,119,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x,y,radius,0,Math.PI*2); ctx.fill();
+    });
+    const y = h - 22; const wProgress = w * .34; const x = (w - wProgress) / 2; ctx.fillStyle = 'rgba(242,235,205,.18)'; ctx.fillRect(x, y, wProgress, 1); ctx.fillStyle = 'rgba(201,178,104,.85)'; ctx.fillRect(x, y, wProgress * state.progress, 1.5);
+  }
+
+  function bind() {
+    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || event.target.closest('button')) return; try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
+    elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
+    elements.assist.addEventListener('click', assistedAdvance);
+    elements.menu.addEventListener('click', () => setPanel(true)); elements.closePanel.addEventListener('click', closePanel); elements.scrim.addEventListener('click', closePanel);
+    elements.sound.addEventListener('click', toggleSound); elements.panelSound.addEventListener('click', toggleSound);
+    elements.haptic.addEventListener('click', () => { state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); persist(); });
+    elements.motion.addEventListener('click', () => { state.reducedMotion = !state.reducedMotion; updateSettings(); persist(); });
+    elements.reset.addEventListener('click', () => { state.completed.clear(); persist(); renderNavigation(); resetMaterial(); closePanel(); });
+    elements.home.addEventListener('click', () => { setDay(1); }); window.addEventListener('resize', resize);
+  }
+  function toggleSound() { state.sound = !state.sound; updateSettings(); persist(); }
+  function updateSettings() {
+    elements.sound.textContent = `SOUND ${state.sound ? 'ON' : 'OFF'}`; elements.sound.setAttribute('aria-pressed', String(state.sound));
+    elements.panelSound.textContent = state.sound ? 'ON' : 'OFF'; elements.panelSound.setAttribute('aria-pressed', String(state.sound));
+    elements.haptic.textContent = state.haptics.toUpperCase(); elements.haptic.classList.toggle('active', state.haptics !== 'off');
+    elements.motion.textContent = state.reducedMotion ? 'ON' : 'OFF'; elements.motion.setAttribute('aria-pressed', String(state.reducedMotion));
+  }
+
+  window.PineReview = { setDay, assistedAdvance, getState: () => ({ day: state.day, progress: state.progress, completed: [...state.completed], contacts: state.contacts.size }), reset: () => { state.completed.clear(); resetMaterial(); persist(); renderNavigation(); } };
+  bind(); resize(); updateSettings(); setDay(1); requestAnimationFrame(draw);
+})();
