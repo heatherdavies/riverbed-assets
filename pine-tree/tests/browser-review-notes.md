@@ -32,3 +32,7 @@ The revised Day 1 tactile sequence was also verified after dismissal. A direct 3
 ## Responsive seed anchor and dismissal hardening
 
 The Day 1 cue now derives its position from the rendered image’s actual `object-fit: cover` crop rather than a fixed viewport percentage. The intrinsic seed anchor was calibrated against the full image and verified in the public review to centre the cue on the visible seed. The introduction control now listens for click, pointer-up, and touch-end; public browser validation confirmed that `BEGIN WITH THE SEED` dismisses the panel and leaves the seed scene open.
+
+## Mobile long-press hardening
+
+The scene image is now non-draggable and non-selectable, while the scene suppresses cancelable context-menu, selection, drag, touch-start, and touch-move events outside controls. Browser validation confirmed that scene-level context-menu and touch-start events are prevented, whereas the introduction button’s touch-start remains unblocked. This preserves standard button interaction while preventing the scene from yielding to native long-press save/selection behaviour.

@@ -19,8 +19,9 @@ button { font: inherit; color: inherit; }
 button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 
 .experience { position: relative; min-height: 100dvh; background: var(--pine); overflow: hidden; }
-.scene { position: relative; min-height: 100dvh; overflow: hidden; touch-action: none; user-select: none; isolation: isolate; }
-.scene-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -3; transform: scale(1.025); transition: opacity 850ms ease, transform 2600ms ease; }
+.scene { position: relative; min-height: 100dvh; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; isolation: isolate; }
+.scene * { -webkit-user-select: none; user-select: none; }
+.scene-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -3; transform: scale(1.025); transition: opacity 850ms ease, transform 2600ms ease; pointer-events: none; -webkit-user-drag: none; user-drag: none; }
 .scene-image.loaded { transform: scale(1); }
 .scene-vignette { position: absolute; inset: 0; z-index: -2; background: linear-gradient(180deg, rgba(2, 16, 11, .58) 0%, rgba(3, 19, 13, .12) 35%, rgba(3, 18, 12, .22) 54%, rgba(2, 16, 10, .9) 100%), linear-gradient(90deg, rgba(3, 20, 14, .22), transparent 42%, rgba(2, 14, 10, .15)); pointer-events: none; }
 #materialCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }

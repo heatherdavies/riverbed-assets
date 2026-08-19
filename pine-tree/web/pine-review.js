@@ -273,7 +273,14 @@
   }
 
   function bind() {
-    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || event.target.closest('button')) return; if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
+    const preserveControls = (event) => Boolean(event.target.closest('button'));
+    const blockNativeSceneGesture = (event) => { if (!preserveControls(event)) event.preventDefault(); };
+    elements.scene.addEventListener('contextmenu', blockNativeSceneGesture);
+    elements.scene.addEventListener('dragstart', blockNativeSceneGesture);
+    elements.scene.addEventListener('selectstart', blockNativeSceneGesture);
+    elements.scene.addEventListener('touchstart', blockNativeSceneGesture, { passive: false });
+    elements.scene.addEventListener('touchmove', blockNativeSceneGesture, { passive: false });
+    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
     elements.assist.addEventListener('click', assistedAdvance);
