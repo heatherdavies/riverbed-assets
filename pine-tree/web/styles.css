@@ -36,7 +36,7 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .day-one-completion p:not(.completion-kicker) { max-width: 300px; margin: 11px 0 0; color: rgba(245, 240, 221, .84); font-family: "Cormorant Garamond", Georgia, serif; font-size: 18px; font-style: italic; line-height: 1.14; }
 .completion-next { appearance: none; margin-top: 17px; padding: 10px 12px; border: 1px solid rgba(230, 214, 153, .56); border-radius: 2px; background: rgba(19, 69, 48, .4); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
 .completion-restart { appearance: none; display: block; margin: 12px 0 0; padding: 5px 0; border: 0; background: transparent; color: rgba(245,240,221,.76); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .13em; text-decoration: underline; text-underline-offset: 4px; }
-.scene.day-one-complete .day-one-completion { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.scene.practice-complete .day-one-completion { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .scene.day-one-complete .seed-target { opacity: .22; transform: translate(-50%, -50%) scale(.58); transition: opacity 900ms ease, transform 1200ms ease; }
 .scene.day-one-complete .seed-target-label { opacity: 0; }
 
@@ -68,6 +68,9 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 .gesture-orbit { width: 25px; height: 25px; border: 1px solid var(--gilt); border-radius: 50%; position: relative; animation: breathe 2.8s ease-in-out infinite; }
 .gesture-orbit::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1px solid rgba(245,240,221,.55); }
 .assist-button { display: block; pointer-events: auto; margin-top: 16px; padding: 9px 13px; border: 1px solid rgba(242,234,193,.48); background: rgba(4, 28, 19, .55); color: rgba(245,240,221,.86); border-radius: 3px; text-transform: uppercase; letter-spacing: .12em; font-size: 9px; cursor: pointer; }
+.gesture-hint { position: absolute; left: 23px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 74px); z-index: 4; display: none; align-items: center; gap: 8px; color: rgba(245,240,221,.88); font-size: 9px; font-weight: 600; letter-spacing: .15em; text-shadow: 0 2px 11px rgba(0,0,0,.75); pointer-events: none; }
+.gesture-hint-orbit { width: 21px; height: 21px; border: 1px solid rgba(210,187,106,.8); border-radius: 50%; box-shadow: 0 0 0 5px rgba(201,178,104,.08); animation: breathe 2.8s ease-in-out infinite; }
+.scene:not(.practice-intro-open):not(.practice-complete) .gesture-hint { display: inline-flex; }
 .return-to-seed { position: absolute; left: 23px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 18px); z-index: 4; display: none; pointer-events: auto; padding: 8px 0; border: 0; background: transparent; color: rgba(245,240,221,.8); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; text-decoration: underline; text-underline-offset: 4px; }
 .scene:not([data-day="1"]) .return-to-seed { display: block; }
 .completion-copy { display: none; max-width: 390px; margin: 20px 0 0; font-family: "Cormorant Garamond", Georgia, serif; color: var(--ivory); font-size: 23px; font-style: italic; line-height: 1.1; }

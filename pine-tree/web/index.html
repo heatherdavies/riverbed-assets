@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#061e16" />
     <title>Pine Tree — Strength & Vitality</title>
-    <link rel="stylesheet" href="./styles.css?v=20260819-controls-5" />
+    <link rel="stylesheet" href="./styles.css?v=20260819-nine-day-repair-2" />
   </head>
   <body>
     <main class="experience" id="experience" aria-label="Pine Rooting Experience">
@@ -18,9 +18,9 @@
           <span class="seed-target-label">TOUCH THE SEED</span>
         </div>
         <section class="day-one-completion" id="dayOneCompletion" aria-live="polite">
-          <p class="completion-kicker">DAY 01 COMPLETE</p>
-          <h2>Rooted.</h2>
-          <p>What is ready to take root, quietly and without force?</p>
+          <p class="completion-kicker" id="completionKicker">DAY 01 COMPLETE</p>
+          <h2 id="completionTitle">Rooted.</h2>
+          <p id="completionReflection">What is ready to take root, quietly and without force?</p>
           <button class="completion-next" id="nextDayButton" type="button">CONTINUE TO DEEP ANCHOR</button>
           <button class="completion-restart" id="restartDayButton" type="button">START AGAIN AT DAY 1</button>
         </section>
@@ -58,6 +58,7 @@
           <p class="completion-copy" id="completionText"></p>
         </section>
 
+        <div class="gesture-hint" id="gestureHint" aria-live="polite"><span class="gesture-hint-orbit" aria-hidden="true"></span><span id="gestureHintText">REST & HOLD</span></div>
         <button class="return-to-seed" id="returnToSeedButton" type="button">↺ START AGAIN AT DAY 1</button>
         <button class="menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="sidePanel">
           <span aria-hidden="true">⌁</span><span class="sr-only">Open practice controls</span>
@@ -91,6 +92,6 @@
       </aside>
       <button class="scrim" id="scrim" type="button" aria-label="Close controls"></button>
     </main>
-    <script src="./pine-review.js?v=20260819-controls-5"></script>
+    <script src="./pine-review.js?v=20260819-nine-day-repair-2"></script>
   </body>
 </html>

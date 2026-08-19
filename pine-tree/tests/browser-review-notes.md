@@ -78,3 +78,13 @@ The new `START AGAIN AT DAY 1` control was exercised on the fresh control build.
 The shared mobile activation system was revalidated after refining its duplicate-event logic. The Day 1 Begin action dismissed its introduction, Day 2 opened with its own introduction, the same Begin control dismissed Day 2’s panel, and `START AGAIN AT DAY 1` reset progress and reopened the Day 1 introduction. The full control sequence succeeded with touch-style release events.
 
 A fresh Day 1 flow was also verified from the initial introduction through a stationary seed hold: it reached `progress: 1`, recorded Day 1 as complete, and activated the rooted completion state with usable controls. The completion card’s `START AGAIN AT DAY 1` action then cleared completion data, reset progress to zero, hid the completion state, and reopened the Day 1 introduction.
+
+## Complete nine-day interaction and completion audit
+
+A fresh end-to-end mobile-style gesture run completed every ritual. Day 1 completed from a stationary seed hold; Day 2 from a downward root trace; Day 3 from durable soil-brushing passes; Day 4 from an upward trunk trace; Day 5 from a branch-cluster circle; Day 6 from an outward branch sweep; Day 7 from canopy brushing; Day 8 from individual touches; and Day 9 from an outward landscape sweep. Each day reached progress 1, recorded completion, opened the shared completion card, and presented its own completion title.
+
+A separate fresh sequential run confirmed the expected user flow: each day completed with its specific completion title, the next action opened the following day, and the following day displayed its own introduction panel. Day 9’s completion action returned to a fresh Day 1 introduction and cleared the review progress.
+
+Day 4 was reset and opened independently. Its introduction was present with the title `Developing Trunk`, the clear instruction `Trace steadily upward along the forming trunk.`, and the post-dismissal `TRACE UPWARD` gesture cue.
+
+The revised opening-panel behavior was rechecked on Day 4 after an eight-second delay. The instruction remained visible and readable until user dismissal, confirming it no longer disappears before the upward-trace practice begins.

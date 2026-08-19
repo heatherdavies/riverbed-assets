@@ -6,7 +6,7 @@
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
     ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil softly away from the new needles.', 'A first green sign is enough.', 'BRUSH SOFTLY', 'soft-brush', '../assets/day-03-first-light.webp'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
-    ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Pinch to notice the whorls, then circle once to strengthen them.', 'Strength can remain responsive.', 'STRENGTHEN', 'pinch-circle', '../assets/day-05-stronger-structure.webp'],
+    ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Find the small ring of branches around the young trunk. Place two fingers there, then draw one slow circle.', 'Strength can remain responsive.', 'CIRCLE THE BRANCH CLUSTER', 'two-finger-circle', '../assets/day-05-stronger-structure.webp'],
     ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Sweep outward along the branches toward the light.', 'There is room to extend.', 'SWEEP OUTWARD', 'outward-sweep', '../assets/day-06-branching-out.webp'],
     ['Weathering & Completing', 'Weathering Growth', 'Mastering resilience.', 'Move with the canopy slowly, letting it bend and return.', 'Flexibility keeps the roots intact.', 'MOVE WITH WIND', 'wind-brush', '../assets/day-07-weathering-growth.webp'],
     ['Weathering & Completing', 'Forming Features', 'Integrating wisdom and complexity.', 'Notice the sap and young cones with individual, unhurried touches.', 'Detail holds a living history.', 'NOTICE DETAIL', 'feature-touch', '../assets/day-08-forming-features.webp'],
@@ -15,13 +15,25 @@
     day: index + 1, stage, title, intent, instruction, contemplation, prompt, gesture, image,
   }));
 
+  const COMPLETIONS = [
+    ['Rooted.', 'What is ready to take root, quietly and without force?'],
+    ['Anchored.', 'Strength begins below the surface.'],
+    ['First light.', 'A first green sign is enough.'],
+    ['Steady.', 'Let your structure rise from what is grounded.'],
+    ['Strengthening.', 'Strength can remain responsive.'],
+    ['Opening.', 'There is room to extend.'],
+    ['Resilient.', 'Flexibility keeps the roots intact.'],
+    ['Forming.', 'Detail holds a living history.'],
+    ['Mature.', 'You are rooted, complete, and still becoming.'],
+  ];
+
   const $ = (selector) => document.querySelector(selector);
   const elements = {
     scene: $('#scene'), image: $('#sceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
-    dayOneCompletion: $('#dayOneCompletion'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'),
+    dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
     haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
@@ -58,7 +70,7 @@
     if (button.dataset.day) return setDay(Number(button.dataset.day));
     switch (button.id) {
       case 'assistButton': return assistedAdvance();
-      case 'nextDayButton': return setDay(2);
+      case 'nextDayButton': return state.day < 9 ? setDay(state.day + 1) : resetToDayOne();
       case 'restartDayButton': return resetToDayOne();
       case 'returnToSeedButton': return resetToDayOne();
       case 'introDismiss': return dismissIntro();
@@ -104,10 +116,22 @@
   function resetMaterial() {
     state.contacts.clear(); state.progress = 0;
     state.material = { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 };
-    elements.scene.classList.remove('day-one-complete');
+    elements.scene.classList.remove('day-one-complete', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
   function current() { return DAYS[state.day - 1]; }
+
+  function showCompletionState() {
+    const [title, reflection] = COMPLETIONS[state.day - 1];
+    const next = DAYS[state.day];
+    elements.completionKicker.textContent = `DAY ${String(state.day).padStart(2, '0')} COMPLETE`;
+    elements.completionTitle.textContent = title;
+    elements.completionReflection.textContent = reflection;
+    elements.nextDay.textContent = next ? `CONTINUE TO ${next.title.toUpperCase()}` : 'RETURN TO DAY 1';
+    elements.restartDay.textContent = state.day === 1 ? 'START AGAIN AT DAY 1' : 'START THE JOURNEY AGAIN';
+    elements.scene.classList.add('practice-complete');
+    if (state.day === 1) elements.scene.classList.add('day-one-complete');
+  }
 
   function updateDayOneIntro() {
     const show = state.introVisible;
@@ -115,7 +139,6 @@
     elements.scene.classList.toggle('practice-intro-open', show);
     clearTimeout(state.introTimer);
     state.introTimer = null;
-    if (show && !state.reducedMotion) state.introTimer = setTimeout(dismissIntro, 7200);
   }
 
   function dismissIntro() {
@@ -136,13 +159,16 @@
   function setDay(day) {
     state.day = clamp(Math.round(day), 1, 9);
     elements.scene.dataset.day = String(state.day);
-    const restoredDayOne = state.day === 1 && state.completed.has(1);
-    state.introVisible = !restoredDayOne;
+    const restoredCompletedDay = state.completed.has(state.day);
+    state.introVisible = !restoredCompletedDay;
     resetMaterial();
-    if (restoredDayOne) {
+    if (restoredCompletedDay) {
       state.progress = 1;
-      state.material.soil = .88;
-      elements.scene.classList.add('day-one-complete');
+      if (state.day === 1) state.material.soil = .88;
+      if (state.day === 2) state.material.root = 1;
+      if (state.day === 3) { state.material.soil = 1; state.material.needles = .7; }
+      if (state.day === 4) state.material.bark = 1;
+      showCompletionState();
     }
     const config = current();
     elements.image.classList.remove('loaded');
@@ -157,6 +183,7 @@
     elements.introInstruction.textContent = config.instruction;
     elements.introDismiss.textContent = state.day === 1 ? 'BEGIN WITH THE SEED' : 'BEGIN PRACTICE';
     elements.prompt.textContent = config.prompt;
+    elements.gestureHintText.textContent = config.prompt;
     elements.assist.textContent = `GUIDED ${config.prompt}`;
     elements.panelDay.textContent = `${String(config.day).padStart(2, '0')} / 09`;
     elements.image.addEventListener('load', () => { elements.image.classList.add('loaded'); requestAnimationFrame(positionSeedTarget); }, { once: true });
@@ -222,9 +249,33 @@
         const hold = clamp(contact.duration / 3200);
         state.material.soil = Math.max(state.material.soil, hold * (.56 + pressure * .3)); state.progress = Math.max(state.progress, hold); break;
       }
-      case 2: { const down = Math.max(0, dy) + Math.max(0, contact.vy) * .014; state.material.root = clamp(state.material.root + down * 1.45); state.progress = Math.max(state.progress, state.material.root); break; }
-      case 3: { const brush = Math.abs(dx) + Math.abs(contact.vx) * .011; state.material.soil = clamp(state.material.soil + brush * 1.7); state.material.needles = Math.max(state.material.needles, .18 + move * .2); state.progress = Math.max(state.progress, state.material.soil); break; }
-      case 4: { const up = Math.max(0, -dy) + Math.max(0, -contact.vy) * .014; state.material.bark = Math.max(state.material.bark, .08 + pressure * .15); state.progress = clamp(state.progress + up * 1.45); break; }
+      case 2: {
+        const inRootCorridor = Math.abs(contact.x - .5) < .3 && contact.y > .16 && contact.y < .9;
+        const reachedDepth = clamp((contact.y - .18) / .66);
+        if (inRootCorridor && (contact.phase === 'begin' || dy > .002)) {
+          state.material.root = Math.max(state.material.root, reachedDepth);
+          state.progress = Math.max(state.progress, reachedDepth);
+        }
+        break;
+      }
+      case 3: {
+        const brush = Math.abs(dx) + Math.abs(dy) + Math.min(.08, Math.abs(contact.vx) * .008 + Math.abs(contact.vy) * .008);
+        if (brush > .002) {
+          state.material.soil = clamp(state.material.soil + brush * 2.45);
+          state.material.needles = Math.max(state.material.needles, .14 + state.material.soil * .58);
+          state.progress = Math.max(state.progress, state.material.soil);
+        }
+        break;
+      }
+      case 4: {
+        const inTrunkCorridor = Math.abs(contact.x - .5) < .25 && contact.y > .18 && contact.y < .84;
+        const reachedHeight = clamp((.78 - contact.y) / .54);
+        if (inTrunkCorridor && (contact.phase === 'begin' || dy < -.002)) {
+          state.material.bark = Math.max(state.material.bark, reachedHeight);
+          state.progress = Math.max(state.progress, reachedHeight);
+        }
+        break;
+      }
       case 5: { const energy = move + Math.min(.14, speed * .1); state.material.bough = Math.max(state.material.bough, energy * .85); state.progress = clamp(state.progress + energy * .2); break; }
       case 6: { const out = Math.max(0, dx) + Math.max(0, contact.vx) * .014; state.material.bough = clamp(state.material.bough + out * 1.25); state.material.needles = Math.max(state.material.needles, .17 + out * .45); state.progress = clamp(state.progress + out * 1.2); break; }
       case 7: { const brush = Math.abs(dx) + Math.abs(dy) + speed * .05; state.material.bough = Math.max(state.material.bough, brush * .52); state.material.wind = Math.max(state.material.wind, .08 + brush * .36); state.progress = clamp(state.progress + brush * .62); break; }
@@ -248,12 +299,11 @@
       persist();
       renderNavigation();
     }
-    if (state.day === 1) {
-      state.material.soil = 1;
-      elements.scene.classList.add('day-one-complete');
-    } else {
-      elements.copy.classList.add('completed'); elements.completion.textContent = current().contemplation;
-    }
+    if (state.day === 1) state.material.soil = 1;
+    if (state.day === 2) state.material.root = 1;
+    if (state.day === 3) { state.material.soil = 1; state.material.needles = .7; }
+    if (state.day === 4) state.material.bark = 1;
+    showCompletionState();
     if (newlyCompleted) respond('completion', .9);
   }
 
@@ -293,10 +343,10 @@
     advanceStationarySeedHold(timestamp);
     const decay = state.reducedMotion ? .08 : .045; const scale = dt / 16.667;
     const soilTarget = state.day === 1 && state.completed.has(1) ? .88 : 0;
-    state.material.soil += (soilTarget - state.material.soil) * (state.completed.has(1) ? .09 : decay) * scale;
-    state.material.bark += (0 - state.material.bark) * decay * scale;
-    state.material.bough += (0 - state.material.bough) * (decay * .58) * scale;
-    state.material.root += (0 - state.material.root) * (decay * .2) * scale;
+    if (state.day !== 3) state.material.soil += (soilTarget - state.material.soil) * (state.completed.has(1) ? .09 : decay) * scale;
+    if (state.day !== 4) state.material.bark += (0 - state.material.bark) * decay * scale;
+    if (![5, 6, 7].includes(state.day)) state.material.bough += (0 - state.material.bough) * (decay * .58) * scale;
+    if (state.day !== 2) state.material.root += (0 - state.material.root) * (decay * .2) * scale;
     const baseline = state.reducedMotion ? .025 : state.day >= 7 ? .13 : .07;
     const held = [...state.contacts.values()].some((c) => c.duration > 480);
     const needleTarget = held && state.day >= 7 ? .045 : baseline;
@@ -323,7 +373,7 @@
       const r = Math.max(35, w * (.08 + m.soil * .13)); const x = w * .51; const y = h * .562;
       const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill();
     } else if (state.day === 2) {
-      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .49, h * .31); const yEnd = h * (.31 + progress * .49); ctx.bezierCurveTo(w * .45, h * .44, w * .56, h * .58, w * .48, yEnd); ctx.stroke();
+      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .18); const yEnd = h * (.18 + progress * .66); ctx.bezierCurveTo(w * .44, h * .4, w * .56, h * .62, w * .49, yEnd); ctx.stroke();
     } else if (state.day === 3) {
       for (let i = 0; i < Math.round(32 * (1 - m.soil)); i++) { const x = w * (.39 + (i % 7) * .032); const y = h * (.52 + ((i * 29) % 11) * .012); ctx.fillStyle = `rgba(98,72,46,${.25 * (1 - m.soil)})`; ctx.beginPath(); ctx.arc(x, y, 2 + (i % 3), 0, Math.PI * 2); ctx.fill(); }
     } else if (state.day === 4) {
