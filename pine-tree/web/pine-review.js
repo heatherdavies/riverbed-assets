@@ -6,11 +6,11 @@
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
     ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil softly away from the new needles.', 'A first green sign is enough.', 'BRUSH SOFTLY', 'soft-brush', '../assets/day-03-first-light.webp'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
-    ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Find the small ring of branches around the young trunk. Place two fingers there, then draw one slow circle.', 'Strength can remain responsive.', 'CIRCLE THE BRANCH CLUSTER', 'two-finger-circle', '../assets/day-05-stronger-structure.webp'],
+    ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Place two fingers inside the small gold ring around the young branch cluster. Draw one slow circle to strengthen it.', 'Strength can remain responsive.', 'CIRCLE THE GOLD RING', 'two-finger-circle', '../assets/day-05-stronger-structure.webp'],
     ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Sweep outward along the branches toward the light.', 'There is room to extend.', 'SWEEP OUTWARD', 'outward-sweep', '../assets/day-06-branching-out.webp'],
-    ['Weathering & Completing', 'Weathering Growth', 'Mastering resilience.', 'Move with the canopy slowly, letting it bend and return.', 'Flexibility keeps the roots intact.', 'MOVE WITH WIND', 'wind-brush', '../assets/day-07-weathering-growth.webp'],
-    ['Weathering & Completing', 'Forming Features', 'Integrating wisdom and complexity.', 'Notice the sap and young cones with individual, unhurried touches.', 'Detail holds a living history.', 'NOTICE DETAIL', 'feature-touch', '../assets/day-08-forming-features.webp'],
-    ['Weathering & Completing', 'Full Maturity', 'Completed growth, peace, and deep rootedness.', 'Sweep outward to open the tree into its wider landscape.', 'You are rooted, complete, and still becoming.', 'OPEN OUTWARD', 'landscape-release', '../assets/day-09-full-maturity.webp'],
+    ['Weathering & Completing', 'Weathering Growth', 'Mastering resilience.', 'Brush slowly left and right across the canopy. Watch the tree bend with the wind, then return.', 'Flexibility keeps the roots intact.', 'SWAY THE CANOPY', 'wind-brush', '../assets/day-07-weathering-growth.webp'],
+    ['Weathering & Completing', 'Forming Features', 'Integrating wisdom and complexity.', 'Touch five warm points of sap or young cones. Each touch will reveal a quiet glow.', 'Detail holds a living history.', 'TOUCH 5 DETAILS', 'feature-touch', '../assets/day-08-forming-features.webp'],
+    ['Weathering & Completing', 'Full Maturity', 'Completed growth, peace, and deep rootedness.', 'Sweep outward from the trunk to reveal the tree’s wider forest landscape.', 'You are rooted, complete, and still becoming.', 'OPEN THE FOREST', 'landscape-release', '../assets/day-09-full-maturity.webp'],
   ].map(([stage, title, intent, instruction, contemplation, prompt, gesture, image], index) => ({
     day: index + 1, stage, title, intent, instruction, contemplation, prompt, gesture, image,
   }));
@@ -47,6 +47,8 @@
     progress: 0,
     material: { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 },
     brushes: [],
+    branchReveals: 0,
+    branchTrace: 0,
     sound: localStorage.getItem('pine-review-sound') === 'on',
     haptics: localStorage.getItem('pine-review-haptics') || 'subtle',
     reducedMotion: localStorage.getItem('pine-review-motion') === 'on',
@@ -118,6 +120,8 @@
     state.contacts.clear(); state.progress = 0;
     state.material = { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 };
     state.brushes = [];
+    state.branchReveals = 0;
+    state.branchTrace = 0;
     elements.scene.classList.remove('day-one-complete', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
@@ -170,11 +174,12 @@
       if (state.day === 2) state.material.root = 1;
       if (state.day === 3) { state.material.soil = 1; state.material.needles = .7; }
       if (state.day === 4) state.material.bark = 1;
+      if (state.day === 6) { state.branchReveals = 9; state.branchTrace = 0; state.material.bough = 9; }
       showCompletionState();
     }
     const config = current();
     elements.image.classList.remove('loaded');
-    elements.image.src = config.image;
+    elements.image.src = `${config.image}?v=20260819-late-journey-1`;
     elements.image.alt = `Day ${config.day}: ${config.title}.`;
     elements.stage.textContent = `DAY ${String(config.day).padStart(2, '0')} · ${config.stage.toUpperCase()}`;
     elements.title.textContent = config.title;
@@ -280,11 +285,32 @@
         }
         break;
       }
-      case 5: { const energy = move + Math.min(.14, speed * .1); state.material.bough = Math.max(state.material.bough, energy * .85); state.progress = clamp(state.progress + energy * .2); break; }
-      case 6: { const out = Math.max(0, dx) + Math.max(0, contact.vx) * .014; state.material.bough = clamp(state.material.bough + out * 1.25); state.material.needles = Math.max(state.material.needles, .17 + out * .45); state.progress = clamp(state.progress + out * 1.2); break; }
-      case 7: { const brush = Math.abs(dx) + Math.abs(dy) + speed * .05; state.material.bough = Math.max(state.material.bough, brush * .52); state.material.wind = Math.max(state.material.wind, .08 + brush * .36); state.progress = clamp(state.progress + brush * .62); break; }
-      case 8: { if (contact.phase === 'begin') { state.material.bark = Math.max(state.material.bark, .22 + pressure * .12); state.progress = clamp(state.progress + .16); } break; }
-      case 9: { const release = Math.max(0, dx) + Math.max(0, contact.vx) * .017; state.material.bough = Math.max(state.material.bough, release * .2); state.progress = clamp(state.progress + release * 1.05); break; }
+      case 5: {
+        const ringDistance = Math.hypot(contact.x - .5, contact.y - .51);
+        const circleEnergy = move + Math.min(.07, speed * .045);
+        if (ringDistance < .22 && contact.phase === 'move') {
+          state.material.bough = clamp(state.material.bough + circleEnergy * .44);
+          state.progress = Math.max(state.progress, state.material.bough);
+        }
+        break;
+      }
+      case 6: {
+        const outward = Math.max(0, dx) + Math.max(0, contact.vx) * .009;
+        if (outward > .005 && state.branchReveals < 9) {
+          state.branchTrace = clamp(state.branchTrace + outward * 2.3);
+          if (state.branchTrace >= 1) { state.branchReveals += 1; state.branchTrace = 0; }
+          state.material.bough = state.branchReveals + state.branchTrace;
+          state.progress = state.material.bough / 9;
+        }
+        break;
+      }
+      case 7: {
+        const brush = Math.abs(dx) + Math.abs(dy) + speed * .025;
+        if (brush > .003) { state.material.wind = clamp(state.material.wind + brush * .7); state.progress = Math.max(state.progress, state.material.wind); }
+        break;
+      }
+      case 8: { if (contact.phase === 'begin') { state.material.bark = Math.max(state.material.bark, .22 + pressure * .12); state.progress = clamp(state.progress + .2); } break; }
+      case 9: { const out = Math.abs(dx) + Math.abs(dy) + speed * .03; state.progress = clamp(state.progress + out * .32); break; }
     }
     if (state.progress > before + .015 || contact.phase === 'begin') respond('contact', Math.max(move, speed, .18));
     if (state.progress >= .999) completeDay();
@@ -384,24 +410,22 @@
     } else if (state.day === 4) {
       ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
     } else if (state.day === 5) {
-      ctx.strokeStyle = `rgba(202,176,106,${.12 + state.progress * .36})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(w * .5, h * .51, Math.min(w, h) * (.1 + state.progress * .08), 0, Math.PI * 2); ctx.stroke();
+      const ring = Math.min(w, h) * .115; const pulse = state.reducedMotion ? 0 : (Math.sin(t / 480) + 1) * .5;
+      ctx.strokeStyle = `rgba(219,193,112,${.6 + pulse * .2})`; ctx.lineWidth = 1.5; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.arc(w * .5, h * .51, ring, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle = `rgba(240,226,164,${.22 + state.progress * .68})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(w * .5, h * .51, ring * .74, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * state.progress); ctx.stroke();
     } else if (state.day === 6) {
-      const reveal = Math.max(m.bough, state.progress);
       const branches = [
-        [[.5,.47],[.43,.4],[.25,.3],[.08,.24]],
-        [[.51,.44],[.61,.37],[.77,.25],[.93,.18]],
-        [[.5,.57],[.38,.51],[.2,.46],[.06,.45]],
-        [[.52,.57],[.66,.5],[.83,.43],[.96,.39]],
-        [[.51,.68],[.64,.68],[.78,.72],[.93,.77]],
+        [[.5,.47],[.43,.4],[.25,.3],[.08,.24]], [[.51,.44],[.61,.37],[.77,.25],[.93,.18]],
+        [[.5,.57],[.38,.51],[.2,.46],[.06,.45]], [[.52,.57],[.66,.5],[.83,.43],[.96,.39]],
+        [[.51,.68],[.4,.65],[.2,.67],[.06,.7]], [[.51,.68],[.64,.68],[.78,.72],[.93,.77]],
+        [[.5,.39],[.43,.33],[.33,.24],[.25,.16]], [[.52,.51],[.67,.48],[.81,.48],[.98,.51]],
+        [[.49,.62],[.4,.59],[.25,.56],[.1,.55]],
       ];
       branches.forEach((branch, index) => {
-        const amount = clamp(reveal * branches.length - index);
+        const amount = index < state.branchReveals ? 1 : index === state.branchReveals ? state.branchTrace : 0;
         if (amount <= 0) return;
-        ctx.strokeStyle = `rgba(224,207,126,${.16 + amount * .58})`;
-        ctx.lineWidth = 1.2 + amount * 1.8;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        const steps = 28;
+        ctx.strokeStyle = `rgba(224,207,126,${.18 + amount * .52})`; ctx.lineWidth = 1.1 + amount * 1.7; ctx.lineCap = 'round'; ctx.beginPath();
+        const steps = 30;
         for (let step = 0; step <= Math.ceil(steps * amount); step += 1) {
           const t = Math.min(1, step / steps); const q = 1 - t;
           const x = q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0];
@@ -411,9 +435,9 @@
         ctx.stroke();
       });
     } else if (state.day === 7) {
-      ctx.strokeStyle = `rgba(199,220,196,${.07 + m.wind * .24})`; ctx.lineWidth = 1.2; const motion = state.reducedMotion ? 0 : Math.sin(t / 700) * 12; for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
+      ctx.strokeStyle = `rgba(199,220,196,${.1 + m.wind * .34})`; ctx.lineWidth = 1.35; const motion = state.reducedMotion ? 0 : Math.sin(t / 620) * (5 + m.wind * 36); for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
     } else if (state.day === 8) {
-      const points = [[.63,.44],[.72,.56],[.48,.63],[.78,.35],[.38,.48]]; points.slice(0, Math.ceil(state.progress * 5)).forEach(([x,y], index) => { const glow = ctx.createRadialGradient(w*x,h*y,0,w*x,h*y,36); glow.addColorStop(0, `rgba(216,177,91,${.38 - index*.03})`); glow.addColorStop(1,'rgba(216,177,91,0)'); ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(w*x,h*y,36,0,Math.PI*2); ctx.fill(); });
+      const points = [[.63,.44],[.72,.56],[.48,.63],[.78,.35],[.38,.48]]; points.forEach(([x,y], index) => { ctx.strokeStyle = 'rgba(215,188,104,.42)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(w*x,h*y,12,0,Math.PI*2); ctx.stroke(); if (index < Math.ceil(state.progress * 5)) { const glow = ctx.createRadialGradient(w*x,h*y,0,w*x,h*y,36); glow.addColorStop(0, `rgba(216,177,91,${.42 - index*.03})`); glow.addColorStop(1,'rgba(216,177,91,0)'); ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(w*x,h*y,36,0,Math.PI*2); ctx.fill(); } });
     } else if (state.day === 9) {
       ctx.fillStyle = `rgba(227,235,222,${state.progress * .12})`; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = `rgba(235,221,169,${state.progress * .42})`; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(w * (.5 - state.progress * .25), h * .57); ctx.quadraticCurveTo(w*.5,h*.5,w*(.5 + state.progress*.27),h*.47); ctx.stroke();
     }

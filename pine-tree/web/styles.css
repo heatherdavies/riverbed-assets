@@ -39,6 +39,10 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .scene.practice-complete .day-one-completion { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .scene.day-one-complete .seed-target { opacity: 0; transform: translate(-50%, calc(-50% + 20px)) scale(.42); transition: opacity 1100ms ease, transform 1300ms cubic-bezier(.2,.72,.25,1); }
 .scene.day-one-complete .seed-target-label { opacity: 0; }
+.branch-target { position: absolute; left: 50%; top: 46%; z-index: 3; display: none; width: 86px; height: 86px; transform: translate(-50%, -50%); pointer-events: none; }
+.branch-target-ring { position: absolute; inset: 8px; border: 1.5px solid rgba(222, 194, 108, .96); border-radius: 50%; box-shadow: 0 0 0 7px rgba(201,178,104,.11), 0 0 26px rgba(215,188,103,.32); animation: breathe 2.6s ease-in-out infinite; }
+.branch-target-label { position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); white-space: nowrap; color: var(--ivory); font-size: 9px; font-weight: 600; letter-spacing: .16em; text-shadow: 0 2px 11px rgba(0,0,0,.85); }
+.scene[data-day="5"]:not(.practice-intro-open):not(.practice-complete) .branch-target { display: block; }
 
 .topbar { position: absolute; inset: max(22px, env(safe-area-inset-top)) 22px auto; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px; z-index: 3; }
 .mark, .menu-button, .close-panel { appearance: none; border: 1px solid var(--hairline); background: rgba(5, 29, 20, .76); cursor: pointer; }

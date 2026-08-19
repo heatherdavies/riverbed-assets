@@ -101,3 +101,14 @@ The Day 6 scene contains a central vertical trunk with pronounced upper-left, up
 
 Day 3 was exercised through multiple alternating brush passes across the soil layer, reaching completion only after the deliberate sweep sequence while retaining the accumulated clear paths. Day 6 was exercised with outward sweeps toward the main branch directions and completed with retained branch-reveal progress.
 The Day 6 completed scene was visually inspected after outward sweeps. Retained warm-gilt lines extend from the central trunk through the main upper-left, upper-right, mid-left, mid-right, and lower-right visible branch paths, remaining behind the completion card to make the canopy-opening response legible.
+
+## Late-journey asset recovery
+
+Day 7 was reopened from the cache-busted build. Its asset decoded successfully at 1080×1920, and the opening instruction now clearly says to brush left and right across the canopy and watch the tree bend and return; its persistent cue is `SWAY THE CANOPY`.
+
+The cache-busted Days 7–9 assets each decoded successfully at 1080×1920 with their revised image-grounded instructions and cues. Day 6 was validated with nine separate outward sweeps: progress advanced exactly 1/9 at a time through 0.111, 0.222, 0.333, 0.444, 0.556, 0.667, 0.778, 0.889, and 1.000, then displayed the `Opening.` completion state.
+
+Full mobile-style gesture sequences were executed for Days 5, 7, 8, and 9. The gold-ring circle, canopy sway brushes, five detail touches, and outward forest sweeps each reached progress 1, recorded their respective completion, and left no active contacts.
+A Day 5 mobile visual inspection showed that the canvas ring was not sufficiently visible against the branch photograph. The repair will use a dedicated high-contrast, non-interactive HTML target anchored to the young branch cluster so the target is unmistakable.
+The final Day 5 check confirmed that, after its introduction is dismissed, the explicit branch target is visible (`display: block`) and labelled `CIRCLE HERE` while the persistent cue reads `CIRCLE THE GOLD RING`.
+Visual inspection confirmed that the Day 5 `CIRCLE HERE` gold ring is now clearly visible on the young central branch cluster and is reinforced by the lower-screen `CIRCLE THE GOLD RING` cue.
