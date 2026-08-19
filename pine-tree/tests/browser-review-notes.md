@@ -62,3 +62,9 @@ The existing lower-right Journey control and Day 1 rail dot can navigate between
 The hardened completion control successfully opened Day 2. Day 2 now displays a clearly labeled `← RETURN TO ROOTING THE SEED` action beneath the guided gesture control, providing an explicit return path without relying on the small day rail or side-panel trigger.
 
 The explicit return-to-seed control was activated from Day 2 and restored Day 1’s rooted completion state. A direct `pointerup` validation confirmed that the action reaches Day 1 and restores the expected completion response without depending on a synthesized browser click.
+
+## Unified nine-day open-scene layout
+
+All nine days were checked through the review state. Each day opens with the shared introduction panel visible and no persistent ritual-copy overlay. Dismissing the introduction leaves the panel hidden and the ritual copy absent on every day, preserving an open tactile scene across the complete journey.
+
+Touch-style pointer-release checks confirmed that the shared introduction dismisses on Day 2, the Journey menu opens, and the direct return action reaches Day 1. A fresh Day 1 test then dismissed the shared introduction, completed a stationary 3.4-second seed hold, and activated the visible rooted completion state with enabled continuation controls.

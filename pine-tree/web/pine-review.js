@@ -78,16 +78,16 @@
   function current() { return DAYS[state.day - 1]; }
 
   function updateDayOneIntro() {
-    const show = state.day === 1 && state.introVisible;
+    const show = state.introVisible;
     elements.intro.classList.toggle('visible', show);
-    elements.scene.classList.toggle('day-one-intro-open', show);
+    elements.scene.classList.toggle('practice-intro-open', show);
     clearTimeout(state.introTimer);
     state.introTimer = null;
     if (show && !state.reducedMotion) state.introTimer = setTimeout(dismissIntro, 7200);
   }
 
   function dismissIntro() {
-    if (state.day !== 1 || !state.introVisible) return;
+    if (!state.introVisible) return;
     state.introVisible = false;
     updateDayOneIntro();
   }
@@ -106,7 +106,7 @@
     state.day = clamp(Math.round(day), 1, 9);
     elements.scene.dataset.day = String(state.day);
     const restoredDayOne = state.day === 1 && state.completed.has(1);
-    state.introVisible = state.day === 1 && !restoredDayOne;
+    state.introVisible = !restoredDayOne;
     resetMaterial();
     if (restoredDayOne) {
       state.progress = 1;
@@ -124,6 +124,7 @@
     elements.introTitle.textContent = config.title;
     elements.introIntent.textContent = config.intent;
     elements.introInstruction.textContent = config.instruction;
+    elements.introDismiss.textContent = state.day === 1 ? 'BEGIN WITH THE SEED' : 'BEGIN PRACTICE';
     elements.prompt.textContent = config.prompt;
     elements.assist.textContent = `GUIDED ${config.prompt}`;
     elements.panelDay.textContent = `${String(config.day).padStart(2, '0')} / 09`;

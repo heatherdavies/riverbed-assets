@@ -58,7 +58,7 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .day-dot.active { background: var(--jade); border-color: var(--gilt); transform: scale(1.22); }
 .day-dot.active::after { background: var(--ivory); }
 
-.ritual-copy { position: absolute; left: 28px; right: 28px; bottom: calc(max(30px, env(safe-area-inset-bottom)) + 40px); z-index: 2; max-width: 560px; text-shadow: 0 2px 18px rgba(0, 0, 0, .72); pointer-events: none; transition: opacity 300ms ease; }
+.ritual-copy { position: absolute; left: 28px; right: 28px; bottom: calc(max(30px, env(safe-area-inset-bottom)) + 40px); z-index: 2; display: none; max-width: 560px; text-shadow: 0 2px 18px rgba(0, 0, 0, .72); pointer-events: none; transition: opacity 300ms ease; }
 .eyebrow { margin: 0 0 9px; color: var(--gilt); }
 h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9vw, 76px); font-weight: 400; letter-spacing: -.035em; line-height: .89; margin: 0; max-width: 380px; }
 .intent { font-family: "Cormorant Garamond", Georgia, serif; font-size: 22px; font-style: italic; margin: 12px 0 0; color: rgba(245,240,221,.86); }
@@ -67,15 +67,15 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 .gesture-orbit { width: 25px; height: 25px; border: 1px solid var(--gilt); border-radius: 50%; position: relative; animation: breathe 2.8s ease-in-out infinite; }
 .gesture-orbit::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1px solid rgba(245,240,221,.55); }
 .assist-button { display: block; pointer-events: auto; margin-top: 16px; padding: 9px 13px; border: 1px solid rgba(242,234,193,.48); background: rgba(4, 28, 19, .55); color: rgba(245,240,221,.86); border-radius: 3px; text-transform: uppercase; letter-spacing: .12em; font-size: 9px; cursor: pointer; }
-.return-to-seed { display: none; pointer-events: auto; margin: 15px 0 0; padding: 4px 0; border: 0; background: transparent; color: rgba(245,240,221,.76); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .12em; text-decoration: underline; text-underline-offset: 4px; }
+.return-to-seed { position: absolute; left: 23px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 18px); z-index: 4; display: none; pointer-events: auto; padding: 8px 0; border: 0; background: transparent; color: rgba(245,240,221,.8); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; text-decoration: underline; text-underline-offset: 4px; }
 .scene:not([data-day="1"]) .return-to-seed { display: block; }
 .completion-copy { display: none; max-width: 390px; margin: 20px 0 0; font-family: "Cormorant Garamond", Georgia, serif; color: var(--ivory); font-size: 23px; font-style: italic; line-height: 1.1; }
 .ritual-copy.completed .instruction, .ritual-copy.completed .gesture-prompt, .ritual-copy.completed .assist-button { display: none; }
 .ritual-copy.completed .completion-copy { display: block; }
 .scene[data-day="1"] .ritual-copy { display: none; }
-.day-one-intro { position: absolute; top: calc(max(22px, env(safe-area-inset-top)) + 118px); left: 20px; right: 20px; z-index: 5; display: none; padding: 18px 19px 15px; border: 1px solid rgba(212, 196, 131, .3); border-radius: 4px; background: linear-gradient(135deg, rgba(4, 31, 21, .88), rgba(5, 22, 15, .68)); box-shadow: 0 13px 35px rgba(0, 0, 0, .24); backdrop-filter: blur(9px); transition: opacity 900ms ease, transform 900ms ease; }
-.day-one-intro.visible { display: block; animation: intro-arrive 700ms ease both; }
-.day-one-intro h1 { margin: 0; max-width: 320px; color: var(--ivory); font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(36px, 9vw, 52px); font-weight: 400; letter-spacing: -.035em; line-height: .9; }
+.practice-intro { position: absolute; top: calc(max(22px, env(safe-area-inset-top)) + 118px); left: 20px; right: 20px; z-index: 5; display: none; padding: 18px 19px 15px; border: 1px solid rgba(212, 196, 131, .3); border-radius: 4px; background: linear-gradient(135deg, rgba(4, 31, 21, .88), rgba(5, 22, 15, .68)); box-shadow: 0 13px 35px rgba(0, 0, 0, .24); backdrop-filter: blur(9px); transition: opacity 900ms ease, transform 900ms ease; }
+.practice-intro.visible { display: block; animation: intro-arrive 700ms ease both; }
+.practice-intro h1 { margin: 0; max-width: 320px; color: var(--ivory); font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(36px, 9vw, 52px); font-weight: 400; letter-spacing: -.035em; line-height: .9; }
 .intro-intent { margin: 9px 0 0; color: rgba(245,240,221,.88); font-family: "Cormorant Garamond", Georgia, serif; font-size: 20px; font-style: italic; }
 .intro-instruction { max-width: 355px; margin: 13px 0 0; color: var(--muted-ivory); font-size: 13px; line-height: 1.48; }
 .intro-dismiss { appearance: none; display: inline-flex; margin-top: 16px; padding: 9px 12px; border: 1px solid rgba(230, 214, 153, .55); border-radius: 2px; background: rgba(19, 69, 48, .35); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
@@ -109,5 +109,5 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 @keyframes breathe { 0%, 100% { transform: scale(.9); opacity: .58; } 50% { transform: scale(1.13); opacity: 1; } }
 @keyframes intro-arrive { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes seed-breathe { 0%, 100% { transform: scale(.92); opacity: .58; } 50% { transform: scale(1.06); opacity: 1; } }
-@media (min-width: 760px) { .ritual-copy { left: 8vw; bottom: 9vh; } .topbar { inset-left: 5vw; inset-right: 5vw; } .stage-strip, .day-rail { left: 5vw; right: 5vw; } .menu-button { right: 5vw; bottom: 5vh; } .day-one-intro { left: 8vw; right: auto; width: min(410px, 38vw); } .day-one-completion { left: 8vw; right: auto; width: min(370px, 38vw); } }
+@media (min-width: 760px) { .ritual-copy { left: 8vw; bottom: 9vh; } .topbar { inset-left: 5vw; inset-right: 5vw; } .stage-strip, .day-rail { left: 5vw; right: 5vw; } .menu-button { right: 5vw; bottom: 5vh; } .practice-intro { left: 8vw; right: auto; width: min(410px, 38vw); } .day-one-completion { left: 8vw; right: auto; width: min(370px, 38vw); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
