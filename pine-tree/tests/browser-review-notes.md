@@ -112,3 +112,7 @@ Full mobile-style gesture sequences were executed for Days 5, 7, 8, and 9. The g
 A Day 5 mobile visual inspection showed that the canvas ring was not sufficiently visible against the branch photograph. The repair will use a dedicated high-contrast, non-interactive HTML target anchored to the young branch cluster so the target is unmistakable.
 The final Day 5 check confirmed that, after its introduction is dismissed, the explicit branch target is visible (`display: block`) and labelled `CIRCLE HERE` while the persistent cue reads `CIRCLE THE GOLD RING`.
 Visual inspection confirmed that the Day 5 `CIRCLE HERE` gold ring is now clearly visible on the young central branch cluster and is reinforced by the lower-screen `CIRCLE THE GOLD RING` cue.
+
+## Completion timing validation
+
+Day 6 was brought to full progress while its contact remained active. After an 850 ms hold at full progress, it had no completion card and no completed status. After the pointer released and the 620 ms settling interval elapsed, the card appeared and Day 6 was recorded complete. This confirms that completion no longer interrupts active interaction.

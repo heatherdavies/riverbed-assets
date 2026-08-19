@@ -49,6 +49,8 @@
     brushes: [],
     branchReveals: 0,
     branchTrace: 0,
+    pendingCompletion: false,
+    completionTimer: null,
     sound: localStorage.getItem('pine-review-sound') === 'on',
     haptics: localStorage.getItem('pine-review-haptics') || 'subtle',
     reducedMotion: localStorage.getItem('pine-review-motion') === 'on',
@@ -122,6 +124,8 @@
     state.brushes = [];
     state.branchReveals = 0;
     state.branchTrace = 0;
+    state.pendingCompletion = false;
+    clearTimeout(state.completionTimer); state.completionTimer = null;
     elements.scene.classList.remove('day-one-complete', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
@@ -313,12 +317,30 @@
       case 9: { const out = Math.abs(dx) + Math.abs(dy) + speed * .03; state.progress = clamp(state.progress + out * .32); break; }
     }
     if (state.progress > before + .015 || contact.phase === 'begin') respond('contact', Math.max(move, speed, .18));
-    if (state.progress >= .999) completeDay();
+    if (state.progress >= .999) queueCompletion();
+  }
+
+  function queueCompletion() {
+    if (state.completed.has(state.day) || state.pendingCompletion) return;
+    state.pendingCompletion = true;
+    elements.scene.classList.add('settling-completion');
+    if (!state.contacts.size) scheduleCompletion();
+  }
+
+  function scheduleCompletion() {
+    if (!state.pendingCompletion || state.contacts.size) return;
+    clearTimeout(state.completionTimer);
+    state.completionTimer = setTimeout(() => {
+      if (!state.pendingCompletion || state.contacts.size) return;
+      state.pendingCompletion = false;
+      elements.scene.classList.remove('settling-completion');
+      completeDay();
+    }, state.reducedMotion ? 220 : 620);
   }
 
   function assistedAdvance() {
     state.progress = clamp(state.progress + .16); state.material.soil = Math.max(state.material.soil, state.progress * .75); state.material.root = Math.max(state.material.root, state.progress * .75); state.material.bark = Math.max(state.material.bark, state.progress * .35); state.material.bough = Math.max(state.material.bough, state.progress * .3); state.material.needles = Math.max(state.material.needles, .16 + state.progress * .18);
-    respond('movement', .35); if (state.progress >= .999) completeDay();
+    respond('movement', .35); if (state.progress >= .999) queueCompletion();
   }
 
   function completeDay() {
@@ -333,6 +355,7 @@
     if (state.day === 2) state.material.root = 1;
     if (state.day === 3) { state.material.soil = 1; state.material.needles = .7; }
     if (state.day === 4) state.material.bark = 1;
+    elements.scene.classList.remove('settling-completion');
     showCompletionState();
     if (newlyCompleted) respond('completion', .9);
   }
@@ -463,7 +486,7 @@
     elements.scene.addEventListener('touchmove', blockNativeSceneGesture, { passive: false });
     elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); }));
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); if (!state.contacts.size && state.pendingCompletion) scheduleCompletion(); }));
     bindPrimaryControls();
     window.addEventListener('resize', resize);
   }
