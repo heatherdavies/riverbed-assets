@@ -46,3 +46,9 @@ A Day 1 hold was tested without any pointer movement. At 1.7 seconds, the ritual
 After a 3.4-second stationary Day 1 hold, the review reached `progress: 1`, persisted Day 1 as complete, and activated the dedicated completion state. The completion panel had active pointer events and includes a continuation control for Day 2. Its opacity was transitioning in at the instant of the automated check, as intended by the calm entrance animation.
 
 The completed Day 1 panel was visually inspected after its entrance animation: it presents `Rooted.`, retains an open view of the settled seed, and gives a clear `CONTINUE TO DEEP ANCHOR` action. Activating that control opened Day 2, updated the journey status to `02 / 09`, and correctly retained Day 1’s completed mark.
+
+## Persistent Day 1 completion restoration
+
+Validation was run for a fresh review reset, a newly completed stationary hold, and navigation away from and back to Day 1. The fresh state correctly had no saved completion; the completed state reached `progress: 1`; and returning to Day 1 restored `progress: 1` with the Day 1 completion state rather than leaving a bare completed bar. The completion panel’s visual transition was still in progress at the instant of automated state sampling and was queued for a settled-state check.
+
+A settled-state check confirmed that resetting the review removes the completion class, hides the Day 1 completion panel, and restores the introduction panel. A separate completed-and-revisited check confirmed that returning to Day 1 restores `progress: 1`, the `day-one-complete` scene class, full completion-panel opacity, and enabled continuation controls.

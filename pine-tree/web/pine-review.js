@@ -89,8 +89,14 @@
   function setDay(day) {
     state.day = clamp(Math.round(day), 1, 9);
     elements.scene.dataset.day = String(state.day);
-    state.introVisible = state.day === 1;
+    const restoredDayOne = state.day === 1 && state.completed.has(1);
+    state.introVisible = state.day === 1 && !restoredDayOne;
     resetMaterial();
+    if (restoredDayOne) {
+      state.progress = 1;
+      state.material.soil = .88;
+      elements.scene.classList.add('day-one-complete');
+    }
     const config = current();
     elements.image.classList.remove('loaded');
     elements.image.src = config.image;
@@ -187,15 +193,20 @@
   }
 
   function completeDay() {
-    if (state.completed.has(state.day)) return;
-    state.progress = 1; state.completed.add(state.day); persist(); renderNavigation();
+    const newlyCompleted = !state.completed.has(state.day);
+    state.progress = 1;
+    if (newlyCompleted) {
+      state.completed.add(state.day);
+      persist();
+      renderNavigation();
+    }
     if (state.day === 1) {
       state.material.soil = 1;
       elements.scene.classList.add('day-one-complete');
     } else {
       elements.copy.classList.add('completed'); elements.completion.textContent = current().contemplation;
     }
-    respond('completion', .9);
+    if (newlyCompleted) respond('completion', .9);
   }
 
   function respond(kind, strength) {
