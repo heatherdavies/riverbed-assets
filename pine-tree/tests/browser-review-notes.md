@@ -235,3 +235,9 @@ The first fresh visual check showed the revised drawn-root start is closer to th
 The final Day 2 alignment preview reached a completed root state with the visual-only upper anchor at `x: .552, y: .315`; the original interaction corridor and progress state remained unchanged. A final overlap inspection follows.
 
 The final Day 2 visual check shows the white root’s upper start now meeting the photographed root at the natural upper junction, rather than beginning visibly to its left. The adjustment remains visual-only; gesture and progress behavior were not changed.
+
+## 2026-08-20 — Day 2 seed-junction correction (port 4189)
+
+The Day 2 root was restored to its seed-junction start at `x: .5, y: .29`, with only a gentler initial visual curve applied. The original gesture corridor and root-progress behavior remain unchanged; the fresh completed-root view is ready for final visual confirmation.
+
+The final fresh Day 2 completion check confirms the drawn root starts again at the original seed junction (`x: .5, y: .29`) rather than the displaced lower-right anchor. Its only retained refinement is the gentler initial curve, which follows the photographed root’s first segment without changing interaction behavior.

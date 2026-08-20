@@ -534,7 +534,7 @@
       if (!state.pendingCompletion && !state.completed.has(1)) { const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill(); }
 
     } else if (state.day === 2) {
-      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .552, h * .315); const yEnd = h * (.315 + progress * .555); ctx.bezierCurveTo(w * .465, h * .47, w * .56, h * .66, w * .49, yEnd); ctx.stroke();
+      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .29); const yEnd = h * (.29 + progress * .58); ctx.bezierCurveTo(w * .48, h * .41, w * .56, h * .66, w * .49, yEnd); ctx.stroke();
     } else if (state.day === 3 && !state.completed.has(3)) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
