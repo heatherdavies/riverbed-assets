@@ -321,3 +321,27 @@ Final visual inspection confirmed the extended guide has no separate side-twig s
 A trace through the final overlap segment reached `progress: 0.1342`, beginning at the adjusted seed-exit endpoint and continuing through the first photographed-root bend. A visual confirmation follows.
 
 Final inspection confirmed the adjusted guide follows the photographed root through the rendered crop; its first endpoint was moved up and right to overlap the seed’s visible lower-right root exit on the mobile scene.
+
+## 2026-08-20 — Day 3 denser soil concealment (port 4205)
+
+The fresh Day 3 practice opened with `progress: 0`, no completed state, no active contacts, and its introduction dismissed. The denser soil layer is ready for unbrushed visual inspection and subsequent brush-reveal validation.
+
+The denser Day 3 overlay fully concealed the seedling in the unbrushed state, but visual inspection found its continuous radial base reads as an overly smooth oval. The final refinement will preserve concealment while replacing that silhouette with an irregular, soil-like patch edge and denser natural clumps.
+
+## 2026-08-20 — Day 3 irregular dense soil patch (port 4206)
+
+The revised Day 3 practice opened unbrushed at `progress: 0`, with no completed state or active contacts. The irregular opaque soil footprint is ready for visual inspection before confirming its brush-reveal behavior.
+
+## 2026-08-20 — Day 3 photorealistic soil asset (port 4207)
+
+The Day 3 practice opened unbrushed at `progress: 0`. The preloaded transparent soil asset was present and decoded at `1800 × 1200`, ready to be drawn through the persistent brushing mask. A visual concealment check follows.
+
+## 2026-08-20 — Day 3 clean photorealistic soil overlay (port 4208)
+
+The cleaned transparent soil asset was loaded successfully in the Day 3 practice at `progress: 0`, with no active contacts or completed state. Its unbrushed artifact-free appearance and persistent reveal behavior are pending final inspection.
+
+A five-row pointer-style brushing pass across the new Day 3 photorealistic soil patch reached `progress: 0.9211` without loss of the existing interaction state. The final visual check will confirm that cleared paths reveal the seedling through the new asset.
+
+The final Day 3 brushing pass reached `progress: 1` with no active contacts. The new photorealistic soil asset cleared successfully through the existing persistent mask, and the settled reveal state was then checked.
+
+Settled Day 3 completion confirmed: the photorealistic soil layer was fully removed after brushing, the seedling reveal remained intact, and the existing First light completion state appeared normally.

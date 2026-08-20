@@ -76,7 +76,7 @@
 
   const $ = (selector) => document.querySelector(selector);
   const elements = {
-    scene: $('#scene'), image: $('#sceneImage'), dayTwoImage: $('#dayTwoSceneImage'), windImage: $('#windSceneImage'), buriedImage: $('#buriedSceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
+    scene: $('#scene'), image: $('#sceneImage'), dayTwoImage: $('#dayTwoSceneImage'), windImage: $('#windSceneImage'), buriedImage: $('#buriedSceneImage'), dayThreeSoil: $('#dayThreeSoilTexture'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
@@ -584,17 +584,36 @@
     } else if (state.day === 3 && !state.completed.has(3)) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
-      const soilPatch = ctx.createRadialGradient(w * .5, h * .67, 6, w * .5, h * .67, Math.min(w, h) * .27);
-      soilPatch.addColorStop(0, 'rgba(57,40,25,.76)'); soilPatch.addColorStop(.58, 'rgba(35,27,18,.62)'); soilPatch.addColorStop(1, 'rgba(16,17,11,0)');
-      ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .67, w * .25, h * .14, 0, 0, Math.PI * 2); ctx.fill();
-      for (let i = 0; i < 96; i += 1) {
-        const dx = (((i * 47) % 101) / 50) - 1;
-        const dy = (((i * 61) % 101) / 50) - 1;
+      const soilTexture = elements.dayThreeSoil;
+      if (soilTexture && soilTexture.complete && soilTexture.naturalWidth) {
+        ctx.drawImage(soilTexture, w * .17, h * .485, w * .66, h * .37);
+      } else {
+      ctx.fillStyle = 'rgba(42,29,17,.97)';
+      ctx.beginPath();
+      for (let i = 0; i <= 30; i += 1) {
+        const angle = (i / 30) * Math.PI * 2;
+        const wobble = .84 + (((i * 37) % 19) / 100);
+        const px = w * .5 + Math.cos(angle) * w * .275 * wobble;
+        const py = h * .67 + Math.sin(angle) * h * .165 * (1.02 + (((i * 17) % 13) / 100));
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.fill();
+      for (let i = 0; i < 188; i += 1) {
+        const dx = (((i * 47) % 211) / 105) - 1;
+        const dy = (((i * 83) % 211) / 105) - 1;
         if (dx * dx + dy * dy > 1) continue;
-        const px = w * (.5 + dx * .225); const py = h * (.67 + dy * .115);
-        const size = .65 + (i % 5) * .42;
-        ctx.fillStyle = i % 3 === 0 ? 'rgba(101,75,45,.16)' : i % 3 === 1 ? 'rgba(63,45,27,.22)' : 'rgba(28,24,16,.28)';
-        ctx.beginPath(); ctx.ellipse(px, py, size * (1.3 + (i % 2) * .35), size, (i % 7) * .36, 0, Math.PI * 2); ctx.fill();
+        const px = w * (.5 + dx * .255); const py = h * (.67 + dy * .14);
+        const size = .72 + (i % 7) * .38;
+        ctx.fillStyle = i % 5 === 0 ? 'rgba(116,83,46,.34)' : i % 5 === 1 ? 'rgba(76,52,28,.46)' : i % 5 === 2 ? 'rgba(48,34,20,.58)' : 'rgba(24,21,14,.7)';
+        ctx.beginPath(); ctx.ellipse(px, py, size * (1.25 + (i % 3) * .28), size * (.78 + (i % 2) * .18), (i % 9) * .32, 0, Math.PI * 2); ctx.fill();
+      }
+      for (let i = 0; i < 46; i += 1) {
+        const dx = (((i * 29) % 113) / 56) - 1; const dy = (((i * 43) % 113) / 56) - 1;
+        if (dx * dx + dy * dy > .93) continue;
+        const px = w * (.5 + dx * .238); const py = h * (.67 + dy * .132); const size = 2.1 + (i % 6) * 1.18;
+        ctx.fillStyle = i % 3 === 0 ? 'rgba(20,16,11,.86)' : i % 3 === 1 ? 'rgba(76,50,27,.66)' : 'rgba(116,78,42,.44)';
+        ctx.beginPath(); ctx.ellipse(px, py, size * (1.25 + (i % 3) * .25), size, (i % 6) * .46, 0, Math.PI * 2); ctx.fill();
+      }
       }
       ctx.globalCompositeOperation = 'destination-out';
       state.clearedSoil.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,1)'); clear.addColorStop(.68, 'rgba(0,0,0,.92)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); });
