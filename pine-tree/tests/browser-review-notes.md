@@ -211,3 +211,9 @@ The explicit gap was increased to `.72em` and rechecked on the fresh port 4182 p
 ## 2026-08-20 — Day 1 instruction-block separation (port 4183)
 
 The full two-line Day 1 instruction block was raised from `40%` to `36%` of scene height, while preserving its approved internal `.72em` line gap. The fresh preview confirmed visibly comfortable separation between the bottom instruction line and the `TOUCH THE SEED` cue, with the seed target remaining unchanged.
+
+## 2026-08-20 — Day 1 pre-plant reflection placement (port 4184)
+
+The fresh Day 1 opening veil displays `What intention are you ready to place in the soil?` beneath the planting intention and before `HOW TO BEGIN`. A completed Day 1 state was then reached after the ritual; the post-plant `Planted.` card returned `completionReflectionHidden: true` and an empty reflection text, confirming the question no longer repeats after planting.
+
+A separate Day 2 completion check retained its reflection (`Strength begins below the surface.`) with `completionReflectionHidden: false`, confirming the new hidden-state behavior is confined to the intentionally blank Day 1 completion reflection.

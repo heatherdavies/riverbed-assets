@@ -16,7 +16,7 @@
   }));
 
   const COMPLETIONS = [
-    ['Planted.', 'What intention are you ready to place in the soil?'],
+    ['Planted.', ''],
     ['Anchored.', 'Strength begins below the surface.'],
     ['First light.', 'A first green sign is enough.'],
     ['Steady.', 'Let your structure rise from what is grounded.'],
@@ -167,6 +167,7 @@
     elements.completionKicker.textContent = `DAY ${String(state.day).padStart(2, '0')} COMPLETE`;
     elements.completionTitle.textContent = title;
     elements.completionReflection.textContent = reflection;
+    elements.completionReflection.hidden = !reflection;
     elements.nextDay.textContent = next ? `CONTINUE TO ${next.title.toUpperCase()}` : 'RETURN TO DAY 1';
     elements.restartDay.textContent = state.day === 1 ? 'START AGAIN AT DAY 1' : 'START THE JOURNEY AGAIN';
     elements.scene.classList.add('practice-complete');
