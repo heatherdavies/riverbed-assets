@@ -246,7 +246,7 @@
       elements.buriedImage.alt = 'Day 1: planted seed beneath soil.';
       elements.buriedImage.addEventListener('load', () => elements.buriedImage.classList.add('loaded'), { once: true });
     }
-    elements.image.alt = `Day ${config.day}: ${config.title}.`;
+    elements.image.alt = '';
     elements.stage.textContent = `DAY ${String(config.day).padStart(2, '0')} · ${config.stage.toUpperCase()}`;
     elements.title.textContent = config.title;
     elements.intent.textContent = config.intent;

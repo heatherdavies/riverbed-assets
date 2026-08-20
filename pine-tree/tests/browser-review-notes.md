@@ -217,3 +217,7 @@ The full two-line Day 1 instruction block was raised from `40%` to `36%` of scen
 The fresh Day 1 opening veil displays `What intention are you ready to place in the soil?` beneath the planting intention and before `HOW TO BEGIN`. A completed Day 1 state was then reached after the ritual; the post-plant `Planted.` card returned `completionReflectionHidden: true` and an empty reflection text, confirming the question no longer repeats after planting.
 
 A separate Day 2 completion check retained its reflection (`Strength begins below the surface.`) with `completionReflectionHidden: false`, confirming the new hidden-state behavior is confined to the intentionally blank Day 1 completion reflection.
+
+## 2026-08-20 — Day 1 semi-transparent veil repair (port 4185)
+
+The fresh opening preview shows the Day 1 seed photograph clearly but softly beneath the forest-green veil. No stray fallback label or symbol appears over the opening copy. Browser verification reported `naturalWidth: 1080`, `complete: true`, empty alternative text, and an active veil state, confirming that the seed image is loaded while fallback text remains suppressed.
