@@ -37,7 +37,7 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .completion-next { appearance: none; margin-top: 17px; padding: 10px 12px; border: 1px solid rgba(230, 214, 153, .56); border-radius: 2px; background: rgba(19, 69, 48, .4); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
 .completion-restart { appearance: none; display: block; margin: 12px 0 0; padding: 5px 0; border: 0; background: transparent; color: rgba(245,240,221,.76); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .13em; text-decoration: underline; text-underline-offset: 4px; }
 .scene.practice-complete .day-one-completion { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.scene.day-one-complete .seed-target { opacity: 0; transform: translate(-50%, calc(-50% + 20px)) scale(.42); transition: opacity 1100ms ease, transform 1300ms cubic-bezier(.2,.72,.25,1); }
+.scene[data-day="1"].settling-completion .seed-target, .scene.day-one-complete .seed-target { opacity: 0; transform: translate(-50%, calc(-50% + 24px)) scale(.34); transition: opacity 1500ms ease, transform 1650ms cubic-bezier(.2,.72,.25,1); }
 .scene.day-one-complete .seed-target-label { opacity: 0; }
 .branch-target { position: absolute; left: 50%; top: 46%; z-index: 3; display: none; width: 86px; height: 86px; transform: translate(-50%, -50%); pointer-events: none; }
 .branch-target-ring { position: absolute; inset: 8px; border: 1.5px solid rgba(222, 194, 108, .96); border-radius: 50%; box-shadow: 0 0 0 7px rgba(201,178,104,.11), 0 0 26px rgba(215,188,103,.32); animation: breathe 2.6s ease-in-out infinite; }

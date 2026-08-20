@@ -116,3 +116,9 @@ Visual inspection confirmed that the Day 5 `CIRCLE HERE` gold ring is now clearl
 ## Completion timing validation
 
 Day 6 was brought to full progress while its contact remained active. After an 850 ms hold at full progress, it had no completion card and no completed status. After the pointer released and the 620 ms settling interval elapsed, the card appeared and Day 6 was recorded complete. This confirms that completion no longer interrupts active interaction.
+
+Day 1 burial timing test exposed a regression: the Rooted card was already visible at the 900 ms post-release checkpoint, rather than waiting for the intended 1.85-second burial interval. The scheduling path requires correction before publication.
+
+## Day 1 narrative transition
+
+The review now presents Day 1 as `Planting the Seed` and completes as `Planted.` with the approved planting reflection. Its continuation action successfully opens Day 2 `Deep Anchor`, whose instruction introduces the visible taproot as the next growth stage.

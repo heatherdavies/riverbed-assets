@@ -2,7 +2,7 @@
   'use strict';
 
   const DAYS = [
-    ['Grounding & Anchoring', 'Rooting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press slowly until the soil yields.', 'What is ready to take root, quietly and without force?', 'REST & HOLD', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
+    ['Grounding & Anchoring', 'Planting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press it gently into the soil.', 'What intention are you ready to place in the soil?', 'PRESS INTO SOIL', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
     ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil softly away from the new needles.', 'A first green sign is enough.', 'BRUSH SOFTLY', 'soft-brush', '../assets/day-03-first-light.webp'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
@@ -16,7 +16,7 @@
   }));
 
   const COMPLETIONS = [
-    ['Rooted.', 'What is ready to take root, quietly and without force?'],
+    ['Planted.', 'What intention are you ready to place in the soil?'],
     ['Anchored.', 'Strength begins below the surface.'],
     ['First light.', 'A first green sign is enough.'],
     ['Steady.', 'Let your structure rise from what is grounded.'],
@@ -51,6 +51,8 @@
     branchTrace: 0,
     pendingCompletion: false,
     completionTimer: null,
+    burialStartedAt: 0,
+    seedPoint: { x: 0.51, y: 0.562 },
     sound: localStorage.getItem('pine-review-sound') === 'on',
     haptics: localStorage.getItem('pine-review-haptics') || 'subtle',
     reducedMotion: localStorage.getItem('pine-review-motion') === 'on',
@@ -126,6 +128,7 @@
     state.branchTrace = 0;
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
+    state.burialStartedAt = 0;
     elements.scene.classList.remove('day-one-complete', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
@@ -225,6 +228,7 @@
     const top = elements.image.naturalHeight * DAY_ONE_SEED.y * scale - cropY;
     elements.target.style.left = `${left}px`;
     elements.target.style.top = `${top}px`;
+    state.seedPoint = { x: left / rect.width, y: top / rect.height };
   }
 
   function resize() {
@@ -323,6 +327,7 @@
   function queueCompletion() {
     if (state.completed.has(state.day) || state.pendingCompletion) return;
     state.pendingCompletion = true;
+    if (state.day === 1) state.burialStartedAt = performance.now();
     elements.scene.classList.add('settling-completion');
     if (!state.contacts.size) scheduleCompletion();
   }
@@ -335,7 +340,7 @@
       state.pendingCompletion = false;
       elements.scene.classList.remove('settling-completion');
       completeDay();
-    }, state.reducedMotion ? 220 : 620);
+    }, state.day === 1 ? (state.reducedMotion ? 700 : 1850) : (state.reducedMotion ? 220 : 620));
   }
 
   function assistedAdvance() {
@@ -388,7 +393,7 @@
     const hold = clamp(elapsed / 3200);
     state.material.soil = Math.max(state.material.soil, hold * (.56 + (contact.pressure || .42) * .3));
     state.progress = Math.max(state.progress, hold);
-    if (state.progress >= .999) completeDay();
+    if (state.progress >= .999) queueCompletion();
   }
 
   function draw(timestamp) {
@@ -423,9 +428,9 @@
     const m = state.material; const config = current();
     ctx.save(); ctx.globalCompositeOperation = 'screen';
     if (state.day === 1) {
-      const r = Math.max(35, w * (.08 + m.soil * .13)); const x = w * .51; const y = h * .562;
+      const r = Math.max(35, w * (.055 + m.soil * .075)); const x = w * state.seedPoint.x; const y = h * state.seedPoint.y;
       const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill();
-      if (state.completed.has(1)) { ctx.save(); ctx.globalCompositeOperation = 'source-over'; const soil = ctx.createRadialGradient(x, y, 2, x, y, w * .16); soil.addColorStop(0, 'rgba(24,21,15,.96)'); soil.addColorStop(.48, 'rgba(51,39,25,.8)'); soil.addColorStop(1, 'rgba(15,18,12,0)'); ctx.fillStyle = soil; ctx.beginPath(); ctx.ellipse(x, y, w * .15, w * .105, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+      if (state.pendingCompletion || state.completed.has(1)) { const burial = state.completed.has(1) ? 1 : clamp((t - state.burialStartedAt) / (state.reducedMotion ? 600 : 1600)); const coverY = y + h * .035; ctx.save(); ctx.globalCompositeOperation = 'source-over'; for (let i = 0; i < 38; i += 1) { const angle = i * 2.399; const initialRadius = w * (.105 - (i % 5) * .006); const radius = w * (.012 + (1 - burial) * initialRadius); const px = x + Math.cos(angle) * radius; const py = coverY + Math.sin(angle) * radius * .72; ctx.fillStyle = `rgba(${25 + (i % 4) * 7},${20 + (i % 3) * 6},${13 + (i % 3) * 4},${.28 + burial * .68})`; ctx.beginPath(); ctx.arc(px, py, 2.2 + (i % 4) * 1.35, 0, Math.PI * 2); ctx.fill(); } const soil = ctx.createRadialGradient(x, coverY, 2, x, coverY, w * (.05 + burial * .045)); soil.addColorStop(0, `rgba(12,11,8,${.58 + burial * .37})`); soil.addColorStop(.44, `rgba(34,27,17,${.42 + burial * .5})`); soil.addColorStop(.78, `rgba(58,43,25,${.18 + burial * .3})`); soil.addColorStop(1, 'rgba(15,18,12,0)'); ctx.fillStyle = soil; ctx.beginPath(); ctx.ellipse(x, coverY, w * (.045 + burial * .035), w * (.075 + burial * .055), 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
     } else if (state.day === 2) {
       const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .29); const yEnd = h * (.29 + progress * .58); ctx.bezierCurveTo(w * .45, h * .46, w * .56, h * .66, w * .49, yEnd); ctx.stroke();
     } else if (state.day === 3) {
