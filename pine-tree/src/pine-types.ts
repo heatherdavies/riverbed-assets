@@ -5,6 +5,7 @@ export type GestureKind =
   | 'downward-drag'
   | 'soft-brush'
   | 'upward-trace'
+  | 'spiral-up'
   | 'pinch-circle'
   | 'outward-sweep'
   | 'wind-brush'

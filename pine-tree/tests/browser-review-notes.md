@@ -134,3 +134,7 @@ The review server was restarted from the Pine Tree module root so `/web/` and `/
 ## Day 3 persistent soil clearing and seedling reveal
 
 The Day 3 base image now loads `day-03-seedling-reveal.png`, which contains one young pine seedling rather than a cluster of needles. A direct mobile-style brush stroke increased clearing progress to 0.143. After the touch ended and an additional 1.8-second wait elapsed, progress remained exactly 0.143 with no active contacts, confirming cleared state no longer decays or resets.
+
+## Day 5 spiral-up ritual
+
+The obsolete circle target was replaced by a one-finger guided spiral from the gold base point up the young trunk. A direct 2.5-turn mobile-style spiral completed Day 5 with progress 1.0, no retained contacts, and the completed state recorded after release. The new movement remains distinct from Day 4's central vertical trace and Day 6's outward branch sweeps.

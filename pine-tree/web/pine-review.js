@@ -6,7 +6,7 @@
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
     ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.png'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
-    ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Place two fingers inside the small gold ring around the young branch cluster. Draw one slow circle to strengthen it.', 'Strength can remain responsive.', 'CIRCLE THE GOLD RING', 'two-finger-circle', '../assets/day-05-stronger-structure.webp'],
+    ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Begin at the gold point. Spiral slowly upward around the young trunk.', 'Layer by layer, the young trunk finds its strength.', 'SPIRAL UPWARD', 'upward-spiral', '../assets/day-05-stronger-structure.webp'],
     ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Sweep outward along the branches toward the light.', 'There is room to extend.', 'SWEEP OUTWARD', 'outward-sweep', '../assets/day-06-branching-out.webp'],
     ['Weathering & Completing', 'Weathering Growth', 'Mastering resilience.', 'Brush slowly left and right across the canopy. Watch the tree bend with the wind, then return.', 'Flexibility keeps the roots intact.', 'SWAY THE CANOPY', 'wind-brush', '../assets/day-07-weathering-growth.webp'],
     ['Weathering & Completing', 'Forming Features', 'Integrating wisdom and complexity.', 'Touch five warm points of sap or young cones. Each touch will reveal a quiet glow.', 'Detail holds a living history.', 'TOUCH 5 DETAILS', 'feature-touch', '../assets/day-08-forming-features.webp'],
@@ -20,7 +20,7 @@
     ['Anchored.', 'Strength begins below the surface.'],
     ['First light.', 'A first green sign is enough.'],
     ['Steady.', 'Let your structure rise from what is grounded.'],
-    ['Strengthening.', 'Strength can remain responsive.'],
+    ['Strengthened.', 'Layer by layer, the young trunk finds its strength.'],
     ['Opening.', 'There is room to extend.'],
     ['Resilient.', 'Flexibility keeps the roots intact.'],
     ['Forming.', 'Detail holds a living history.'],
@@ -183,6 +183,7 @@
       if (state.day === 2) state.material.root = 1;
       if (state.day === 3) { state.material.soil = 1; state.material.needles = .7; }
       if (state.day === 4) state.material.bark = 1;
+      if (state.day === 5) state.material.bough = 1;
       if (state.day === 6) { state.branchReveals = 9; state.branchTrace = 0; state.material.bough = 9; }
       showCompletionState();
     }
@@ -310,10 +311,12 @@
         break;
       }
       case 5: {
-        const ringDistance = Math.hypot(contact.x - .5, contact.y - .51);
-        const circleEnergy = move + Math.min(.07, speed * .045);
-        if (ringDistance < .22 && contact.phase === 'move') {
-          state.material.bough = clamp(state.material.bough + circleEnergy * .44);
+        const spiralProgress = clamp((.78 - contact.y) / .43);
+        const guideX = .5 + Math.cos(spiralProgress * Math.PI * 5) * (.072 - spiralProgress * .014);
+        const onSpiral = Math.abs(contact.x - guideX) < .125 && contact.y > .32 && contact.y < .82;
+        const canAdvance = spiralProgress <= state.material.bough + .16;
+        if (onSpiral && canAdvance && contact.phase === 'move' && dy < -.001) {
+          state.material.bough = Math.max(state.material.bough, spiralProgress);
           state.progress = Math.max(state.progress, state.material.bough);
         }
         break;
@@ -462,9 +465,11 @@
     } else if (state.day === 4) {
       ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
     } else if (state.day === 5) {
-      const ring = Math.min(w, h) * .115; const pulse = state.reducedMotion ? 0 : (Math.sin(t / 480) + 1) * .5;
-      ctx.strokeStyle = `rgba(219,193,112,${.6 + pulse * .2})`; ctx.lineWidth = 1.5; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.arc(w * .5, h * .51, ring, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
-      ctx.strokeStyle = `rgba(240,226,164,${.22 + state.progress * .68})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(w * .5, h * .51, ring * .74, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * state.progress); ctx.stroke();
+      const turns = 2.5; const steps = 84; const widthAt = (p) => w * (.072 - p * .014); const xAt = (p) => w * (.5 + Math.cos(p * Math.PI * 2 * turns) * (widthAt(p) / w)); const yAt = (p) => h * (.78 - p * .43); const pulse = state.reducedMotion ? 0 : (Math.sin(t / 560) + 1) * .5;
+      ctx.save(); ctx.lineCap = 'round'; ctx.setLineDash([4, 8]); ctx.strokeStyle = `rgba(219,193,112,${.34 + pulse * .18})`; ctx.lineWidth = 1.2; ctx.beginPath();
+      for (let step = 0; step <= steps; step += 1) { const p = step / steps; if (step === 0) ctx.moveTo(xAt(p), yAt(p)); else ctx.lineTo(xAt(p), yAt(p)); } ctx.stroke(); ctx.setLineDash([]);
+      const progress = Math.max(state.material.bough, state.progress); if (progress > 0) { ctx.strokeStyle = `rgba(240,226,164,${.34 + progress * .56})`; ctx.lineWidth = 2.8; ctx.beginPath(); for (let step = 0; step <= Math.ceil(steps * progress); step += 1) { const p = Math.min(progress, step / steps); if (step === 0) ctx.moveTo(xAt(p), yAt(p)); else ctx.lineTo(xAt(p), yAt(p)); } ctx.stroke(); }
+      const startGlow = ctx.createRadialGradient(xAt(0), yAt(0), 2, xAt(0), yAt(0), 16 + pulse * 5); startGlow.addColorStop(0, 'rgba(245,230,169,.98)'); startGlow.addColorStop(.22, 'rgba(219,193,112,.86)'); startGlow.addColorStop(1, 'rgba(219,193,112,0)'); ctx.fillStyle = startGlow; ctx.beginPath(); ctx.arc(xAt(0), yAt(0), 18 + pulse * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     } else if (state.day === 6) {
       const branches = [
         [[.5,.47],[.43,.4],[.25,.3],[.08,.24]], [[.51,.44],[.61,.37],[.77,.25],[.93,.18]],
