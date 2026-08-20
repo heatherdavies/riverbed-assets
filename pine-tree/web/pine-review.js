@@ -4,7 +4,7 @@
   const DAYS = [
     ['Grounding & Anchoring', 'Planting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press it gently into the soil.', 'What intention are you ready to place in the soil?', 'PRESS INTO SOIL', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
-    ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.png'],
+    ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.webp'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
     ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Begin at the gold point. Spiral slowly upward around the young trunk.', 'Layer by layer, the young trunk finds its strength.', 'SPIRAL UPWARD', 'upward-spiral', '../assets/day-05-stronger-structure.webp'],
     ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Touch a branch, then sweep outward along the branch you chose.', 'There is room to extend.', 'TRACE THE BRANCHES', 'outward-sweep', '../assets/day-06-branching-out.webp'],
@@ -238,7 +238,7 @@
     }
     if (state.day === 1) {
       elements.buriedImage.classList.remove('loaded');
-      elements.buriedImage.src = '../assets/day-01-seed-buried.png?v=20260819-burial-scene-1';
+      elements.buriedImage.src = '../assets/day-01-seed-buried.webp?v=20260820-mobile-asset-1';
       elements.buriedImage.alt = 'Day 1: planted seed beneath soil.';
       elements.buriedImage.addEventListener('load', () => elements.buriedImage.classList.add('loaded'), { once: true });
     }
