@@ -249,3 +249,11 @@ Two direct pointer-style Day 3 brush strokes increased clearing progress to `0.3
 Three additional pointer-style brush strokes advanced Day 3 to `progress: 1` and completed the practice with no active contacts. This confirms the repaired interaction supports both persistent partial clearing and full completion through brushing alone.
 
 The completed Day 3 state removes the temporary loose-soil overlay and leaves the intended seedling reveal visible, followed by the existing First light completion card. The refined soil effect therefore does not persist after the practice is completed.
+
+## 2026-08-20 — Day 3 seedling-centered soil correction (port 4191)
+
+A fresh Day 3 practice state was opened with zero brushing progress after moving the temporary soil layer and brush zone to the lower seedling area. A visual check of the unbrushed overlay follows.
+
+Two pointer-style brush strokes within the moved lower seedling zone advanced Day 3 to `progress: 0.5`; after a 700 ms wait, progress remained `0.5` with no active contacts. The centered soil layer and its persistent clearing behavior therefore remain coupled correctly.
+
+The partial-brush visual check confirmed that both the temporary loose-soil layer and the newly cleared horizontal paths are now centered on the visible seedling, not the earlier root area.

@@ -342,7 +342,7 @@
       }
       case 3: {
         const brush = Math.abs(dx) + Math.abs(dy) + Math.min(.055, Math.abs(contact.vx) * .005 + Math.abs(contact.vy) * .005);
-        const inSeedlingPatch = contact.x > .22 && contact.x < .78 && contact.y > .43 && contact.y < .80;
+        const inSeedlingPatch = contact.x > .25 && contact.x < .75 && contact.y > .52 && contact.y < .80;
         const beginsBrush = contact.phase === 'begin';
         const movesBrush = contact.phase === 'move' && brush > .001;
         if (inSeedlingPatch && (beginsBrush || movesBrush)) {
@@ -351,7 +351,7 @@
             const amount = samples ? index / samples : 1;
             const x = contact.px + (contact.x - contact.px) * amount;
             const y = contact.py + (contact.y - contact.py) * amount;
-            if (x <= .22 || x >= .78 || y <= .43 || y >= .80) continue;
+            if (x <= .25 || x >= .75 || y <= .52 || y >= .80) continue;
             const key = `${Math.round(x * 16)}:${Math.round(y * 20)}`;
             state.clearedSoil.set(key, { x, y, radius: .06 });
           }
@@ -540,14 +540,14 @@
     } else if (state.day === 3 && !state.completed.has(3)) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
-      const soilPatch = ctx.createRadialGradient(w * .5, h * .61, 6, w * .5, h * .61, Math.min(w, h) * .31);
+      const soilPatch = ctx.createRadialGradient(w * .5, h * .67, 6, w * .5, h * .67, Math.min(w, h) * .27);
       soilPatch.addColorStop(0, 'rgba(57,40,25,.76)'); soilPatch.addColorStop(.58, 'rgba(35,27,18,.62)'); soilPatch.addColorStop(1, 'rgba(16,17,11,0)');
-      ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .61, w * .285, h * .175, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .67, w * .25, h * .14, 0, 0, Math.PI * 2); ctx.fill();
       for (let i = 0; i < 96; i += 1) {
         const dx = (((i * 47) % 101) / 50) - 1;
         const dy = (((i * 61) % 101) / 50) - 1;
         if (dx * dx + dy * dy > 1) continue;
-        const px = w * (.5 + dx * .255); const py = h * (.61 + dy * .145);
+        const px = w * (.5 + dx * .225); const py = h * (.67 + dy * .115);
         const size = .65 + (i % 5) * .42;
         ctx.fillStyle = i % 3 === 0 ? 'rgba(101,75,45,.16)' : i % 3 === 1 ? 'rgba(63,45,27,.22)' : 'rgba(28,24,16,.28)';
         ctx.beginPath(); ctx.ellipse(px, py, size * (1.3 + (i % 2) * .35), size, (i % 7) * .36, 0, Math.PI * 2); ctx.fill();
