@@ -315,3 +315,9 @@ The first visible guide segment is now seeded from the lower edge of the root/se
 A partial trace through the extended seed-exit segment reached `progress: 0.1224`; the guide now includes the link from the seed’s visible root exit into the established root path. A final visual check follows.
 
 Final visual inspection confirmed the extended guide has no separate side-twig start and is configured as a continuous seed-exit-to-root path. It remains absent until the Day 2 practice begins.
+
+## 2026-08-20 — Day 2 seed-exit overlap (port 4204)
+
+A trace through the final overlap segment reached `progress: 0.1342`, beginning at the adjusted seed-exit endpoint and continuing through the first photographed-root bend. A visual confirmation follows.
+
+Final inspection confirmed the adjusted guide follows the photographed root through the rendered crop; its first endpoint was moved up and right to overlap the seed’s visible lower-right root exit on the mobile scene.
