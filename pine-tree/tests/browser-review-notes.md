@@ -257,3 +257,7 @@ A fresh Day 3 practice state was opened with zero brushing progress after moving
 Two pointer-style brush strokes within the moved lower seedling zone advanced Day 3 to `progress: 0.5`; after a 700 ms wait, progress remained `0.5` with no active contacts. The centered soil layer and its persistent clearing behavior therefore remain coupled correctly.
 
 The partial-brush visual check confirmed that both the temporary loose-soil layer and the newly cleared horizontal paths are now centered on the visible seedling, not the earlier root area.
+
+## 2026-08-20 — Day 1 intention-to-action transition prompt (port 4192)
+
+The fresh Day 1 veil now includes the quiet two-line prompt `When you have chosen an intention, press HOW TO BEGIN.` directly above the action button. Selecting the button removed the entire reflective veil and prompt together, then restored the unchanged practical instruction and seed target state.
