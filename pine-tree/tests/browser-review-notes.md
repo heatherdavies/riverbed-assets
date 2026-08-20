@@ -150,3 +150,7 @@ The spring-coil build was opened and Day 5 was reset to an active, uncompleted s
 ## Day 5 true spring-coil revision
 
 Day 5 was revised to four visibly separated spring-like loops with a wider base, alternating bright foreground arcs, and softer dashed rear arcs. The active guide now reads as a coil wrapping around the trunk. A direct 4-loop mobile-style upward coil reached progress 1.0 and completed after release with no active contacts.
+
+## Day 5 rear-coil guidance refinement
+
+The rear coil segments were made more traceable with brighter, closer-spaced dashed marks and a slightly wider stroke, while the front arcs remain stronger. The review was reset into a fresh active Day 5 state for final visual validation of the improved path hierarchy.
