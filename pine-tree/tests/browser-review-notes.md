@@ -197,3 +197,7 @@ After the measure correction, the Day 1 action state displayed the approved inst
 ## 2026-08-20 — Day 1 instruction spacing nudge (port 4179)
 
 The Day 1 action instruction was raised from `42%` to `40%` of the scene height. The fresh preview retained the elegant two-line measure and created visibly more breathing room above the `TOUCH THE SEED` cue, with the seed target and veil transition otherwise unchanged.
+
+## 2026-08-20 — Day 1 instruction leading refinement (port 4180)
+
+The Day 1 action instruction’s line-height increased from `1.08` to `1.28`. The fresh preview preserved the exact two-line wording and raised placement, while making the two lines visibly more open and less compressed above the `TOUCH THE SEED` cue.
