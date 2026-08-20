@@ -187,3 +187,9 @@ Activating **HOW TO BEGIN** removed the veil and revealed the practical instruct
 A stationary 3.35-second hold at the revealed seed target reached `progress: 1`, recorded Day 1 as complete, and cleared active contacts after release. The existing delayed `Planted.` completion state appeared with the buried-seed scene and continuation controls, confirming the new opening leaves the previously restored completion sequence intact.
 
 The Day 1 continuation control then opened Day 2, whose original shared `Deep Anchor` introduction card and `BEGIN PRACTICE` control remained visible. The dedicated veil is therefore confined to a fresh Day 1 opening.
+
+## 2026-08-20 — Day 1 instruction typography refinement (port 4178)
+
+The fresh preview preserved the veil and action reveal. The instruction adopted the intended larger Cormorant Garamond treatment and moved nearer the seed. At the desktop validation width, however, the second approved line wrapped before `soil.`, producing an unwanted third line; a small width/type adjustment is required before publication.
+
+After the measure correction, the Day 1 action state displayed the approved instruction in the larger serif style as exactly two lines: `Rest your finger on the seed,` and `then press it gently into the soil.` The block remains centered and visibly nearer the seed target, while the veil and target reveal continue to operate normally.

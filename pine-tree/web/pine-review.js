@@ -253,7 +253,7 @@
     elements.introTitle.textContent = config.title;
     elements.introIntent.textContent = config.intent;
     elements.introInstruction.textContent = config.instruction;
-    elements.actionInstruction.textContent = config.instruction;
+    elements.actionInstruction.textContent = state.day === 1 ? 'Rest your finger on the seed,\nthen press it gently into the soil.' : config.instruction;
     elements.introDismiss.textContent = state.day === 1 ? 'BEGIN WITH THE SEED' : 'BEGIN PRACTICE';
     elements.prompt.textContent = config.prompt;
     elements.gestureHintText.textContent = config.prompt;
