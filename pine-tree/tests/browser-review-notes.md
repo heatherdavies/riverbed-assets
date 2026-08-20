@@ -193,3 +193,7 @@ The Day 1 continuation control then opened Day 2, whose original shared `Deep An
 The fresh preview preserved the veil and action reveal. The instruction adopted the intended larger Cormorant Garamond treatment and moved nearer the seed. At the desktop validation width, however, the second approved line wrapped before `soil.`, producing an unwanted third line; a small width/type adjustment is required before publication.
 
 After the measure correction, the Day 1 action state displayed the approved instruction in the larger serif style as exactly two lines: `Rest your finger on the seed,` and `then press it gently into the soil.` The block remains centered and visibly nearer the seed target, while the veil and target reveal continue to operate normally.
+
+## 2026-08-20 — Day 1 instruction spacing nudge (port 4179)
+
+The Day 1 action instruction was raised from `42%` to `40%` of the scene height. The fresh preview retained the elegant two-line measure and created visibly more breathing room above the `TOUCH THE SEED` cue, with the seed target and veil transition otherwise unchanged.
