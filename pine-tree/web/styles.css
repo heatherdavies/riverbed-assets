@@ -25,6 +25,8 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .scene-image.loaded { transform: scale(1); }
 .buried-scene-image { z-index: -3; opacity: 0; transform: scale(1.015); transition: opacity 1500ms ease, transform 2200ms ease; }
 .scene.day-one-buried .buried-scene-image { opacity: 1; transform: scale(1); }
+.day-two-scene-image { z-index: -3; opacity: 0; transform: scale(1.015); transition: transform 520ms ease; }
+.scene[data-day="2"] .day-two-scene-image { opacity: 1; transform: scale(1); }
 .wind-scene-image { z-index: -3; opacity: 0; transform-origin: 50% 88%; will-change: transform, opacity; transition: opacity 420ms ease; mix-blend-mode: screen; }
 .scene[data-day="7"] .wind-scene-image { opacity: .78; }
 .scene[data-day="7"] .scene-image:not(.wind-scene-image) { filter: saturate(.78) contrast(.94); }

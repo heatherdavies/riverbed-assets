@@ -229,15 +229,8 @@
       showCompletionState();
     }
     const config = current();
-    const sceneImageSrc = `${config.image}?v=20260820-day-scene-restore-1&day=${config.day}`;
-    const priorSceneImage = elements.image;
-    const nextSceneImage = priorSceneImage.cloneNode(false);
-    nextSceneImage.classList.remove('loaded');
-    nextSceneImage.removeAttribute('src');
-    nextSceneImage.alt = '';
-    nextSceneImage.draggable = false;
-    priorSceneImage.replaceWith(nextSceneImage);
-    elements.image = nextSceneImage;
+    const sceneImageSrc = `${config.image}?v=20260820-day-scene-ready-2`;
+    elements.image.classList.remove('loaded');
     elements.image.src = sceneImageSrc;
     if (state.day === 7) {
       elements.windImage.classList.remove('loaded');

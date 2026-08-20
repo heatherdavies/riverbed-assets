@@ -279,3 +279,11 @@ The fresh Day 1 veil correctly intercepts direct rail touches until its Begin ac
 The isolated new Day 2 base-image element loaded the cache-busted Day 2 rooted-seed photograph at `1080×1920`. Visual inspection confirmed the correct Day 2 scene with no Day 1 buried-image overlay present.
 
 After dismissing the Day 2 introduction, a partial downward trace reached `progress: 0.5172` with no stale contacts and the correct rooted-seed photograph remained visible beneath the root guidance. The scene restoration did not alter Day 2 gesture behavior.
+
+The first preload test exposed a cache-key mismatch: the preload omitted the `day=2` query fragment used by the runtime image source, so Day 2 was not considered the same preloaded resource. The immediate correction will align the runtime and preload URLs exactly.
+
+A synchronous Day 2 switch still reports the prior Day 1 `currentSrc` during the same event turn, even with an exact preload URL. The correction therefore also needs a controlled handoff that avoids exposing the scene background while the browser commits the new image source.
+
+The dedicated Day 2 layer was `complete: true` at 1080×1920 and had computed `opacity: 1` in the same event turn that Day 2 opened; the primary base image no longer had a pending load. This confirms the correct rooted-seed photograph is ready immediately behind the Day 2 introduction.
+
+Visual inspection of the immediate Day 2 opening confirmed the rooted-seed photograph is present behind the Deep Anchor panel rather than the blank green fallback seen on iPhone previously.
