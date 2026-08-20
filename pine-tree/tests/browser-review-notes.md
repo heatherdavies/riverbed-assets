@@ -269,3 +269,13 @@ The opening prompt and action button now read `How to begin` in sentence case wi
 ## 2026-08-20 — Day 1 Begin copy simplification (port 4194)
 
 The Day 1 opening now reads `When you have chosen an intention, press Begin.` with a `Begin` button. Selecting Begin continues to dismiss the veil and restore the unchanged practical instruction and seed target state.
+
+## 2026-08-20 — Day 2 scene-image regression investigation
+
+The local `day-02-deep-anchor.webp` asset is the correct rooted-seed photograph. On the fresh port 4194 review, direct navigation to Day 2 produced `sceneImage.src` and `currentSrc` pointing to that asset at 1080×1920, and the visible scene was correct. The iPhone regression is therefore treated as a stale-layer or Safari image-swap issue rather than an incorrect Day 2 asset.
+
+The fresh Day 1 veil correctly intercepts direct rail touches until its Begin action is selected; Day 2 validation therefore uses the normal completion/direct-switch path rather than a hidden rail control behind the active veil.
+
+The isolated new Day 2 base-image element loaded the cache-busted Day 2 rooted-seed photograph at `1080×1920`. Visual inspection confirmed the correct Day 2 scene with no Day 1 buried-image overlay present.
+
+After dismissing the Day 2 introduction, a partial downward trace reached `progress: 0.5172` with no stale contacts and the correct rooted-seed photograph remained visible beneath the root guidance. The scene restoration did not alter Day 2 gesture behavior.

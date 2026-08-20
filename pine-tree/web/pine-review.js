@@ -229,8 +229,16 @@
       showCompletionState();
     }
     const config = current();
-    elements.image.classList.remove('loaded');
-    elements.image.src = `${config.image}?v=20260819-late-journey-1`;
+    const sceneImageSrc = `${config.image}?v=20260820-day-scene-restore-1&day=${config.day}`;
+    const priorSceneImage = elements.image;
+    const nextSceneImage = priorSceneImage.cloneNode(false);
+    nextSceneImage.classList.remove('loaded');
+    nextSceneImage.removeAttribute('src');
+    nextSceneImage.alt = '';
+    nextSceneImage.draggable = false;
+    priorSceneImage.replaceWith(nextSceneImage);
+    elements.image = nextSceneImage;
+    elements.image.src = sceneImageSrc;
     if (state.day === 7) {
       elements.windImage.classList.remove('loaded');
       elements.windImage.src = `${config.image}?v=20260819-late-journey-1`;
@@ -245,6 +253,10 @@
       elements.buriedImage.src = '../assets/day-01-seed-buried.png?v=20260819-burial-scene-1';
       elements.buriedImage.alt = 'Day 1: planted seed beneath soil.';
       elements.buriedImage.addEventListener('load', () => elements.buriedImage.classList.add('loaded'), { once: true });
+    } else {
+      elements.buriedImage.removeAttribute('src');
+      elements.buriedImage.removeAttribute('alt');
+      elements.buriedImage.classList.remove('loaded');
     }
     elements.image.alt = '';
     elements.stage.textContent = `DAY ${String(config.day).padStart(2, '0')} · ${config.stage.toUpperCase()}`;
