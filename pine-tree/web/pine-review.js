@@ -311,12 +311,10 @@
         break;
       }
       case 5: {
-        const spiralProgress = clamp((.78 - contact.y) / .43);
-        const guideX = .5 + Math.cos(spiralProgress * Math.PI * 5) * (.072 - spiralProgress * .014);
-        const onSpiral = Math.abs(contact.x - guideX) < .125 && contact.y > .32 && contact.y < .82;
-        const canAdvance = spiralProgress <= state.material.bough + .16;
-        if (onSpiral && canAdvance && contact.phase === 'move' && dy < -.001) {
-          state.material.bough = Math.max(state.material.bough, spiralProgress);
+        const inCoilZone = Math.abs(contact.x - .5) < .18 && contact.y > .29 && contact.y < .84;
+        const coilTravel = Math.abs(dx) + Math.abs(dy);
+        if (inCoilZone && contact.phase === 'move' && coilTravel > .003) {
+          state.material.bough = clamp(state.material.bough + coilTravel * .82);
           state.progress = Math.max(state.progress, state.material.bough);
         }
         break;
@@ -465,11 +463,10 @@
     } else if (state.day === 4) {
       ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
     } else if (state.day === 5) {
-      const turns = 2.5; const steps = 84; const widthAt = (p) => w * (.072 - p * .014); const xAt = (p) => w * (.5 + Math.cos(p * Math.PI * 2 * turns) * (widthAt(p) / w)); const yAt = (p) => h * (.78 - p * .43); const pulse = state.reducedMotion ? 0 : (Math.sin(t / 560) + 1) * .5;
-      ctx.save(); ctx.lineCap = 'round'; ctx.setLineDash([4, 8]); ctx.strokeStyle = `rgba(219,193,112,${.34 + pulse * .18})`; ctx.lineWidth = 1.2; ctx.beginPath();
-      for (let step = 0; step <= steps; step += 1) { const p = step / steps; if (step === 0) ctx.moveTo(xAt(p), yAt(p)); else ctx.lineTo(xAt(p), yAt(p)); } ctx.stroke(); ctx.setLineDash([]);
-      const progress = Math.max(state.material.bough, state.progress); if (progress > 0) { ctx.strokeStyle = `rgba(240,226,164,${.34 + progress * .56})`; ctx.lineWidth = 2.8; ctx.beginPath(); for (let step = 0; step <= Math.ceil(steps * progress); step += 1) { const p = Math.min(progress, step / steps); if (step === 0) ctx.moveTo(xAt(p), yAt(p)); else ctx.lineTo(xAt(p), yAt(p)); } ctx.stroke(); }
-      const startGlow = ctx.createRadialGradient(xAt(0), yAt(0), 2, xAt(0), yAt(0), 16 + pulse * 5); startGlow.addColorStop(0, 'rgba(245,230,169,.98)'); startGlow.addColorStop(.22, 'rgba(219,193,112,.86)'); startGlow.addColorStop(1, 'rgba(219,193,112,0)'); ctx.fillStyle = startGlow; ctx.beginPath(); ctx.arc(xAt(0), yAt(0), 18 + pulse * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      const loops = 4; const steps = 160; const thetaAt = (p) => p * Math.PI * 2 * loops; const radiusAt = (p) => w * (.112 - p * .027); const xAt = (p) => w * .5 + Math.cos(thetaAt(p)) * radiusAt(p); const yAt = (p) => h * (.78 - p * .43) + Math.sin(thetaAt(p)) * h * .034; const pulse = state.reducedMotion ? 0 : (Math.sin(t / 560) + 1) * .5; const progress = Math.max(state.material.bough, state.progress);
+      const drawCoil = (limit, completed, front) => { for (let step = 0; step < Math.ceil(steps * limit); step += 1) { const p0 = step / steps; const p1 = Math.min(limit, (step + 1) / steps); const mid = (thetaAt(p0) + thetaAt(p1)) / 2; const isFront = Math.sin(mid) > 0; if (isFront !== front) continue; ctx.setLineDash(front ? [] : [2, 7]); ctx.lineWidth = front ? (completed ? 4.2 : 2.9) : (completed ? 1.8 : 1.15); ctx.strokeStyle = front ? `rgba(245,226,158,${completed ? .86 : .58 + pulse * .16})` : `rgba(116,95,57,${completed ? .5 : .3})`; ctx.beginPath(); ctx.moveTo(xAt(p0), yAt(p0)); ctx.lineTo(xAt(p1), yAt(p1)); ctx.stroke(); } };
+      ctx.save(); ctx.lineCap = 'round'; drawCoil(1, false, false); drawCoil(1, false, true); if (progress > 0) { drawCoil(progress, true, false); drawCoil(progress, true, true); }
+      const startGlow = ctx.createRadialGradient(xAt(0), yAt(0), 2, xAt(0), yAt(0), 17 + pulse * 5); startGlow.addColorStop(0, 'rgba(245,230,169,.98)'); startGlow.addColorStop(.22, 'rgba(219,193,112,.86)'); startGlow.addColorStop(1, 'rgba(219,193,112,0)'); ctx.fillStyle = startGlow; ctx.beginPath(); ctx.arc(xAt(0), yAt(0), 19 + pulse * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     } else if (state.day === 6) {
       const branches = [
         [[.5,.47],[.43,.4],[.25,.3],[.08,.24]], [[.51,.44],[.61,.37],[.77,.25],[.93,.18]],

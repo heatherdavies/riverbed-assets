@@ -138,3 +138,15 @@ The Day 3 base image now loads `day-03-seedling-reveal.png`, which contains one 
 ## Day 5 spiral-up ritual
 
 The obsolete circle target was replaced by a one-finger guided spiral from the gold base point up the young trunk. A direct 2.5-turn mobile-style spiral completed Day 5 with progress 1.0, no retained contacts, and the completed state recorded after release. The new movement remains distinct from Day 4's central vertical trace and Day 6's outward branch sweeps.
+
+## Day 5 wrapped-coil refinement
+
+The refined Day 5 review was opened from a fresh, uncompleted state with the introduction dismissed, preparing the active trunk coil guide for visual and interaction validation. The new guide uses alternating front and rear segments to read as a coil around the bark rather than a flat overlay.
+
+## Day 5 spring-coil guide
+
+The spring-coil build was opened and Day 5 was reset to an active, uncompleted state with the introduction dismissed. This establishes the guide’s zero-progress visual state before final direct visual and gesture validation.
+
+## Day 5 true spring-coil revision
+
+Day 5 was revised to four visibly separated spring-like loops with a wider base, alternating bright foreground arcs, and softer dashed rear arcs. The active guide now reads as a coil wrapping around the trunk. A direct 4-loop mobile-style upward coil reached progress 1.0 and completed after release with no active contacts.
