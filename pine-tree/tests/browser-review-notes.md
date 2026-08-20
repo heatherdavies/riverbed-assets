@@ -241,3 +241,11 @@ The final Day 2 visual check shows the white root’s upper start now meeting th
 The Day 2 root was restored to its seed-junction start at `x: .5, y: .29`, with only a gentler initial visual curve applied. The original gesture corridor and root-progress behavior remain unchanged; the fresh completed-root view is ready for final visual confirmation.
 
 The final fresh Day 2 completion check confirms the drawn root starts again at the original seed junction (`x: .5, y: .29`) rather than the displaced lower-right anchor. Its only retained refinement is the gentler initial curve, which follows the photographed root’s first segment without changing interaction behavior.
+
+## 2026-08-20 — Day 3 brushing repair (port 4190)
+
+Two direct pointer-style Day 3 brush strokes increased clearing progress to `0.3684`. After touch release and a one-second pause, progress remained `0.3684` with no active contacts, confirming that brushing now registers and cleared state remains persistent.
+
+Three additional pointer-style brush strokes advanced Day 3 to `progress: 1` and completed the practice with no active contacts. This confirms the repaired interaction supports both persistent partial clearing and full completion through brushing alone.
+
+The completed Day 3 state removes the temporary loose-soil overlay and leaves the intended seedling reveal visible, followed by the existing First light completion card. The refined soil effect therefore does not persist after the practice is completed.

@@ -342,18 +342,20 @@
       }
       case 3: {
         const brush = Math.abs(dx) + Math.abs(dy) + Math.min(.055, Math.abs(contact.vx) * .005 + Math.abs(contact.vy) * .005);
-        const inSeedlingPatch = contact.x > .28 && contact.x < .72 && contact.y > .47 && contact.y < .78;
-        if (brush > .002 && inSeedlingPatch && contact.phase === 'move') {
-          const samples = Math.max(2, Math.ceil(Math.hypot(dx, dy) * 36));
+        const inSeedlingPatch = contact.x > .22 && contact.x < .78 && contact.y > .43 && contact.y < .80;
+        const beginsBrush = contact.phase === 'begin';
+        const movesBrush = contact.phase === 'move' && brush > .001;
+        if (inSeedlingPatch && (beginsBrush || movesBrush)) {
+          const samples = beginsBrush ? 1 : Math.max(2, Math.ceil(Math.hypot(dx, dy) * 42));
           for (let index = 0; index <= samples; index += 1) {
-            const amount = index / samples;
+            const amount = samples ? index / samples : 1;
             const x = contact.px + (contact.x - contact.px) * amount;
             const y = contact.py + (contact.y - contact.py) * amount;
-            if (x <= .28 || x >= .72 || y <= .47 || y >= .78) continue;
-            const key = `${Math.round(x * 18)}:${Math.round(y * 22)}`;
-            state.clearedSoil.set(key, { x, y, radius: .072 });
+            if (x <= .22 || x >= .78 || y <= .43 || y >= .80) continue;
+            const key = `${Math.round(x * 16)}:${Math.round(y * 20)}`;
+            state.clearedSoil.set(key, { x, y, radius: .06 });
           }
-          state.material.soil = clamp(state.clearedSoil.size / 56);
+          state.material.soil = clamp(state.clearedSoil.size / 38);
           state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
           state.progress = Math.max(state.progress, state.material.soil);
         }
@@ -538,12 +540,20 @@
     } else if (state.day === 3 && !state.completed.has(3)) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
-      const soilPatch = ctx.createRadialGradient(w * .5, h * .61, 8, w * .5, h * .61, Math.min(w, h) * .32);
-      soilPatch.addColorStop(0, 'rgba(70,52,33,.94)'); soilPatch.addColorStop(.62, 'rgba(43,31,20,.88)'); soilPatch.addColorStop(1, 'rgba(17,18,12,0)');
-      ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .61, w * .29, h * .18, 0, 0, Math.PI * 2); ctx.fill();
-      for (let i = 0; i < 72; i += 1) { const px = w * (.3 + ((i * 37) % 100) / 250); const py = h * (.49 + ((i * 53) % 100) / 500); ctx.fillStyle = `rgba(112,84,52,${.23 + (i % 4) * .045})`; ctx.beginPath(); ctx.arc(px, py, 1.8 + (i % 4) * 1.15, 0, Math.PI * 2); ctx.fill(); }
+      const soilPatch = ctx.createRadialGradient(w * .5, h * .61, 6, w * .5, h * .61, Math.min(w, h) * .31);
+      soilPatch.addColorStop(0, 'rgba(57,40,25,.76)'); soilPatch.addColorStop(.58, 'rgba(35,27,18,.62)'); soilPatch.addColorStop(1, 'rgba(16,17,11,0)');
+      ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .61, w * .285, h * .175, 0, 0, Math.PI * 2); ctx.fill();
+      for (let i = 0; i < 96; i += 1) {
+        const dx = (((i * 47) % 101) / 50) - 1;
+        const dy = (((i * 61) % 101) / 50) - 1;
+        if (dx * dx + dy * dy > 1) continue;
+        const px = w * (.5 + dx * .255); const py = h * (.61 + dy * .145);
+        const size = .65 + (i % 5) * .42;
+        ctx.fillStyle = i % 3 === 0 ? 'rgba(101,75,45,.16)' : i % 3 === 1 ? 'rgba(63,45,27,.22)' : 'rgba(28,24,16,.28)';
+        ctx.beginPath(); ctx.ellipse(px, py, size * (1.3 + (i % 2) * .35), size, (i % 7) * .36, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.globalCompositeOperation = 'destination-out';
-      state.clearedSoil.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,1)'); clear.addColorStop(.72, 'rgba(0,0,0,.88)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); });
+      state.clearedSoil.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,1)'); clear.addColorStop(.68, 'rgba(0,0,0,.92)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); });
       ctx.restore();
     } else if (state.day === 4) {
       ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
