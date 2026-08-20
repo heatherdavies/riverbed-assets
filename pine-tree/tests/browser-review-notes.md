@@ -167,3 +167,9 @@ A strong horizontal touch-style brush across Day 7 reached 0.928 ritual progress
 
 A direct horizontal mobile-style brush produced an immediate wind-layer transform of `translateX(3.772%) rotate(6.396deg) scale(1.055)` while the contact remained active, confirming that the canopy now visibly bends in the brushed direction rather than only drawing wind marks.
 The Day 7 canopy transform returned from a visible active brush bend to effectively zero after release, confirming the intended elastic settling behavior. The gesture remained incomplete at 0.780 progress, so the motion can be repeated naturally before the completion threshold is reached.
+
+## Day 6 direct touch-path rendering
+
+A mobile-style trace was dispatched along a selected visible right-hand branch from the trunk outward. The test produced 0.141 progress with no active contacts. Unlike the former branch-snap approach, the renderer now retains the ordered touch coordinates themselves for the gold line.
+During direct-path validation, the public Day 6 image briefly failed to decode because the temporary review server was no longer listening. The server was restarted from the Pine Tree module root; local `/web/` and `/assets/day-06-branching-out.webp` returned 200 afterward, and the fresh public review route loaded normally.
+A fresh Day 6 direct-path test confirmed the restored scene image decodes at 1080 × 1920. A chosen branch was traced through recorded touch coordinates, yielding 0.141 progress with no active contacts; the next visual review checks the gold stroke against that exact recorded path.

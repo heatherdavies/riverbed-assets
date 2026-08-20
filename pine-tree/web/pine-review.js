@@ -7,7 +7,7 @@
     ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.png'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
     ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Begin at the gold point. Spiral slowly upward around the young trunk.', 'Layer by layer, the young trunk finds its strength.', 'SPIRAL UPWARD', 'upward-spiral', '../assets/day-05-stronger-structure.webp'],
-    ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Sweep outward along the branches toward the light.', 'There is room to extend.', 'SWEEP OUTWARD', 'outward-sweep', '../assets/day-06-branching-out.webp'],
+    ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Touch a branch, then sweep outward along the branch you chose.', 'There is room to extend.', 'TRACE THE BRANCHES', 'outward-sweep', '../assets/day-06-branching-out.webp'],
     ['Weathering & Completing', 'Weathering Growth', 'Mastering resilience.', 'Brush slowly left and right across the canopy. Watch the tree bend with the wind, then return.', 'Flexibility keeps the roots intact.', 'SWAY THE CANOPY', 'wind-brush', '../assets/day-07-weathering-growth.webp'],
     ['Weathering & Completing', 'Forming Features', 'Integrating wisdom and complexity.', 'Touch five warm points of sap or young cones. Each touch will reveal a quiet glow.', 'Detail holds a living history.', 'TOUCH 5 DETAILS', 'feature-touch', '../assets/day-08-forming-features.webp'],
     ['Weathering & Completing', 'Full Maturity', 'Completed growth, peace, and deep rootedness.', 'Sweep outward from the trunk to reveal the tree’s wider forest landscape.', 'You are rooted, complete, and still becoming.', 'OPEN THE FOREST', 'landscape-release', '../assets/day-09-full-maturity.webp'],
@@ -61,6 +61,8 @@
     branchReveals: 0,
     branchTrace: 0,
     branchProgress: Array(9).fill(0),
+    daySixStrokes: [],
+    daySixActive: new Map(),
     windLean: 0,
     windVelocity: 0,
     pendingCompletion: false,
@@ -142,6 +144,8 @@
     state.branchReveals = 0;
     state.branchTrace = 0;
     state.branchProgress = Array(9).fill(0);
+    state.daySixStrokes = [];
+    state.daySixActive.clear();
     state.windLean = 0;
     state.windVelocity = 0;
     elements.windImage.style.transform = '';
@@ -352,13 +356,25 @@
         break;
       }
       case 6: {
-        const hit = findDaySixBranch(contact.x, contact.y);
-        if (hit && (contact.phase === 'begin' || contact.phase === 'move')) {
-          const reached = Math.max(hit.progress, contact.phase === 'move' ? state.branchProgress[hit.index] : 0);
-          state.branchProgress[hit.index] = Math.max(state.branchProgress[hit.index], reached);
-          state.branchReveals = state.branchProgress.filter((value) => value >= .985).length;
-          state.material.bough = state.branchProgress.reduce((sum, value) => sum + value, 0);
-          state.progress = state.material.bough / DAY_SIX_BRANCHES.length;
+        const inCanopy = contact.x > .025 && contact.x < .975 && contact.y > .14 && contact.y < .82;
+        if (contact.phase === 'begin' && inCanopy) {
+          const stroke = { id: contact.id, points: [{ x: contact.x, y: contact.y }], length: 0 };
+          state.daySixStrokes.push(stroke);
+          state.daySixActive.set(contact.id, stroke);
+        } else if (contact.phase === 'move') {
+          const stroke = state.daySixActive.get(contact.id);
+          if (stroke && inCanopy) {
+            const prior = stroke.points[stroke.points.length - 1];
+            const segment = Math.hypot(contact.x - prior.x, contact.y - prior.y);
+            if (segment > .004) {
+              stroke.points.push({ x: contact.x, y: contact.y });
+              stroke.length += segment;
+              state.material.bough = state.daySixStrokes.reduce((sum, path) => sum + path.length, 0);
+              state.progress = clamp(state.material.bough / 2.45);
+            }
+          }
+        } else if (contact.phase === 'end' || contact.phase === 'cancel') {
+          state.daySixActive.delete(contact.id);
         }
         break;
       }
@@ -515,18 +531,21 @@
       ctx.save(); ctx.lineCap = 'round'; drawCoil(1, false, false); drawCoil(1, false, true); if (progress > 0) { drawCoil(progress, true, false); drawCoil(progress, true, true); }
       const startGlow = ctx.createRadialGradient(xAt(0), yAt(0), 2, xAt(0), yAt(0), 17 + pulse * 5); startGlow.addColorStop(0, 'rgba(245,230,169,.98)'); startGlow.addColorStop(.22, 'rgba(219,193,112,.86)'); startGlow.addColorStop(1, 'rgba(219,193,112,0)'); ctx.fillStyle = startGlow; ctx.beginPath(); ctx.arc(xAt(0), yAt(0), 19 + pulse * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     } else if (state.day === 6) {
-      DAY_SIX_BRANCHES.forEach((branch, index) => {
-        const amount = state.branchProgress[index] || 0;
-        if (amount <= 0) return;
-        ctx.strokeStyle = `rgba(224,207,126,${.18 + amount * .52})`; ctx.lineWidth = 1.1 + amount * 1.7; ctx.lineCap = 'round'; ctx.beginPath();
-        const steps = 30;
-        for (let step = 0; step <= Math.ceil(steps * amount); step += 1) {
-          const t = Math.min(1, step / steps); const q = 1 - t;
-          const x = q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0];
-          const y = q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1];
-          if (step === 0) ctx.moveTo(w * x, h * y); else ctx.lineTo(w * x, h * y);
-        }
+      state.daySixStrokes.forEach((stroke, index) => {
+        if (stroke.points.length < 2) return;
+        const active = state.daySixActive.has(stroke.id);
+        ctx.save();
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.shadowColor = active ? 'rgba(238,220,143,.72)' : 'rgba(216,196,110,.4)';
+        ctx.shadowBlur = active ? 12 : 6;
+        ctx.strokeStyle = active ? 'rgba(248,232,163,.92)' : `rgba(224,207,126,${.48 + Math.min(.3, stroke.length * .12)})`;
+        ctx.lineWidth = active ? 4.3 : 3.15;
+        ctx.beginPath();
+        stroke.points.forEach((point, pointIndex) => { if (pointIndex === 0) ctx.moveTo(w * point.x, h * point.y); else ctx.lineTo(w * point.x, h * point.y); });
         ctx.stroke();
+        const last = stroke.points[stroke.points.length - 1];
+        ctx.fillStyle = 'rgba(247,230,158,.8)'; ctx.beginPath(); ctx.arc(w * last.x, h * last.y, active ? 3.6 : 2.2, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
       });
     } else if (state.day === 7) {
       ctx.strokeStyle = `rgba(199,220,196,${.1 + m.wind * .34})`; ctx.lineWidth = 1.35; const motion = state.reducedMotion ? 0 : Math.sin(t / 620) * (5 + m.wind * 36); for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
