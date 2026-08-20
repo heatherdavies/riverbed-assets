@@ -345,3 +345,9 @@ A five-row pointer-style brushing pass across the new Day 3 photorealistic soil 
 The final Day 3 brushing pass reached `progress: 1` with no active contacts. The new photorealistic soil asset cleared successfully through the existing persistent mask, and the settled reveal state was then checked.
 
 Settled Day 3 completion confirmed: the photorealistic soil layer was fully removed after brushing, the seedling reveal remained intact, and the existing First light completion state appeared normally.
+
+## 2026-08-20 — Day 5 finger-paced coil (port 4209)
+
+A traced first quarter of the Day 5 coil reached `progress: 0.1990`, rather than completing the coil ahead of the finger. The reduced gain keeps the illuminated portion proportionate to a measured partial trace.
+
+Visual inspection confirmed that the bright Day 5 coil segment stops with the first traced loop instead of running ahead toward the upper coils; the remaining guide stays in its softer guidance state.

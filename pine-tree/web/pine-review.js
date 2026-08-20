@@ -418,7 +418,7 @@
         const inCoilZone = Math.abs(contact.x - .5) < .18 && contact.y > .29 && contact.y < .84;
         const coilTravel = Math.abs(dx) + Math.abs(dy);
         if (inCoilZone && contact.phase === 'move' && coilTravel > .003) {
-          state.material.bough = clamp(state.material.bough + coilTravel * .82);
+          state.material.bough = clamp(state.material.bough + coilTravel * .34);
           state.progress = Math.max(state.progress, state.material.bough);
         }
         break;
