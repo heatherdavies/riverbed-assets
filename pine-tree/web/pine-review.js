@@ -4,7 +4,7 @@
   const DAYS = [
     ['Grounding & Anchoring', 'Planting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press it gently into the soil.', 'What intention are you ready to place in the soil?', 'PRESS INTO SOIL', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
-    ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.webp'],
+    ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.png'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
     ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Begin at the gold point. Spiral slowly upward around the young trunk.', 'Layer by layer, the young trunk finds its strength.', 'SPIRAL UPWARD', 'upward-spiral', '../assets/day-05-stronger-structure.webp'],
     ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Touch a branch, then sweep outward along the branch you chose.', 'There is room to extend.', 'TRACE THE BRANCHES', 'outward-sweep', '../assets/day-06-branching-out.webp'],
@@ -43,7 +43,7 @@
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
-    dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), completionReady: $('#completionReadyButton'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
+    dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
     haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
@@ -65,8 +65,6 @@
     daySixActive: new Map(),
     windLean: 0,
     windVelocity: 0,
-    completionReady: false,
-    reflectionOpen: false,
     pendingCompletion: false,
     completionTimer: null,
     burialStartedAt: 0,
@@ -95,7 +93,6 @@
     if (button.dataset.day) return setDay(Number(button.dataset.day));
     switch (button.id) {
       case 'assistButton': return assistedAdvance();
-      case 'completionReadyButton': return openCompletionReflection();
       case 'nextDayButton': return state.day < 9 ? setDay(state.day + 1) : resetToDayOne();
       case 'restartDayButton': return resetToDayOne();
       case 'returnToSeedButton': return resetToDayOne();
@@ -151,13 +148,11 @@
     state.daySixActive.clear();
     state.windLean = 0;
     state.windVelocity = 0;
-    state.completionReady = false;
-    state.reflectionOpen = false;
     elements.windImage.style.transform = '';
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
     state.burialStartedAt = 0;
-    elements.scene.classList.remove('day-one-complete', 'day-one-buried', 'practice-complete', 'completion-ready', 'reflection-open');
+    elements.scene.classList.remove('day-one-complete', 'day-one-buried', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
   function current() { return DAYS[state.day - 1]; }
@@ -170,19 +165,8 @@
     elements.completionReflection.textContent = reflection;
     elements.nextDay.textContent = next ? `CONTINUE TO ${next.title.toUpperCase()}` : 'RETURN TO DAY 1';
     elements.restartDay.textContent = state.day === 1 ? 'START AGAIN AT DAY 1' : 'START THE JOURNEY AGAIN';
-    elements.completionReady.textContent = state.day === 9 ? 'COMPLETE' : 'CONTINUE';
-    state.completionReady = true;
-    state.reflectionOpen = false;
-    elements.scene.classList.remove('reflection-open');
-    elements.scene.classList.add('completion-ready');
+    elements.scene.classList.add('practice-complete');
     if (state.day === 1) elements.scene.classList.add('day-one-complete', 'day-one-buried');
-  }
-
-  function openCompletionReflection() {
-    if (!state.completionReady) return;
-    state.reflectionOpen = true;
-    elements.scene.classList.remove('completion-ready');
-    elements.scene.classList.add('reflection-open');
   }
 
   function updateDayOneIntro() {
@@ -238,7 +222,7 @@
     }
     if (state.day === 1) {
       elements.buriedImage.classList.remove('loaded');
-      elements.buriedImage.src = '../assets/day-01-seed-buried.webp?v=20260820-mobile-asset-1';
+      elements.buriedImage.src = '../assets/day-01-seed-buried.png?v=20260819-burial-scene-1';
       elements.buriedImage.alt = 'Day 1: planted seed beneath soil.';
       elements.buriedImage.addEventListener('load', () => elements.buriedImage.classList.add('loaded'), { once: true });
     }
@@ -430,7 +414,7 @@
       state.pendingCompletion = false;
       elements.scene.classList.remove('settling-completion');
       completeDay();
-    }, state.day === 1 ? (state.reducedMotion ? 850 : 2300) : (state.reducedMotion ? 380 : 1450));
+    }, state.day === 1 ? (state.reducedMotion ? 700 : 1850) : (state.reducedMotion ? 220 : 620));
   }
 
   function assistedAdvance() {
@@ -579,7 +563,7 @@
       const radius = 16 + pulse * 7;
       const g = ctx.createRadialGradient(x, y, 1, x, y, radius); g.addColorStop(0, 'rgba(241,229,182,.42)'); g.addColorStop(.5,'rgba(177,190,119,.14)'); g.addColorStop(1,'rgba(177,190,119,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x,y,radius,0,Math.PI*2); ctx.fill();
     });
-    const y = h - 22; const wProgress = w * .34; const x = (w - wProgress) / 2; ctx.fillStyle = 'rgba(242,235,205,.18)'; ctx.fillRect(x, y, wProgress, 1); if (state.completionReady) { const glow = ctx.createLinearGradient(x, y, x + wProgress, y); glow.addColorStop(0, 'rgba(244,220,140,.5)'); glow.addColorStop(.5, 'rgba(255,239,177,1)'); glow.addColorStop(1, 'rgba(244,220,140,.5)'); ctx.shadowColor = 'rgba(234,198,96,.72)'; ctx.shadowBlur = 15; ctx.fillStyle = glow; ctx.fillRect(x, y - 1, wProgress, 3); ctx.shadowBlur = 0; } else { ctx.fillStyle = 'rgba(201,178,104,.85)'; ctx.fillRect(x, y, wProgress * state.progress, 1.5); }
+    const y = h - 22; const wProgress = w * .34; const x = (w - wProgress) / 2; ctx.fillStyle = 'rgba(242,235,205,.18)'; ctx.fillRect(x, y, wProgress, 1); ctx.fillStyle = 'rgba(201,178,104,.85)'; ctx.fillRect(x, y, wProgress * state.progress, 1.5);
   }
 
   function bind() {

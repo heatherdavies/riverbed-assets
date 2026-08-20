@@ -177,10 +177,3 @@ A fresh Day 6 direct-path test confirmed the restored scene image decodes at 108
 ## Day 5 rear-coil guidance
 
 The refreshed Day 5 build opened from a clean active state with no progress, ready for visual verification of the brightened, near-continuous rear coil segments.
-
-## User-controlled completion flow
-
-A fresh Day 2 run reached full progress and completed after the longer release-and-settle interval. At the first state check, the scene had `completion-ready` active, no `reflection-open` state, and the new Continue control was in its entrance transition; the reflection card was correctly still hidden.
-After the Continue entrance completed, activating it removed `completion-ready`, added `reflection-open`, and began the translucent completion-card transition. The card exposed the correct Day 2 next action: `CONTINUE TO FIRST LIGHT`.
-The full Day 1–9 regression passed. Every practice first entered the `completion-ready` state with no reflection card, then opened the translucent reflection only after activating the glowing Continue control. All nine checks returned `ready: true` and `reflection: true`.
-During Safari layout validation, the fresh public review loaded the versioned stylesheet and Day 1 image decoded at 1080 × 1920. The live scene computed to 1100px tall, confirming the current public route and asset path were reachable; a subsequent visual capture is being investigated because it appeared darker than its decoded state.

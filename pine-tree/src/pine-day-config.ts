@@ -37,7 +37,7 @@ export const PINE_DAY_CONFIG: Record<PineDay, PineDayConfig> = {
     instruction: 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.',
     contemplation: 'A first green sign is enough.',
     gesture: 'soft-brush',
-    image: '../assets/day-03-seedling-reveal.webp',
+    image: '../assets/day-03-seedling-reveal.png',
     light: 'sunrise',
     material: 'shoot',
     haptic: 'fibre',
