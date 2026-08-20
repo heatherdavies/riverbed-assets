@@ -225,3 +225,13 @@ The fresh opening preview shows the Day 1 seed photograph clearly but softly ben
 ## 2026-08-20 — Day 1 reflection typography and wrap refinement (port 4186)
 
 The Day 1 opening reflection retains its exact wording and is now rendered as two deliberate centered serif lines: `What intention are you ready` and `to place in the soil?`. The fresh preview shows a balanced, uncut presentation, and browser verification confirmed two separate visual lines with the full sentence preserved.
+
+## 2026-08-20 — Day 2 root-anchor alignment (port 4187)
+
+A fresh Day 2 completed-root state was rendered after the upper visual anchor moved to `x: .515, y: .315`; the original touch corridor and progress logic were left unchanged. A final visual check of the revised overlap follows.
+
+The first fresh visual check showed the revised drawn-root start is closer to the photographed root but still sits slightly to its left at the upper meeting point. A final small rightward visual-only anchor adjustment is needed; the gesture corridor remains untouched.
+
+The final Day 2 alignment preview reached a completed root state with the visual-only upper anchor at `x: .552, y: .315`; the original interaction corridor and progress state remained unchanged. A final overlap inspection follows.
+
+The final Day 2 visual check shows the white root’s upper start now meeting the photographed root at the natural upper junction, rather than beginning visibly to its left. The adjustment remains visual-only; gesture and progress behavior were not changed.
