@@ -309,3 +309,9 @@ Final visual inspection confirmed that the calibrated white trace now follows th
 A first-segment trace from the revised seed-base anchor reached `progress: 0.0652`; its rendered start was at the seed’s lower-edge projection, not the earlier nearby side twig. A visual confirmation follows.
 
 The first visible guide segment is now seeded from the lower edge of the root/seed junction, with the former upper-left side-twig segment removed. The guide remains suppressed before practice begins.
+
+## 2026-08-20 — Day 2 seed-exit connection extension (port 4203)
+
+A partial trace through the extended seed-exit segment reached `progress: 0.1224`; the guide now includes the link from the seed’s visible root exit into the established root path. A final visual check follows.
+
+Final visual inspection confirmed the extended guide has no separate side-twig start and is configured as a continuous seed-exit-to-root path. It remains absent until the Day 2 practice begins.
