@@ -201,3 +201,9 @@ The Day 1 action instruction was raised from `42%` to `40%` of the scene height.
 ## 2026-08-20 — Day 1 instruction leading refinement (port 4180)
 
 The Day 1 action instruction’s line-height increased from `1.08` to `1.28`. The fresh preview preserved the exact two-line wording and raised placement, while making the two lines visibly more open and less compressed above the `TOUCH THE SEED` cue.
+
+## 2026-08-20 — Day 1 explicit two-line gap check (port 4181)
+
+The fresh preview confirmed that Day 1 now renders two independent instruction-line elements, so their separation is controllable rather than dependent on a newline. The `.42em` gap is present but remains visually restrained at the browser test size; it will be enlarged before publication to make the intended relaxed rhythm unmistakable on iPhone.
+
+The explicit gap was increased to `.72em` and rechecked on the fresh port 4182 preview. Both Day 1 instruction lines remained centered, retained the approved wording and type treatment, and now have a clearly visible intentional separation above the `TOUCH THE SEED` cue.
