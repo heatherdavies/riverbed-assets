@@ -351,3 +351,9 @@ Settled Day 3 completion confirmed: the photorealistic soil layer was fully remo
 A traced first quarter of the Day 5 coil reached `progress: 0.1990`, rather than completing the coil ahead of the finger. The reduced gain keeps the illuminated portion proportionate to a measured partial trace.
 
 Visual inspection confirmed that the bright Day 5 coil segment stops with the first traced loop instead of running ahead toward the upper coils; the remaining guide stays in its softer guidance state.
+
+## 2026-08-20 — Day 2 lower-left root turn (port 4210)
+
+The expanded Day 2 source path was traced through the available rendered crop; progress reached `0.6691` with no active contacts. The lower-root guide points now continue along the photographed root’s leftward tail rather than ending at the prior premature point.
+
+Visual inspection confirmed that the Day 2 white guide now continues beyond the prior endpoint and follows the photographed root into its lower-left tail rather than departing from it at the bottom.
