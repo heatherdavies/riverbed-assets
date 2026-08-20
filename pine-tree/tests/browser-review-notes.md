@@ -122,3 +122,7 @@ Day 1 burial timing test exposed a regression: the Rooted card was already visib
 ## Day 1 narrative transition
 
 The review now presents Day 1 as `Planting the Seed` and completes as `Planted.` with the approved planting reflection. Its continuation action successfully opens Day 2 `Deep Anchor`, whose instruction introduces the visible taproot as the next growth stage.
+
+## Photorealistic Day 1 burial scene
+
+The improvised canvas cover was replaced by a dedicated photorealistic buried-seed completion image. A stationary Day 1 hold was validated: 900 ms after release the buried image was actively crossfading (`opacity 0.916`) while the completion card remained hidden; after the full interval, the buried image reached full opacity and the `Planted.` completion card appeared.

@@ -29,7 +29,7 @@
 
   const $ = (selector) => document.querySelector(selector);
   const elements = {
-    scene: $('#scene'), image: $('#sceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
+    scene: $('#scene'), image: $('#sceneImage'), buriedImage: $('#buriedSceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
@@ -129,7 +129,7 @@
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
     state.burialStartedAt = 0;
-    elements.scene.classList.remove('day-one-complete', 'practice-complete');
+    elements.scene.classList.remove('day-one-complete', 'day-one-buried', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
   function current() { return DAYS[state.day - 1]; }
@@ -143,7 +143,7 @@
     elements.nextDay.textContent = next ? `CONTINUE TO ${next.title.toUpperCase()}` : 'RETURN TO DAY 1';
     elements.restartDay.textContent = state.day === 1 ? 'START AGAIN AT DAY 1' : 'START THE JOURNEY AGAIN';
     elements.scene.classList.add('practice-complete');
-    if (state.day === 1) elements.scene.classList.add('day-one-complete');
+    if (state.day === 1) elements.scene.classList.add('day-one-complete', 'day-one-buried');
   }
 
   function updateDayOneIntro() {
@@ -187,6 +187,12 @@
     const config = current();
     elements.image.classList.remove('loaded');
     elements.image.src = `${config.image}?v=20260819-late-journey-1`;
+    if (state.day === 1) {
+      elements.buriedImage.classList.remove('loaded');
+      elements.buriedImage.src = '../assets/day-01-seed-buried.png?v=20260819-burial-scene-1';
+      elements.buriedImage.alt = 'Day 1: planted seed beneath soil.';
+      elements.buriedImage.addEventListener('load', () => elements.buriedImage.classList.add('loaded'), { once: true });
+    }
     elements.image.alt = `Day ${config.day}: ${config.title}.`;
     elements.stage.textContent = `DAY ${String(config.day).padStart(2, '0')} · ${config.stage.toUpperCase()}`;
     elements.title.textContent = config.title;
@@ -327,7 +333,7 @@
   function queueCompletion() {
     if (state.completed.has(state.day) || state.pendingCompletion) return;
     state.pendingCompletion = true;
-    if (state.day === 1) state.burialStartedAt = performance.now();
+    if (state.day === 1) { state.burialStartedAt = performance.now(); elements.scene.classList.add('day-one-buried'); }
     elements.scene.classList.add('settling-completion');
     if (!state.contacts.size) scheduleCompletion();
   }
@@ -429,8 +435,8 @@
     ctx.save(); ctx.globalCompositeOperation = 'screen';
     if (state.day === 1) {
       const r = Math.max(35, w * (.055 + m.soil * .075)); const x = w * state.seedPoint.x; const y = h * state.seedPoint.y;
-      const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill();
-      if (state.pendingCompletion || state.completed.has(1)) { const burial = state.completed.has(1) ? 1 : clamp((t - state.burialStartedAt) / (state.reducedMotion ? 600 : 1600)); const coverY = y + h * .035; ctx.save(); ctx.globalCompositeOperation = 'source-over'; for (let i = 0; i < 38; i += 1) { const angle = i * 2.399; const initialRadius = w * (.105 - (i % 5) * .006); const radius = w * (.012 + (1 - burial) * initialRadius); const px = x + Math.cos(angle) * radius; const py = coverY + Math.sin(angle) * radius * .72; ctx.fillStyle = `rgba(${25 + (i % 4) * 7},${20 + (i % 3) * 6},${13 + (i % 3) * 4},${.28 + burial * .68})`; ctx.beginPath(); ctx.arc(px, py, 2.2 + (i % 4) * 1.35, 0, Math.PI * 2); ctx.fill(); } const soil = ctx.createRadialGradient(x, coverY, 2, x, coverY, w * (.05 + burial * .045)); soil.addColorStop(0, `rgba(12,11,8,${.58 + burial * .37})`); soil.addColorStop(.44, `rgba(34,27,17,${.42 + burial * .5})`); soil.addColorStop(.78, `rgba(58,43,25,${.18 + burial * .3})`); soil.addColorStop(1, 'rgba(15,18,12,0)'); ctx.fillStyle = soil; ctx.beginPath(); ctx.ellipse(x, coverY, w * (.045 + burial * .035), w * (.075 + burial * .055), 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+      if (!state.pendingCompletion && !state.completed.has(1)) { const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill(); }
+
     } else if (state.day === 2) {
       const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .29); const yEnd = h * (.29 + progress * .58); ctx.bezierCurveTo(w * .45, h * .46, w * .56, h * .66, w * .49, yEnd); ctx.stroke();
     } else if (state.day === 3) {
