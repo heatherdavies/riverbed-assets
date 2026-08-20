@@ -126,3 +126,11 @@ The review now presents Day 1 as `Planting the Seed` and completes as `Planted.`
 ## Photorealistic Day 1 burial scene
 
 The improvised canvas cover was replaced by a dedicated photorealistic buried-seed completion image. A stationary Day 1 hold was validated: 900 ms after release the buried image was actively crossfading (`opacity 0.916`) while the completion card remained hidden; after the full interval, the buried image reached full opacity and the `Planted.` completion card appeared.
+
+## Day 6–9 public asset recovery
+
+The review server was restarted from the Pine Tree module root so `/web/` and `/assets/` routes resolve again. Public mobile-review checks verified each Day 6–9 WebP decoded successfully at 1080 × 1920 after direct day switches: Day 6 Branching Out, Day 7 Weathering Growth, Day 8 Forming Features, and Day 9 Full Maturity.
+
+## Day 3 persistent soil clearing and seedling reveal
+
+The Day 3 base image now loads `day-03-seedling-reveal.png`, which contains one young pine seedling rather than a cluster of needles. A direct mobile-style brush stroke increased clearing progress to 0.143. After the touch ended and an additional 1.8-second wait elapsed, progress remained exactly 0.143 with no active contacts, confirming cleared state no longer decays or resets.

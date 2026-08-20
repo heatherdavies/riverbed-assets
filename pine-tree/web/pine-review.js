@@ -4,7 +4,7 @@
   const DAYS = [
     ['Grounding & Anchoring', 'Planting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press it gently into the soil.', 'What intention are you ready to place in the soil?', 'PRESS INTO SOIL', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
-    ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil softly away from the new needles.', 'A first green sign is enough.', 'BRUSH SOFTLY', 'soft-brush', '../assets/day-03-first-light.webp'],
+    ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.png'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
     ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Place two fingers inside the small gold ring around the young branch cluster. Draw one slow circle to strengthen it.', 'Strength can remain responsive.', 'CIRCLE THE GOLD RING', 'two-finger-circle', '../assets/day-05-stronger-structure.webp'],
     ['Structuring & Stretching', 'Branching Out', 'Embracing growth and expansion.', 'Sweep outward along the branches toward the light.', 'There is room to extend.', 'SWEEP OUTWARD', 'outward-sweep', '../assets/day-06-branching-out.webp'],
@@ -47,6 +47,7 @@
     progress: 0,
     material: { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 },
     brushes: [],
+    clearedSoil: new Map(),
     branchReveals: 0,
     branchTrace: 0,
     pendingCompletion: false,
@@ -124,6 +125,7 @@
     state.contacts.clear(); state.progress = 0;
     state.material = { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 };
     state.brushes = [];
+    state.clearedSoil = new Map();
     state.branchReveals = 0;
     state.branchTrace = 0;
     state.pendingCompletion = false;
@@ -281,10 +283,18 @@
       }
       case 3: {
         const brush = Math.abs(dx) + Math.abs(dy) + Math.min(.055, Math.abs(contact.vx) * .005 + Math.abs(contact.vy) * .005);
-        if (brush > .002 && contact.phase === 'move') {
-          state.brushes.push({ x: contact.x, y: contact.y, radius: .09 });
-          if (state.brushes.length > 72) state.brushes.shift();
-          state.material.soil = clamp(state.material.soil + brush * .82);
+        const inSeedlingPatch = contact.x > .28 && contact.x < .72 && contact.y > .47 && contact.y < .78;
+        if (brush > .002 && inSeedlingPatch && contact.phase === 'move') {
+          const samples = Math.max(2, Math.ceil(Math.hypot(dx, dy) * 36));
+          for (let index = 0; index <= samples; index += 1) {
+            const amount = index / samples;
+            const x = contact.px + (contact.x - contact.px) * amount;
+            const y = contact.py + (contact.y - contact.py) * amount;
+            if (x <= .28 || x >= .72 || y <= .47 || y >= .78) continue;
+            const key = `${Math.round(x * 18)}:${Math.round(y * 22)}`;
+            state.clearedSoil.set(key, { x, y, radius: .072 });
+          }
+          state.material.soil = clamp(state.clearedSoil.size / 56);
           state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
           state.progress = Math.max(state.progress, state.material.soil);
         }
@@ -439,8 +449,16 @@
 
     } else if (state.day === 2) {
       const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .29); const yEnd = h * (.29 + progress * .58); ctx.bezierCurveTo(w * .45, h * .46, w * .56, h * .66, w * .49, yEnd); ctx.stroke();
-    } else if (state.day === 3) {
-      ctx.save(); ctx.globalCompositeOperation = 'source-over'; const soilPatch = ctx.createRadialGradient(w * .5, h * .6, 8, w * .5, h * .6, Math.min(w, h) * .3); soilPatch.addColorStop(0, 'rgba(76,58,39,.88)'); soilPatch.addColorStop(.68, 'rgba(46,34,23,.78)'); soilPatch.addColorStop(1, 'rgba(20,20,13,0)'); ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .6, w * .28, h * .16, 0, 0, Math.PI * 2); ctx.fill(); for (let i = 0; i < 56; i++) { const px = w * (.3 + ((i * 37) % 100) / 250); const py = h * (.48 + ((i * 53) % 100) / 520); ctx.fillStyle = `rgba(103,79,51,${.24 + (i % 4) * .05})`; ctx.beginPath(); ctx.arc(px, py, 2 + (i % 4), 0, Math.PI * 2); ctx.fill(); } ctx.globalCompositeOperation = 'destination-out'; state.brushes.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,.96)'); clear.addColorStop(.66, 'rgba(0,0,0,.72)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); }); ctx.restore(); ctx.strokeStyle = `rgba(161,207,108,${.16 + m.needles * .56})`; ctx.lineWidth = 1.35; for (let i = 0; i < 9; i++) { const nx = w * (.45 + (i % 5) * .026); const ny = h * (.61 + Math.floor(i / 5) * .025); ctx.beginPath(); ctx.moveTo(nx, ny); ctx.quadraticCurveTo(nx + (i % 2 ? 5 : -4), ny - 18 - m.needles * 24, nx + (i % 2 ? 9 : -8), ny - 31 - m.needles * 28); ctx.stroke(); }
+    } else if (state.day === 3 && !state.completed.has(3)) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+      const soilPatch = ctx.createRadialGradient(w * .5, h * .61, 8, w * .5, h * .61, Math.min(w, h) * .32);
+      soilPatch.addColorStop(0, 'rgba(70,52,33,.94)'); soilPatch.addColorStop(.62, 'rgba(43,31,20,.88)'); soilPatch.addColorStop(1, 'rgba(17,18,12,0)');
+      ctx.fillStyle = soilPatch; ctx.beginPath(); ctx.ellipse(w * .5, h * .61, w * .29, h * .18, 0, 0, Math.PI * 2); ctx.fill();
+      for (let i = 0; i < 72; i += 1) { const px = w * (.3 + ((i * 37) % 100) / 250); const py = h * (.49 + ((i * 53) % 100) / 500); ctx.fillStyle = `rgba(112,84,52,${.23 + (i % 4) * .045})`; ctx.beginPath(); ctx.arc(px, py, 1.8 + (i % 4) * 1.15, 0, Math.PI * 2); ctx.fill(); }
+      ctx.globalCompositeOperation = 'destination-out';
+      state.clearedSoil.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,1)'); clear.addColorStop(.72, 'rgba(0,0,0,.88)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); });
+      ctx.restore();
     } else if (state.day === 4) {
       ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
     } else if (state.day === 5) {
