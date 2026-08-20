@@ -173,3 +173,7 @@ The Day 7 canopy transform returned from a visible active brush bend to effectiv
 A mobile-style trace was dispatched along a selected visible right-hand branch from the trunk outward. The test produced 0.141 progress with no active contacts. Unlike the former branch-snap approach, the renderer now retains the ordered touch coordinates themselves for the gold line.
 During direct-path validation, the public Day 6 image briefly failed to decode because the temporary review server was no longer listening. The server was restarted from the Pine Tree module root; local `/web/` and `/assets/day-06-branching-out.webp` returned 200 afterward, and the fresh public review route loaded normally.
 A fresh Day 6 direct-path test confirmed the restored scene image decodes at 1080 × 1920. A chosen branch was traced through recorded touch coordinates, yielding 0.141 progress with no active contacts; the next visual review checks the gold stroke against that exact recorded path.
+
+## Day 5 rear-coil guidance
+
+The refreshed Day 5 build opened from a clean active state with no progress, ready for visual verification of the brightened, near-continuous rear coil segments.
