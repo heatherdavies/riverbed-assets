@@ -25,6 +25,9 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .scene-image.loaded { transform: scale(1); }
 .buried-scene-image { z-index: -3; opacity: 0; transform: scale(1.015); transition: opacity 1500ms ease, transform 2200ms ease; }
 .scene.day-one-buried .buried-scene-image { opacity: 1; transform: scale(1); }
+.wind-scene-image { z-index: -3; opacity: 0; transform-origin: 50% 88%; will-change: transform, opacity; transition: opacity 420ms ease; mix-blend-mode: screen; }
+.scene[data-day="7"] .wind-scene-image { opacity: .78; }
+.scene[data-day="7"] .scene-image:not(.wind-scene-image) { filter: saturate(.78) contrast(.94); }
 .scene-vignette { position: absolute; inset: 0; z-index: -2; background: linear-gradient(180deg, rgba(2, 16, 11, .58) 0%, rgba(3, 19, 13, .12) 35%, rgba(3, 18, 12, .22) 54%, rgba(2, 16, 10, .9) 100%), linear-gradient(90deg, rgba(3, 20, 14, .22), transparent 42%, rgba(2, 14, 10, .15)); pointer-events: none; }
 #materialCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 .seed-target { position: absolute; left: 50%; top: 64%; z-index: 2; display: none; flex-direction: column; align-items: center; gap: 7px; transform: translate(-50%, -50%); pointer-events: none; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, .7)); }

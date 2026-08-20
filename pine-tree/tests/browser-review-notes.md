@@ -158,3 +158,12 @@ The rear coil segments were made more traceable with brighter, closer-spaced das
 ## Day 6 branch-specific reveal
 
 A direct mobile-style sweep was dispatched along the visible right-middle branch path only. The resulting Day 6 progress was 0.154 (one branch contribution rather than a sequential global reveal), with no active contacts and no completed state. This confirms the interaction now accumulates from the branch the user actually touches.
+
+## Day 7 brush-driven canopy sway
+
+A strong horizontal touch-style brush across Day 7 reached 0.928 ritual progress with all contacts released. The canopy transform is applied in the animation frame, so a subsequent timed check is required to verify the visible bend and elastic return after the browser advances the frame.
+
+## Day 7 visible canopy sway
+
+A direct horizontal mobile-style brush produced an immediate wind-layer transform of `translateX(3.772%) rotate(6.396deg) scale(1.055)` while the contact remained active, confirming that the canopy now visibly bends in the brushed direction rather than only drawing wind marks.
+The Day 7 canopy transform returned from a visible active brush bend to effectively zero after release, confirming the intended elastic settling behavior. The gesture remained incomplete at 0.780 progress, so the motion can be repeated naturally before the completion threshold is reached.

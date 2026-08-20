@@ -39,7 +39,7 @@
 
   const $ = (selector) => document.querySelector(selector);
   const elements = {
-    scene: $('#scene'), image: $('#sceneImage'), buriedImage: $('#buriedSceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
+    scene: $('#scene'), image: $('#sceneImage'), windImage: $('#windSceneImage'), buriedImage: $('#buriedSceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
@@ -61,6 +61,8 @@
     branchReveals: 0,
     branchTrace: 0,
     branchProgress: Array(9).fill(0),
+    windLean: 0,
+    windVelocity: 0,
     pendingCompletion: false,
     completionTimer: null,
     burialStartedAt: 0,
@@ -140,6 +142,9 @@
     state.branchReveals = 0;
     state.branchTrace = 0;
     state.branchProgress = Array(9).fill(0);
+    state.windLean = 0;
+    state.windVelocity = 0;
+    elements.windImage.style.transform = '';
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
     state.burialStartedAt = 0;
@@ -202,6 +207,15 @@
     const config = current();
     elements.image.classList.remove('loaded');
     elements.image.src = `${config.image}?v=20260819-late-journey-1`;
+    if (state.day === 7) {
+      elements.windImage.classList.remove('loaded');
+      elements.windImage.src = `${config.image}?v=20260819-late-journey-1`;
+      elements.windImage.addEventListener('load', () => elements.windImage.classList.add('loaded'), { once: true });
+    } else {
+      elements.windImage.removeAttribute('src');
+      elements.windImage.classList.remove('loaded');
+      elements.windImage.style.transform = '';
+    }
     if (state.day === 1) {
       elements.buriedImage.classList.remove('loaded');
       elements.buriedImage.src = '../assets/day-01-seed-buried.png?v=20260819-burial-scene-1';
@@ -274,6 +288,12 @@
     return contact;
   }
 
+  function applyWindTransform() {
+    const sway = state.windLean * 7.8;
+    const drift = state.windLean * 4.6;
+    elements.windImage.style.transform = `translateX(${drift}%) rotate(${sway}deg) scale(1.055)`;
+  }
+
   function contactResponse(contact) {
     const dx = contact.x - contact.px; const dy = contact.y - contact.py;
     const speed = clamp(Math.hypot(contact.vx, contact.vy) * 0.45);
@@ -344,7 +364,15 @@
       }
       case 7: {
         const brush = Math.abs(dx) + Math.abs(dy) + speed * .025;
-        if (brush > .003) { state.material.wind = clamp(state.material.wind + brush * .7); state.progress = Math.max(state.progress, state.material.wind); }
+        if (brush > .003) {
+          state.material.wind = clamp(state.material.wind + brush * .7);
+          state.progress = Math.max(state.progress, state.material.wind);
+          if (Math.abs(dx) > .002) {
+            state.windVelocity = 0;
+            state.windLean = clamp(state.windLean + dx * 1.8, -.82, .82);
+            applyWindTransform();
+          }
+        }
         break;
       }
       case 8: { if (contact.phase === 'begin') { state.material.bark = Math.max(state.material.bark, .22 + pressure * .12); state.progress = clamp(state.progress + .2); } break; }
@@ -439,6 +467,12 @@
     const held = [...state.contacts.values()].some((c) => c.duration > 480);
     const needleTarget = held && state.day >= 7 ? .045 : baseline;
     state.material.wind += (baseline - state.material.wind) * .018 * scale;
+    if (state.day === 7 && !state.reducedMotion) {
+      state.windLean *= Math.pow(.955, scale);
+      applyWindTransform();
+    } else if (state.day !== 7) {
+      elements.windImage.style.transform = '';
+    }
     state.material.needles += (needleTarget + state.material.bough * .38 - state.material.needles) * .06 * scale;
 
     const width = canvas.clientWidth; const height = canvas.clientHeight; ctx.clearRect(0, 0, width, height);
