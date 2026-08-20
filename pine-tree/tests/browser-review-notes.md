@@ -221,3 +221,7 @@ A separate Day 2 completion check retained its reflection (`Strength begins belo
 ## 2026-08-20 — Day 1 semi-transparent veil repair (port 4185)
 
 The fresh opening preview shows the Day 1 seed photograph clearly but softly beneath the forest-green veil. No stray fallback label or symbol appears over the opening copy. Browser verification reported `naturalWidth: 1080`, `complete: true`, empty alternative text, and an active veil state, confirming that the seed image is loaded while fallback text remains suppressed.
+
+## 2026-08-20 — Day 1 reflection typography and wrap refinement (port 4186)
+
+The Day 1 opening reflection retains its exact wording and is now rendered as two deliberate centered serif lines: `What intention are you ready` and `to place in the soil?`. The fresh preview shows a balanced, uncut presentation, and browser verification confirmed two separate visual lines with the full sentence preserved.
