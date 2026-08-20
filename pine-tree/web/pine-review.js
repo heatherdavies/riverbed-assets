@@ -35,11 +35,48 @@
     [[.49,.62],[.4,.59],[.25,.56],[.1,.55]],
   ];
   const daySixPoint = (branch, progress) => { const t = clamp(progress); const q = 1 - t; return { x: q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0], y: q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1] }; };
+  const DAY_TWO_ROOT_PATH = [[.444,.260],[.473,.279],[.501,.298],[.492,.326],[.522,.354],[.536,.392],[.543,.430],[.541,.477],[.526,.523],[.506,.551],[.494,.588],[.492,.607],[.469,.626],[.443,.645],[.435,.664],[.447,.692],[.477,.710],[.480,.730],[.499,.767],[.494,.805],[.479,.832],[.475,.851],[.467,.870]];
+  function projectDayTwoPoint(point) {
+    const rect = elements.scene.getBoundingClientRect();
+    const image = elements.dayTwoImage;
+    if (!rect.width || !rect.height || !image.naturalWidth || !image.naturalHeight) return { x: point[0], y: point[1] };
+    const scale = Math.max(rect.width / image.naturalWidth, rect.height / image.naturalHeight);
+    const renderedWidth = image.naturalWidth * scale;
+    const renderedHeight = image.naturalHeight * scale;
+    const cropX = (renderedWidth - rect.width) / 2;
+    const cropY = (renderedHeight - rect.height) / 2;
+    return {
+      x: (image.naturalWidth * point[0] * scale - cropX) / rect.width,
+      y: (image.naturalHeight * point[1] * scale - cropY) / rect.height,
+    };
+  }
+  function drawDayTwoRoot(w, h, progress) {
+    const clipped = clamp(progress);
+    if (clipped <= .005) return;
+    const points = DAY_TWO_ROOT_PATH.map(projectDayTwoPoint);
+    const segments = points.length - 1;
+    const reached = clipped * segments;
+    const fullSegments = Math.floor(reached);
+    const fraction = reached - fullSegments;
+    ctx.save();
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = `rgba(239,229,184,${.34 + clipped * .5})`;
+    ctx.lineWidth = 1.8 + clipped * 2.4;
+    ctx.beginPath();
+    ctx.moveTo(w * points[0].x, h * points[0].y);
+    for (let index = 1; index <= fullSegments; index += 1) ctx.lineTo(w * points[index].x, h * points[index].y);
+    if (fullSegments < segments && fraction > 0) {
+      const start = points[fullSegments]; const end = points[fullSegments + 1];
+      ctx.lineTo(w * (start.x + (end.x - start.x) * fraction), h * (start.y + (end.y - start.y) * fraction));
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
   function findDaySixBranch(x, y) { let closest = { index: -1, progress: 0, distance: Infinity }; DAY_SIX_BRANCHES.forEach((branch, index) => { for (let step = 0; step <= 44; step += 1) { const progress = step / 44; const point = daySixPoint(branch, progress); const distance = Math.hypot(x - point.x, y - point.y); if (distance < closest.distance) closest = { index, progress, distance }; } }); return closest.distance < .075 ? closest : null; }
 
   const $ = (selector) => document.querySelector(selector);
   const elements = {
-    scene: $('#scene'), image: $('#sceneImage'), windImage: $('#windSceneImage'), buriedImage: $('#buriedSceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
+    scene: $('#scene'), image: $('#sceneImage'), dayTwoImage: $('#dayTwoSceneImage'), windImage: $('#windSceneImage'), buriedImage: $('#buriedSceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
@@ -337,8 +374,10 @@
         state.material.soil = Math.max(state.material.soil, hold * (.56 + pressure * .3)); state.progress = Math.max(state.progress, hold); break;
       }
       case 2: {
-        const inRootCorridor = Math.abs(contact.x - .5) < .3 && contact.y > .27 && contact.y < .9;
-        const reachedDepth = clamp((contact.y - .29) / .58);
+        const rootStart = projectDayTwoPoint(DAY_TWO_ROOT_PATH[0]);
+        const rootEnd = projectDayTwoPoint(DAY_TWO_ROOT_PATH[DAY_TWO_ROOT_PATH.length - 1]);
+        const inRootCorridor = Math.abs(contact.x - .5) < .3 && contact.y > Math.max(-.04, rootStart.y - .035) && contact.y < Math.min(1.04, rootEnd.y + .04);
+        const reachedDepth = clamp((contact.y - rootStart.y) / Math.max(.08, rootEnd.y - rootStart.y));
         if (inRootCorridor && (contact.phase === 'begin' || dy > .002)) {
           state.material.root = Math.max(state.material.root, reachedDepth);
           state.progress = Math.max(state.progress, reachedDepth);
@@ -540,8 +579,8 @@
       const r = Math.max(35, w * (.055 + m.soil * .075)); const x = w * state.seedPoint.x; const y = h * state.seedPoint.y;
       if (!state.pendingCompletion && !state.completed.has(1)) { const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill(); }
 
-    } else if (state.day === 2) {
-      const progress = Math.max(m.root, state.progress); ctx.strokeStyle = `rgba(239,229,184,${.35 + progress * .45})`; ctx.lineWidth = 2 + progress * 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(w * .5, h * .29); const yEnd = h * (.29 + progress * .58); ctx.bezierCurveTo(w * .48, h * .41, w * .56, h * .66, w * .49, yEnd); ctx.stroke();
+    } else if (state.day === 2 && !state.introVisible) {
+      drawDayTwoRoot(w, h, Math.max(m.root, state.progress));
     } else if (state.day === 3 && !state.completed.has(3)) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';

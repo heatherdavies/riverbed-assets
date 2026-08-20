@@ -287,3 +287,19 @@ A synchronous Day 2 switch still reports the prior Day 1 `currentSrc` during the
 The dedicated Day 2 layer was `complete: true` at 1080×1920 and had computed `opacity: 1` in the same event turn that Day 2 opened; the primary base image no longer had a pending load. This confirms the correct rooted-seed photograph is ready immediately behind the Day 2 introduction.
 
 Visual inspection of the immediate Day 2 opening confirmed the rooted-seed photograph is present behind the Deep Anchor panel rather than the blank green fallback seen on iPhone previously.
+
+## 2026-08-20 — Day 2 photo-first root sequence (port 4199)
+
+A fresh Day 2 opening has `progress: 0` with `introVisible: true`. The revised renderer suppresses the white root guide in this state so the rooted-seed photograph alone appears behind the introduction panel.
+
+Visual inspection confirmed the Day 2 introduction is photo-only with no white guide. After `BEGIN PRACTICE`, the guide remains absent at zero progress, allowing the user to begin at the photographed seed-root junction rather than following a premature floating line.
+
+A desktop partial-trace check confirmed the revised source-path points need to be projected through the scene image’s `object-fit: cover` crop. Raw source percentages caused the white trace to sit beside the photographed root in cropped viewports; the next correction maps the same points into the rendered image coordinates.
+
+A crop-projected partial Day 2 trace reached `progress: 0.5274` from a rendered seed-root start at `y: 0.018` to `y: 0.676` in the desktop crop, with no active contacts. This verifies that the gesture and guide now share the same object-fit projection.
+
+The first crop-projected validation corrected the major detached-path error and restored a seed-origin guide, but visual inspection found a remaining fine horizontal offset in the source-root calibration. The next pass will refine the sampled root path points without changing the Day 2 sequence or gesture behavior.
+
+The centerline-calibrated partial Day 2 trace reached `progress: 0.5377` with no active contacts. A final visual check follows to confirm the overlay now sits on the photographed root across the rendered crop.
+
+Final visual inspection confirmed that the calibrated white trace now follows the photographed root centerline through the rendered crop, beginning at the visible seed-root junction rather than floating beside it. The introduction remains photo-only until practice begins.
