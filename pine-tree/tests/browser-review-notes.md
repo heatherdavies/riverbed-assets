@@ -261,3 +261,7 @@ The partial-brush visual check confirmed that both the temporary loose-soil laye
 ## 2026-08-20 — Day 1 intention-to-action transition prompt (port 4192)
 
 The fresh Day 1 veil now includes the quiet two-line prompt `When you have chosen an intention, press HOW TO BEGIN.` directly above the action button. Selecting the button removed the entire reflective veil and prompt together, then restored the unchanged practical instruction and seed target state.
+
+## 2026-08-20 — Day 1 sentence-case invitation (port 4193)
+
+The opening prompt and action button now read `How to begin` in sentence case with relaxed letter spacing. The fresh preview confirmed that the calmer label still lifts the veil and returns the original Day 1 instruction and seed target state.
