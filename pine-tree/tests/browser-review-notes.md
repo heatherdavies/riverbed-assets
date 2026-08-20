@@ -265,3 +265,7 @@ The fresh Day 1 veil now includes the quiet two-line prompt `When you have chose
 ## 2026-08-20 — Day 1 sentence-case invitation (port 4193)
 
 The opening prompt and action button now read `How to begin` in sentence case with relaxed letter spacing. The fresh preview confirmed that the calmer label still lifts the veil and returns the original Day 1 instruction and seed target state.
+
+## 2026-08-20 — Day 1 Begin copy simplification (port 4194)
+
+The Day 1 opening now reads `When you have chosen an intention, press Begin.` with a `Begin` button. Selecting Begin continues to dismiss the veil and restore the unchanged practical instruction and seed target state.
