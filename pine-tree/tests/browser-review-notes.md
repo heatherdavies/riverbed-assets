@@ -177,3 +177,13 @@ A fresh Day 6 direct-path test confirmed the restored scene image decodes at 108
 ## Day 5 rear-coil guidance
 
 The refreshed Day 5 build opened from a clean active state with no progress, ready for visual verification of the brightened, near-continuous rear coil segments.
+
+## 2026-08-20 — Day 1 veil-to-action preview (port 4177)
+
+The fresh review origin displayed the Day 1 opening as a dark, semi-transparent forest veil. The title **“Planting the Seed”** and the intent **“Planting a purpose or intention.”** were centered visually, the seed remained present but subdued beneath the veil, and the **“HOW TO BEGIN”** control appeared at the lower edge. This visual check was performed before validating the action reveal.
+
+Activating **HOW TO BEGIN** removed the veil and revealed the practical instruction above the calibrated `TOUCH THE SEED` target. The state immediately after the lift was `day: 1`, `progress: 0`, `completed: []`, `contacts: 0`, `introVisible: false`, and `veilLifted: true`, confirming that the reflective transition does not advance the ritual.
+
+A stationary 3.35-second hold at the revealed seed target reached `progress: 1`, recorded Day 1 as complete, and cleared active contacts after release. The existing delayed `Planted.` completion state appeared with the buried-seed scene and continuation controls, confirming the new opening leaves the previously restored completion sequence intact.
+
+The Day 1 continuation control then opened Day 2, whose original shared `Deep Anchor` introduction card and `BEGIN PRACTICE` control remained visible. The dedicated veil is therefore confined to a fresh Day 1 opening.

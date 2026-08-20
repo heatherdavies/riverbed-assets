@@ -43,6 +43,7 @@
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
+    veil: $('#dayOneVeil'), action: $('#dayOneAction'), actionInstruction: $('#dayOneActionInstruction'), howToBegin: $('#howToBeginButton'),
     dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
@@ -77,6 +78,7 @@
     audio: null,
     panelOpen: false,
     introVisible: true,
+    veilLifted: false,
     introTimer: null,
     quality: window.devicePixelRatio > 2 ? 'standard' : 'high',
   };
@@ -97,6 +99,7 @@
       case 'restartDayButton': return resetToDayOne();
       case 'returnToSeedButton': return resetToDayOne();
       case 'introDismiss': return dismissIntro();
+      case 'howToBeginButton': return liftVeil();
       case 'menuButton': return setPanel(true);
       case 'closePanelButton': return closePanel();
       case 'scrim': return closePanel();
@@ -152,6 +155,7 @@
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
     state.burialStartedAt = 0;
+    state.veilLifted = false;
     elements.scene.classList.remove('day-one-complete', 'day-one-buried', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
   }
@@ -170,14 +174,29 @@
   }
 
   function updateDayOneIntro() {
-    const show = state.introVisible;
-    elements.intro.classList.toggle('visible', show);
-    elements.scene.classList.toggle('practice-intro-open', show);
+    const showSharedIntro = state.introVisible && state.day !== 1;
+    const showVeil = state.day === 1 && state.introVisible && !state.veilLifted;
+    const showAction = state.day === 1 && state.veilLifted && !state.completed.has(1);
+    elements.intro.classList.toggle('visible', showSharedIntro);
+    elements.scene.classList.toggle('practice-intro-open', showSharedIntro || showVeil);
+    elements.scene.classList.toggle('day-one-veil-active', showVeil);
+    elements.scene.classList.toggle('day-one-action-open', showAction);
+    elements.veil.setAttribute('aria-hidden', String(!showVeil));
+    elements.action.setAttribute('aria-hidden', String(!showAction));
     clearTimeout(state.introTimer);
     state.introTimer = null;
   }
 
+  function liftVeil() {
+    if (state.day !== 1 || state.completed.has(1) || state.veilLifted) return;
+    state.veilLifted = true;
+    state.introVisible = false;
+    updateDayOneIntro();
+    requestAnimationFrame(positionSeedTarget);
+  }
+
   function dismissIntro() {
+    if (state.day === 1 && !state.veilLifted) return liftVeil();
     if (!state.introVisible) return;
     state.introVisible = false;
     updateDayOneIntro();
@@ -234,6 +253,7 @@
     elements.introTitle.textContent = config.title;
     elements.introIntent.textContent = config.intent;
     elements.introInstruction.textContent = config.instruction;
+    elements.actionInstruction.textContent = config.instruction;
     elements.introDismiss.textContent = state.day === 1 ? 'BEGIN WITH THE SEED' : 'BEGIN PRACTICE';
     elements.prompt.textContent = config.prompt;
     elements.gestureHintText.textContent = config.prompt;
@@ -574,7 +594,7 @@
     elements.scene.addEventListener('selectstart', blockNativeSceneGesture);
     elements.scene.addEventListener('touchstart', blockNativeSceneGesture, { passive: false });
     elements.scene.addEventListener('touchmove', blockNativeSceneGesture, { passive: false });
-    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible) dismissIntro(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
+    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible && !state.veilLifted) return; try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); if (!state.contacts.size && state.pendingCompletion) scheduleCompletion(); }));
     bindPrimaryControls();
@@ -588,6 +608,6 @@
     elements.motion.textContent = state.reducedMotion ? 'ON' : 'OFF'; elements.motion.setAttribute('aria-pressed', String(state.reducedMotion));
   }
 
-  window.PineReview = { setDay, assistedAdvance, dismissIntro, getState: () => ({ day: state.day, progress: state.progress, completed: [...state.completed], contacts: state.contacts.size, introVisible: state.introVisible }), reset: () => { state.completed.clear(); resetMaterial(); persist(); renderNavigation(); } };
+  window.PineReview = { setDay, assistedAdvance, dismissIntro, liftVeil, getState: () => ({ day: state.day, progress: state.progress, completed: [...state.completed], contacts: state.contacts.size, introVisible: state.introVisible, veilLifted: state.veilLifted }), reset: () => { state.completed.clear(); resetMaterial(); persist(); renderNavigation(); } };
   bind(); resize(); updateSettings(); setDay(1); requestAnimationFrame(draw);
 })();
