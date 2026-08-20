@@ -154,3 +154,7 @@ Day 5 was revised to four visibly separated spring-like loops with a wider base,
 ## Day 5 rear-coil guidance refinement
 
 The rear coil segments were made more traceable with brighter, closer-spaced dashed marks and a slightly wider stroke, while the front arcs remain stronger. The review was reset into a fresh active Day 5 state for final visual validation of the improved path hierarchy.
+
+## Day 6 branch-specific reveal
+
+A direct mobile-style sweep was dispatched along the visible right-middle branch path only. The resulting Day 6 progress was 0.154 (one branch contribution rather than a sequential global reveal), with no active contacts and no completed state. This confirms the interaction now accumulates from the branch the user actually touches.

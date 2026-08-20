@@ -27,6 +27,16 @@
     ['Mature.', 'You are rooted, complete, and still becoming.'],
   ];
 
+  const DAY_SIX_BRANCHES = [
+    [[.5,.47],[.43,.4],[.25,.3],[.08,.24]], [[.51,.44],[.61,.37],[.77,.25],[.93,.18]],
+    [[.5,.57],[.38,.51],[.2,.46],[.06,.45]], [[.52,.57],[.66,.5],[.83,.43],[.96,.39]],
+    [[.51,.68],[.4,.65],[.2,.67],[.06,.7]], [[.51,.68],[.64,.68],[.78,.72],[.93,.77]],
+    [[.5,.39],[.43,.33],[.33,.24],[.25,.16]], [[.52,.51],[.67,.48],[.81,.48],[.98,.51]],
+    [[.49,.62],[.4,.59],[.25,.56],[.1,.55]],
+  ];
+  const daySixPoint = (branch, progress) => { const t = clamp(progress); const q = 1 - t; return { x: q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0], y: q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1] }; };
+  function findDaySixBranch(x, y) { let closest = { index: -1, progress: 0, distance: Infinity }; DAY_SIX_BRANCHES.forEach((branch, index) => { for (let step = 0; step <= 44; step += 1) { const progress = step / 44; const point = daySixPoint(branch, progress); const distance = Math.hypot(x - point.x, y - point.y); if (distance < closest.distance) closest = { index, progress, distance }; } }); return closest.distance < .075 ? closest : null; }
+
   const $ = (selector) => document.querySelector(selector);
   const elements = {
     scene: $('#scene'), image: $('#sceneImage'), buriedImage: $('#buriedSceneImage'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
@@ -50,6 +60,7 @@
     clearedSoil: new Map(),
     branchReveals: 0,
     branchTrace: 0,
+    branchProgress: Array(9).fill(0),
     pendingCompletion: false,
     completionTimer: null,
     burialStartedAt: 0,
@@ -128,6 +139,7 @@
     state.clearedSoil = new Map();
     state.branchReveals = 0;
     state.branchTrace = 0;
+    state.branchProgress = Array(9).fill(0);
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
     state.burialStartedAt = 0;
@@ -184,7 +196,7 @@
       if (state.day === 3) { state.material.soil = 1; state.material.needles = .7; }
       if (state.day === 4) state.material.bark = 1;
       if (state.day === 5) state.material.bough = 1;
-      if (state.day === 6) { state.branchReveals = 9; state.branchTrace = 0; state.material.bough = 9; }
+      if (state.day === 6) { state.branchReveals = 9; state.branchTrace = 0; state.branchProgress = Array(9).fill(1); state.material.bough = 9; }
       showCompletionState();
     }
     const config = current();
@@ -320,12 +332,13 @@
         break;
       }
       case 6: {
-        const outward = Math.max(0, dx) + Math.max(0, contact.vx) * .009;
-        if (outward > .005 && state.branchReveals < 9) {
-          state.branchTrace = clamp(state.branchTrace + outward * 2.3);
-          if (state.branchTrace >= 1) { state.branchReveals += 1; state.branchTrace = 0; }
-          state.material.bough = state.branchReveals + state.branchTrace;
-          state.progress = state.material.bough / 9;
+        const hit = findDaySixBranch(contact.x, contact.y);
+        if (hit && (contact.phase === 'begin' || contact.phase === 'move')) {
+          const reached = Math.max(hit.progress, contact.phase === 'move' ? state.branchProgress[hit.index] : 0);
+          state.branchProgress[hit.index] = Math.max(state.branchProgress[hit.index], reached);
+          state.branchReveals = state.branchProgress.filter((value) => value >= .985).length;
+          state.material.bough = state.branchProgress.reduce((sum, value) => sum + value, 0);
+          state.progress = state.material.bough / DAY_SIX_BRANCHES.length;
         }
         break;
       }
@@ -468,15 +481,8 @@
       ctx.save(); ctx.lineCap = 'round'; drawCoil(1, false, false); drawCoil(1, false, true); if (progress > 0) { drawCoil(progress, true, false); drawCoil(progress, true, true); }
       const startGlow = ctx.createRadialGradient(xAt(0), yAt(0), 2, xAt(0), yAt(0), 17 + pulse * 5); startGlow.addColorStop(0, 'rgba(245,230,169,.98)'); startGlow.addColorStop(.22, 'rgba(219,193,112,.86)'); startGlow.addColorStop(1, 'rgba(219,193,112,0)'); ctx.fillStyle = startGlow; ctx.beginPath(); ctx.arc(xAt(0), yAt(0), 19 + pulse * 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     } else if (state.day === 6) {
-      const branches = [
-        [[.5,.47],[.43,.4],[.25,.3],[.08,.24]], [[.51,.44],[.61,.37],[.77,.25],[.93,.18]],
-        [[.5,.57],[.38,.51],[.2,.46],[.06,.45]], [[.52,.57],[.66,.5],[.83,.43],[.96,.39]],
-        [[.51,.68],[.4,.65],[.2,.67],[.06,.7]], [[.51,.68],[.64,.68],[.78,.72],[.93,.77]],
-        [[.5,.39],[.43,.33],[.33,.24],[.25,.16]], [[.52,.51],[.67,.48],[.81,.48],[.98,.51]],
-        [[.49,.62],[.4,.59],[.25,.56],[.1,.55]],
-      ];
-      branches.forEach((branch, index) => {
-        const amount = index < state.branchReveals ? 1 : index === state.branchReveals ? state.branchTrace : 0;
+      DAY_SIX_BRANCHES.forEach((branch, index) => {
+        const amount = state.branchProgress[index] || 0;
         if (amount <= 0) return;
         ctx.strokeStyle = `rgba(224,207,126,${.18 + amount * .52})`; ctx.lineWidth = 1.1 + amount * 1.7; ctx.lineCap = 'round'; ctx.beginPath();
         const steps = 30;
