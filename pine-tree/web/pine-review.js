@@ -738,8 +738,6 @@
         ctx.fillStyle = 'rgba(247,230,158,.8)'; ctx.beginPath(); ctx.arc(w * last.x, h * last.y, active ? 3.6 : 2.2, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       });
-    } else if (state.day === 7) {
-      ctx.strokeStyle = `rgba(199,220,196,${.1 + m.wind * .34})`; ctx.lineWidth = 1.35; const motion = state.reducedMotion ? 0 : state.windLean * w * .055 + Math.sin(t / 1450 + state.windLean * 1.8) * (2 + m.wind * 11); for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
     } else if (state.day === 8) {
       const targets = DAY_EIGHT_DETAILS.map(({ point }) => projectScenePoint(point));
       targets.forEach(({ x, y }, index) => {
