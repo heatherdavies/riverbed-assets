@@ -415,3 +415,7 @@ The supporting sentence now holds on one smaller line above the Begin button and
 ## 2026-08-21 — Day 1 reduced one-line Begin support prompt (port 4221)
 
 The one-line supporting sentence remains legible and now sits one small visual step below its previous size. It retains a calm secondary hierarchy above the Begin button.
+
+## 2026-08-21 — Day 1 actual support-prompt font-size reduction (port 4222)
+
+The one-line Begin-supporting prompt uses a visibly smaller actual CSS font size, remains readable, and does not wrap. Its hierarchy remains secondary to the gold intention question.
