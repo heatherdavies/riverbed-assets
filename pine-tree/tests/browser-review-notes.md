@@ -403,3 +403,7 @@ Visual inspection confirmed the needle and tall-cone circles illuminated at thei
 The Day 2 guide was traced through the revised source path from the seed root exit to its in-frame end point at `(0.550, 0.765)`. The interaction reached `progress: 0.953`, confirming the shortened guide remains completable without driving below the mobile frame.
 
 On the endpoint-adjusted preview, tracing the rightward taproot route to its visible end reached `progress: 1` and completed Day 2 after the settling interval. This confirms the shorter in-frame route is fully completable.
+
+## 2026-08-21 — Day 1 warm-gold intention question (port 4219)
+
+The Day 1 opening veil shows the intention question in a warm restrained gold, distinct from the ivory title, supporting intent, and Begin invitation. The wording, controlled two-line wrap, and spacing are unchanged.
