@@ -479,3 +479,9 @@ Fresh edited Day 2 scene loaded. A full freehand trace reached the existing in-f
 
 The revised Day 2 photograph loaded and a full freehand trace again reached the same in-frame endpoint for final visual comparison with the matched root tip.
 Visual confirmation: the matched Day 2 photograph now ends its visible taproot at the completed freehand trace endpoint, with no root continuation visible below it.
+
+## 2026-08-21 — Day 3 persistent mask validation (port 4234)
+
+Two separated brush strokes registered without completion. The first patch was retained in the visual-mask stroke list after a second distant patch was added.
+Visual confirmation: both distant cleared patches remained open simultaneously; brushing the second patch did not restore soil over the first.
+A finger-driven nine-row sweep reached 88.9% coverage, and one final bottom-edge finger sweep reached 100%. The completion threshold is therefore reachable through brushing alone, with no automatic clearing of untouched soil.

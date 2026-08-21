@@ -115,7 +115,7 @@
     progress: 0,
     material: { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 },
     brushes: [],
-    clearedSoil: new Map(),
+    clearedSoil: new Set(),
     branchReveals: 0,
     branchTrace: 0,
     branchProgress: Array(9).fill(0),
@@ -203,7 +203,7 @@
     state.contacts.clear(); state.progress = 0;
     state.material = { soil: 0, root: 0, bark: 0, bough: 0, needles: 0.12, wind: 0.1 };
     state.brushes = [];
-    state.clearedSoil = new Map();
+    state.clearedSoil = new Set();
     state.branchReveals = 0;
     state.branchTrace = 0;
     state.branchProgress = Array(9).fill(0);
@@ -442,7 +442,8 @@
             const y = contact.py + (contact.y - contact.py) * amount;
             if (x <= .17 || x >= .83 || y <= .485 || y >= .855) continue;
             const key = `${Math.round((x - .17) / .066)}:${Math.round((y - .485) / .04625)}`;
-            state.clearedSoil.set(key, { x, y, radius: .065 });
+            state.brushes.push({ x, y, radius: .065 });
+            state.clearedSoil.add(key);
           }
           state.material.soil = clamp(state.clearedSoil.size / 99);
           state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
@@ -675,7 +676,7 @@
       }
       }
       ctx.globalCompositeOperation = 'destination-out';
-      state.clearedSoil.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,1)'); clear.addColorStop(.68, 'rgba(0,0,0,.92)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); });
+      state.brushes.forEach(({ x, y, radius }) => { const clear = ctx.createRadialGradient(w * x, h * y, 2, w * x, h * y, Math.min(w, h) * radius); clear.addColorStop(0, 'rgba(0,0,0,1)'); clear.addColorStop(.68, 'rgba(0,0,0,.92)'); clear.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = clear; ctx.beginPath(); ctx.arc(w * x, h * y, Math.min(w, h) * radius, 0, Math.PI * 2); ctx.fill(); });
       ctx.restore();
     } else if (state.day === 4) {
       ctx.strokeStyle = `rgba(211,181,111,${.18 + state.progress * .5})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(w * .5, h * .77); ctx.quadraticCurveTo(w * .48, h * .58, w * .51, h * (.76 - state.progress * .45)); ctx.stroke();
