@@ -452,3 +452,9 @@ Magnified source-crop inspection confirms the intended Day 2 taproot is the thic
 Fresh rebuilt preview opened successfully. Day 2 was entered programmatically with its introduction dismissed; the active practice began at zero progress before tracing the source-calibrated prominent taproot centerline.
 
 The full rebuilt Day 2 trace reached completion. Visual inspection of the fresh preview confirms the white guide now overlays the prominent thick photographed taproot from the seed through the selected in-frame endpoint, rather than the thinner secondary root.
+
+## 2026-08-21 — Day 2 freehand tracing (port 4228)
+
+Fresh preview loaded, Day 2 opened with its introduction dismissed, and the practice began at zero progress with no pre-drawn root overlay present.
+
+A complete Day 2 touch stroke was dispatched through the root corridor. The new line rendered from the stored touch points (not from a pre-drawn guide) and the practice reached completion at the corridor endpoint.

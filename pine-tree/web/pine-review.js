@@ -70,27 +70,27 @@
       y: (image.naturalHeight * point[1] * scale - cropY) / rect.height,
     };
   }
-  function drawDayTwoRoot(w, h, progress) {
-    const clipped = clamp(progress);
-    if (clipped <= .005) return;
-    const points = DAY_TWO_ROOT_PATH.map(projectDayTwoPoint);
-    const segments = points.length - 1;
-    const reached = clipped * segments;
-    const fullSegments = Math.floor(reached);
-    const fraction = reached - fullSegments;
-    ctx.save();
-    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.strokeStyle = `rgba(239,229,184,${.34 + clipped * .5})`;
-    ctx.lineWidth = 1.8 + clipped * 2.4;
-    ctx.beginPath();
-    ctx.moveTo(w * points[0].x, h * points[0].y);
-    for (let index = 1; index <= fullSegments; index += 1) ctx.lineTo(w * points[index].x, h * points[index].y);
-    if (fullSegments < segments && fraction > 0) {
-      const start = points[fullSegments]; const end = points[fullSegments + 1];
-      ctx.lineTo(w * (start.x + (end.x - start.x) * fraction), h * (start.y + (end.y - start.y) * fraction));
-    }
-    ctx.stroke();
-    ctx.restore();
+  function drawDayTwoFreehand(w, h) {
+    state.dayTwoStrokes.forEach((stroke) => {
+      if (stroke.points.length < 2) return;
+      const active = state.dayTwoActive.has(stroke.id);
+      ctx.save();
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.shadowColor = active ? 'rgba(242,224,155,.7)' : 'rgba(218,198,126,.38)';
+      ctx.shadowBlur = active ? 11 : 5;
+      ctx.strokeStyle = active ? 'rgba(248,232,163,.94)' : 'rgba(239,225,173,.82)';
+      ctx.lineWidth = active ? 4.4 : 3.35;
+      ctx.beginPath();
+      stroke.points.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(w * point.x, h * point.y);
+        else ctx.lineTo(w * point.x, h * point.y);
+      });
+      ctx.stroke();
+      const last = stroke.points[stroke.points.length - 1];
+      ctx.fillStyle = 'rgba(248,231,164,.78)';
+      ctx.beginPath(); ctx.arc(w * last.x, h * last.y, active ? 3.3 : 2.15, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    });
   }
   function findDaySixBranch(x, y) { let closest = { index: -1, progress: 0, distance: Infinity }; DAY_SIX_BRANCHES.forEach((branch, index) => { for (let step = 0; step <= 44; step += 1) { const progress = step / 44; const point = daySixPoint(branch, progress); const distance = Math.hypot(x - point.x, y - point.y); if (distance < closest.distance) closest = { index, progress, distance }; } }); return closest.distance < .075 ? closest : null; }
 
@@ -120,6 +120,8 @@
     branchTrace: 0,
     branchProgress: Array(9).fill(0),
     dayEightReveals: new Set(),
+    dayTwoStrokes: [],
+    dayTwoActive: new Map(),
     daySixStrokes: [],
     daySixActive: new Map(),
     windLean: 0,
@@ -206,6 +208,8 @@
     state.branchTrace = 0;
     state.branchProgress = Array(9).fill(0);
     state.dayEightReveals.clear();
+    state.dayTwoStrokes = [];
+    state.dayTwoActive.clear();
     state.daySixStrokes = [];
     state.daySixActive.clear();
     state.windLean = 0;
@@ -401,6 +405,23 @@
         const rootEnd = projectDayTwoPoint(DAY_TWO_ROOT_PATH[DAY_TWO_ROOT_PATH.length - 1]);
         const inRootCorridor = Math.abs(contact.x - .5) < .3 && contact.y > Math.max(-.04, rootStart.y - .035) && contact.y < Math.min(1.04, rootEnd.y + .04);
         const reachedDepth = clamp((contact.y - rootStart.y) / Math.max(.08, rootEnd.y - rootStart.y));
+        if (contact.phase === 'begin' && inRootCorridor) {
+          const stroke = { id: contact.id, points: [{ x: contact.x, y: contact.y }], length: 0 };
+          state.dayTwoStrokes.push(stroke);
+          state.dayTwoActive.set(contact.id, stroke);
+        } else if (contact.phase === 'move') {
+          const stroke = state.dayTwoActive.get(contact.id);
+          if (stroke && inRootCorridor) {
+            const prior = stroke.points[stroke.points.length - 1];
+            const segment = Math.hypot(contact.x - prior.x, contact.y - prior.y);
+            if (segment > .002) {
+              stroke.points.push({ x: contact.x, y: contact.y });
+              stroke.length += segment;
+            }
+          }
+        } else if (contact.phase === 'end' || contact.phase === 'cancel') {
+          state.dayTwoActive.delete(contact.id);
+        }
         if (inRootCorridor && (contact.phase === 'begin' || dy > .002)) {
           state.material.root = Math.max(state.material.root, reachedDepth);
           state.progress = Math.max(state.progress, reachedDepth);
@@ -618,7 +639,7 @@
       if (!state.pendingCompletion && !state.completed.has(1)) { const g = ctx.createRadialGradient(x, y, 3, x, y, r); g.addColorStop(0, `rgba(214,183,118,${m.soil * .28})`); g.addColorStop(.7, `rgba(25,62,37,${m.soil * .19})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .58, 0, 0, Math.PI * 2); ctx.fill(); }
 
     } else if (state.day === 2 && !state.introVisible) {
-      drawDayTwoRoot(w, h, Math.max(m.root, state.progress));
+      drawDayTwoFreehand(w, h);
     } else if (state.day === 3 && !state.completed.has(3) && !state.pendingCompletion) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
