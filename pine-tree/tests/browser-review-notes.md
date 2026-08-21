@@ -381,3 +381,19 @@ Visual inspection confirmed the moving Day 7 layer remains softly contained arou
 A seven-row sweeping brush pattern across the full soil patch reached `progress: 1` and recorded Day 3 as completed after the settling interval. The validation then proceeds to confirm that the final render leaves no soil overlay behind.
 
 Visual inspection of the completed Day 3 state confirmed that the soil layer is absent and the seedling is fully unobstructed behind the completion card.
+
+## 2026-08-21 — Day 8 target calibration (port 4215)
+
+Day 8 now maps five individual image-space details through the same object-fit crop used by the scene: one needle cluster, the tall left cone, the right cone, and two trunk sap points. The computed rendered locations were obtained after the Day 8 image had loaded, confirming that touch hit-testing and circle drawing use the same projected coordinates.
+
+A pointer tap calculated from the projected needle-cluster coordinate produced `progress: 0.2`, confirming that one detail registered rather than the previous generic touch increment. The next visual check verifies that the matching circle, and only that circle, illuminates.
+
+Visual validation confirmed that a tapped needle circle lights in place and no other target lights. The tall-left-cone guide circle was visibly left of the cone and requires a final rightward calibration before publishing.
+
+Day 8 detail tiles confirmed the selected objects at readable scale: the tall cone is centered near source `(0.426, 0.411)`; the right cone near `(0.852, 0.492)`; and the left needle cluster near `(0.250, 0.508)`. The visible trunk sap targets are the upper amber droplets near `(0.713, 0.372)` and the lower amber resin run near `(0.676, 0.560)`, replacing the two earlier bark-only positions.
+
+The lower tile confirms that the selected lower sap target belongs to the continuous amber resin run on the trunk and remains visible above the lower branch clutter. All three image tiles were inspected in order with overlap reconciliation.
+
+On the fresh calibrated preview, taps at the projected needle target and tall-cone target produced `progress: 0.4`, confirming that two distinct details registered individually rather than a misplaced or shared activation.
+
+Visual inspection confirmed the needle and tall-cone circles illuminated at their matching details. The remaining right-cone and two sap targets were then tapped at their projected locations; the practice reached `progress: 1` and Day 8 completed, validating all five independent targets.

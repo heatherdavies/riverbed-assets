@@ -36,6 +36,26 @@
   ];
   const daySixPoint = (branch, progress) => { const t = clamp(progress); const q = 1 - t; return { x: q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0], y: q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1] }; };
   const DAY_TWO_ROOT_PATH = [[.508,.274],[.505,.286],[.501,.298],[.501,.318],[.508,.336],[.522,.354],[.536,.392],[.543,.430],[.541,.477],[.526,.523],[.506,.551],[.494,.588],[.492,.607],[.469,.626],[.443,.645],[.435,.664],[.447,.692],[.477,.710],[.480,.730],[.499,.767],[.512,.778],[.526,.788]];
+  const DAY_EIGHT_DETAILS = [
+    { kind: 'needles', point: [.250, .508] },
+    { kind: 'cone', point: [.426, .411] },
+    { kind: 'cone', point: [.852, .492] },
+    { kind: 'sap', point: [.713, .372] },
+    { kind: 'sap', point: [.676, .560] },
+  ];
+  function projectScenePoint(point, image = elements.image) {
+    const rect = elements.scene.getBoundingClientRect();
+    if (!rect.width || !rect.height || !image.naturalWidth || !image.naturalHeight) return { x: point[0], y: point[1] };
+    const scale = Math.max(rect.width / image.naturalWidth, rect.height / image.naturalHeight);
+    const renderedWidth = image.naturalWidth * scale;
+    const renderedHeight = image.naturalHeight * scale;
+    const cropX = (renderedWidth - rect.width) / 2;
+    const cropY = (renderedHeight - rect.height) / 2;
+    return {
+      x: (image.naturalWidth * point[0] * scale - cropX) / rect.width,
+      y: (image.naturalHeight * point[1] * scale - cropY) / rect.height,
+    };
+  }
   function projectDayTwoPoint(point) {
     const rect = elements.scene.getBoundingClientRect();
     const image = elements.dayTwoImage;
@@ -99,6 +119,7 @@
     branchReveals: 0,
     branchTrace: 0,
     branchProgress: Array(9).fill(0),
+    dayEightReveals: new Set(),
     daySixStrokes: [],
     daySixActive: new Map(),
     windLean: 0,
@@ -184,6 +205,7 @@
     state.branchReveals = 0;
     state.branchTrace = 0;
     state.branchProgress = Array(9).fill(0);
+    state.dayEightReveals.clear();
     state.daySixStrokes = [];
     state.daySixActive.clear();
     state.windLean = 0;
@@ -460,7 +482,21 @@
         }
         break;
       }
-      case 8: { if (contact.phase === 'begin') { state.material.bark = Math.max(state.material.bark, .22 + pressure * .12); state.progress = clamp(state.progress + .2); } break; }
+      case 8: {
+        if (contact.phase !== 'begin') break;
+        const targets = DAY_EIGHT_DETAILS.map(({ point }) => projectScenePoint(point));
+        let closest = { index: -1, distance: Infinity };
+        targets.forEach((target, index) => {
+          const distance = Math.hypot(contact.x - target.x, contact.y - target.y);
+          if (distance < closest.distance) closest = { index, distance };
+        });
+        if (closest.index >= 0 && closest.distance <= .075 && !state.dayEightReveals.has(closest.index)) {
+          state.dayEightReveals.add(closest.index);
+          state.material.bark = Math.max(state.material.bark, .22 + pressure * .12);
+          state.progress = state.dayEightReveals.size / DAY_EIGHT_DETAILS.length;
+        }
+        break;
+      }
       case 9: { const out = Math.abs(dx) + Math.abs(dy) + speed * .03; state.progress = clamp(state.progress + out * .32); break; }
     }
     if (state.progress > before + .015 || contact.phase === 'begin') respond('contact', Math.max(move, speed, .18));
@@ -646,7 +682,18 @@
     } else if (state.day === 7) {
       ctx.strokeStyle = `rgba(199,220,196,${.1 + m.wind * .34})`; ctx.lineWidth = 1.35; const motion = state.reducedMotion ? 0 : state.windLean * w * .055 + Math.sin(t / 1450 + state.windLean * 1.8) * (2 + m.wind * 11); for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
     } else if (state.day === 8) {
-      const points = [[.63,.44],[.72,.56],[.48,.63],[.78,.35],[.38,.48]]; points.forEach(([x,y], index) => { ctx.strokeStyle = 'rgba(215,188,104,.42)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(w*x,h*y,12,0,Math.PI*2); ctx.stroke(); if (index < Math.ceil(state.progress * 5)) { const glow = ctx.createRadialGradient(w*x,h*y,0,w*x,h*y,36); glow.addColorStop(0, `rgba(216,177,91,${.42 - index*.03})`); glow.addColorStop(1,'rgba(216,177,91,0)'); ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(w*x,h*y,36,0,Math.PI*2); ctx.fill(); } });
+      const targets = DAY_EIGHT_DETAILS.map(({ point }) => projectScenePoint(point));
+      targets.forEach(({ x, y }, index) => {
+        const revealed = state.dayEightReveals.has(index);
+        ctx.strokeStyle = revealed ? 'rgba(240,214,134,.9)' : 'rgba(215,188,104,.5)';
+        ctx.lineWidth = revealed ? 1.7 : 1;
+        ctx.beginPath(); ctx.arc(w * x, h * y, revealed ? 13.5 : 12, 0, Math.PI * 2); ctx.stroke();
+        if (revealed) {
+          const glow = ctx.createRadialGradient(w * x, h * y, 0, w * x, h * y, 38);
+          glow.addColorStop(0, 'rgba(247,221,144,.82)'); glow.addColorStop(.32, 'rgba(216,177,91,.38)'); glow.addColorStop(1, 'rgba(216,177,91,0)');
+          ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(w * x, h * y, 38, 0, Math.PI * 2); ctx.fill();
+        }
+      });
     } else if (state.day === 9) {
       ctx.fillStyle = `rgba(227,235,222,${state.progress * .12})`; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = `rgba(235,221,169,${state.progress * .42})`; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(w * (.5 - state.progress * .25), h * .57); ctx.quadraticCurveTo(w*.5,h*.5,w*(.5 + state.progress*.27),h*.47); ctx.stroke();
     }
