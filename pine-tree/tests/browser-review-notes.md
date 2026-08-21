@@ -407,3 +407,7 @@ On the endpoint-adjusted preview, tracing the rightward taproot route to its vis
 ## 2026-08-21 — Day 1 warm-gold intention question (port 4219)
 
 The Day 1 opening veil shows the intention question in a warm restrained gold, distinct from the ivory title, supporting intent, and Begin invitation. The wording, controlled two-line wrap, and spacing are unchanged.
+
+## 2026-08-21 — Day 1 one-line Begin support prompt (port 4220)
+
+The supporting sentence now holds on one smaller line above the Begin button and remains visually secondary to the gold intention question. The button remains distinct and comfortably separated below.
