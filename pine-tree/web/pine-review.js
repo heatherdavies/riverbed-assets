@@ -142,6 +142,8 @@
     introTimer: null,
     quality: window.devicePixelRatio > 2 ? 'standard' : 'high',
   };
+  let dayTransitionToken = 0;
+  let pendingDayTransition = null;
 
   function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
 
@@ -275,8 +277,39 @@
     }).join('');
   }
 
-  function setDay(day) {
-    state.day = clamp(Math.round(day), 1, 9);
+  function sceneImageSource(config) { return `${config.image}?v=20260821-day2-root-match-2`; }
+
+  function prepareDayThreeTransition() {
+    if (pendingDayTransition === 3) return;
+    pendingDayTransition = 3;
+    const transitionToken = ++dayTransitionToken;
+    const dayThree = DAYS.find((entry) => entry.day === 3);
+    const preload = new Image();
+    let settled = false;
+    const continueToDayThree = () => {
+      if (settled) return;
+      settled = true;
+      if (transitionToken !== dayTransitionToken || pendingDayTransition !== 3 || state.day !== 2) return;
+      pendingDayTransition = null;
+      setDay(3, true);
+    };
+    preload.addEventListener('load', () => {
+      if (typeof preload.decode === 'function') preload.decode().catch(() => undefined).then(continueToDayThree);
+      else continueToDayThree();
+    }, { once: true });
+    preload.addEventListener('error', continueToDayThree, { once: true });
+    preload.src = sceneImageSource(dayThree);
+  }
+
+  function setDay(day, scenePrepared = false) {
+    const nextDay = clamp(Math.round(day), 1, 9);
+    if (state.day === 2 && nextDay === 3 && !scenePrepared) {
+      prepareDayThreeTransition();
+      return;
+    }
+    pendingDayTransition = null;
+    dayTransitionToken += 1;
+    state.day = nextDay;
     elements.scene.dataset.day = String(state.day);
     const restoredCompletedDay = state.completed.has(state.day);
     state.introVisible = !restoredCompletedDay;
@@ -292,7 +325,7 @@
       showCompletionState();
     }
     const config = current();
-    const sceneImageSrc = `${config.image}?v=20260821-day2-root-match-2`;
+    const sceneImageSrc = sceneImageSource(config);
     elements.image.classList.remove('loaded');
     elements.image.src = sceneImageSrc;
     if (state.day === 7) {
