@@ -36,6 +36,7 @@
   ];
   const daySixPoint = (branch, progress) => { const t = clamp(progress); const q = 1 - t; return { x: q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0], y: q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1] }; };
   const DAY_TWO_ROOT_PATH = [[.5093,.2740],[.5157,.2854],[.5185,.2995],[.5213,.3177],[.5259,.3385],[.5296,.3620],[.5315,.3865],[.5333,.4115],[.5333,.4365],[.5324,.4615],[.5296,.4865],[.5259,.5104],[.5185,.5339],[.5093,.5563],[.4981,.5781],[.4852,.5979],[.4722,.6146],[.4602,.6292],[.4537,.6417],[.4574,.6510],[.4676,.6615],[.4815,.6729],[.4954,.6849],[.505,.720]];
+  const DAY_THREE_CLEAR_CELL_TARGET = 88;
   const DAY_EIGHT_DETAILS = [
     { kind: 'needles', point: [.250, .508] },
     { kind: 'cone', point: [.426, .411] },
@@ -480,7 +481,7 @@
           }
           state.material.soil = clamp(state.clearedSoil.size / 99);
           state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
-          state.progress = Math.max(state.progress, state.material.soil);
+          state.progress = Math.max(state.progress, clamp(state.clearedSoil.size / DAY_THREE_CLEAR_CELL_TARGET));
         }
         break;
       }
@@ -674,7 +675,7 @@
 
     } else if (state.day === 2 && !state.introVisible) {
       drawDayTwoFreehand(w, h);
-    } else if (state.day === 3 && !state.completed.has(3)) {
+    } else if (state.day === 3 && (!state.completed.has(3) || state.brushes.length)) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
       const soilTexture = elements.dayThreeSoil;
