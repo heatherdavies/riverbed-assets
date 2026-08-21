@@ -357,3 +357,9 @@ Visual inspection confirmed that the bright Day 5 coil segment stops with the fi
 The expanded Day 2 source path was traced through the available rendered crop; progress reached `0.6691` with no active contacts. The lower-root guide points now continue along the photographed root’s leftward tail rather than ending at the prior premature point.
 
 Visual inspection confirmed that the Day 2 white guide now continues beyond the prior endpoint and follows the photographed root into its lower-left tail rather than departing from it at the bottom.
+
+## 2026-08-21 — Day 2 lower-right in-frame route (port 4211)
+
+Two complete pointer-style traces through the rerouted Day 2 lower-right branch reached `progress: 0.9099` with no active contacts. The route ends at the visible branch before the lower edge of the mobile frame.
+
+Visual inspection confirmed the rerouted Day 2 guide now terminates on the visible lower-right branch and stays within the scene frame. The tested trace retained `progress: 0.9099` without any out-of-frame guide segment.
