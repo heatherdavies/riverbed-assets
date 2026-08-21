@@ -357,9 +357,10 @@
   }
 
   function applyWindTransform() {
-    const sway = state.windLean * 7.8;
-    const drift = state.windLean * 4.6;
-    elements.windImage.style.transform = `translateX(${drift}%) rotate(${sway}deg) scale(1.055)`;
+    const sway = state.windLean * 4.1;
+    const drift = state.windLean * 1.35;
+    const shear = state.windLean * -.9;
+    elements.windImage.style.transform = `translateX(${drift}%) rotate(${sway}deg) skewX(${shear}deg) scale(1.015)`;
   }
 
   function contactResponse(contact) {
@@ -643,7 +644,7 @@
         ctx.restore();
       });
     } else if (state.day === 7) {
-      ctx.strokeStyle = `rgba(199,220,196,${.1 + m.wind * .34})`; ctx.lineWidth = 1.35; const motion = state.reducedMotion ? 0 : Math.sin(t / 620) * (5 + m.wind * 36); for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
+      ctx.strokeStyle = `rgba(199,220,196,${.1 + m.wind * .34})`; ctx.lineWidth = 1.35; const motion = state.reducedMotion ? 0 : state.windLean * w * .055 + Math.sin(t / 1450 + state.windLean * 1.8) * (2 + m.wind * 11); for (let i = 0; i < 8; i++) { const y = h * (.28 + i * .055); ctx.beginPath(); ctx.moveTo(w * .06 + motion, y); ctx.bezierCurveTo(w * .28, y - 10, w * .66, y + 10, w * .95 + motion, y - 4); ctx.stroke(); }
     } else if (state.day === 8) {
       const points = [[.63,.44],[.72,.56],[.48,.63],[.78,.35],[.38,.48]]; points.forEach(([x,y], index) => { ctx.strokeStyle = 'rgba(215,188,104,.42)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(w*x,h*y,12,0,Math.PI*2); ctx.stroke(); if (index < Math.ceil(state.progress * 5)) { const glow = ctx.createRadialGradient(w*x,h*y,0,w*x,h*y,36); glow.addColorStop(0, `rgba(216,177,91,${.42 - index*.03})`); glow.addColorStop(1,'rgba(216,177,91,0)'); ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(w*x,h*y,36,0,Math.PI*2); ctx.fill(); } });
     } else if (state.day === 9) {

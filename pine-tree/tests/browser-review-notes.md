@@ -363,3 +363,15 @@ Visual inspection confirmed that the Day 2 white guide now continues beyond the 
 Two complete pointer-style traces through the rerouted Day 2 lower-right branch reached `progress: 0.9099` with no active contacts. The route ends at the visible branch before the lower edge of the mobile frame.
 
 Visual inspection confirmed the rerouted Day 2 guide now terminates on the visible lower-right branch and stays within the scene frame. The tested trace retained `progress: 0.9099` without any out-of-frame guide segment.
+
+## 2026-08-21 — Day 7 natural-sway motion (port 4212)
+
+A left-to-right canopy brush reached `progress: 0.5410` and left no active contacts. The revised brush handler now transfers directional impulse into the separate lean and velocity state for a delayed settling response.
+
+A stronger left-to-right canopy brush produced an immediate restrained transform of `translateX(0.140505%) rotate(0.44574deg) skewX(-0.10659deg) scale(1.018)`, confirming the revised motion is small and trunk-anchored rather than a whole-scene pivot.
+
+## 2026-08-21 — Day 7 visual-only sway refinement (port 4213)
+
+A canopy brush reached `progress: 0.6075` while preserving the original gesture behavior. The visual layer applied `translateX(1.107%) rotate(3.362deg) skewX(-0.738deg) scale(1.015)` through the trunk-anchored feathered mask.
+
+Visual inspection confirmed the moving Day 7 layer remains softly contained around the tree, with the surrounding forest held more stable than the canopy/trunk region during the brush response.
