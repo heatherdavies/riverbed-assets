@@ -419,3 +419,7 @@ The one-line supporting sentence remains legible and now sits one small visual s
 ## 2026-08-21 — Day 1 actual support-prompt font-size reduction (port 4222)
 
 The one-line Begin-supporting prompt uses a visibly smaller actual CSS font size, remains readable, and does not wrap. Its hierarchy remains secondary to the gold intention question.
+
+## 2026-08-21 — Day 1 explicit two-step support-prompt font reduction (port 4223)
+
+The Day 1 supporting sentence remains on one line and is now visibly much smaller than the shared veil copy. Browser validation confirms its computed font size is explicitly `12px`, overriding the larger shared veil paragraph typography.
