@@ -400,7 +400,7 @@
             const key = `${Math.round(x * 16)}:${Math.round(y * 20)}`;
             state.clearedSoil.set(key, { x, y, radius: .06 });
           }
-          state.material.soil = clamp(state.clearedSoil.size / 38);
+          state.material.soil = clamp(state.clearedSoil.size / 52);
           state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
           state.progress = Math.max(state.progress, state.material.soil);
         }
@@ -582,7 +582,7 @@
 
     } else if (state.day === 2 && !state.introVisible) {
       drawDayTwoRoot(w, h, Math.max(m.root, state.progress));
-    } else if (state.day === 3 && !state.completed.has(3)) {
+    } else if (state.day === 3 && !state.completed.has(3) && !state.pendingCompletion) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
       const soilTexture = elements.dayThreeSoil;

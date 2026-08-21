@@ -375,3 +375,9 @@ A stronger left-to-right canopy brush produced an immediate restrained transform
 A canopy brush reached `progress: 0.6075` while preserving the original gesture behavior. The visual layer applied `translateX(1.107%) rotate(3.362deg) skewX(-0.738deg) scale(1.015)` through the trunk-anchored feathered mask.
 
 Visual inspection confirmed the moving Day 7 layer remains softly contained around the tree, with the surrounding forest held more stable than the canopy/trunk region during the brush response.
+
+## 2026-08-21 — Day 3 complete-clear correction (port 4214)
+
+A seven-row sweeping brush pattern across the full soil patch reached `progress: 1` and recorded Day 3 as completed after the settling interval. The validation then proceeds to confirm that the final render leaves no soil overlay behind.
+
+Visual inspection of the completed Day 3 state confirmed that the soil layer is absent and the seedling is fully unobstructed behind the completion card.
