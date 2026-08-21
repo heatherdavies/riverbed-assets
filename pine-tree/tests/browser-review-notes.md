@@ -411,3 +411,7 @@ The Day 1 opening veil shows the intention question in a warm restrained gold, d
 ## 2026-08-21 — Day 1 one-line Begin support prompt (port 4220)
 
 The supporting sentence now holds on one smaller line above the Begin button and remains visually secondary to the gold intention question. The button remains distinct and comfortably separated below.
+
+## 2026-08-21 — Day 1 reduced one-line Begin support prompt (port 4221)
+
+The one-line supporting sentence remains legible and now sits one small visual step below its previous size. It retains a calm secondary hierarchy above the Begin button.
