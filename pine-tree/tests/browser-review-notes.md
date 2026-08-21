@@ -464,3 +464,9 @@ A complete Day 2 touch stroke was dispatched through the root corridor. The new 
 Fresh preview loaded and Day 3 began at zero progress with the full soil overlay visible before testing partial and complete brush coverage.
 A partial Day 3 stroke reached only 5.1% progress. Visual inspection confirmed the brushed channel opened while the remaining soil overlay stayed visible; no completion or automatic disappearance occurred.
 A complete set of finger-style passes across the visible Day 3 soil footprint reached full progress and completion. The seedling was fully revealed only after those passes; no untouched overlay was removed automatically during a partial interaction.
+
+## 2026-08-21 — Day 2 endpoint extension (port 4230)
+
+The first proposed source endpoint at y=0.820 projected below the desktop scene frame, so the freehand extension must be shortened to the lower visible taproot endpoint before publication.
+The revised Day 2 endpoint at source y=0.720 projects to 95.5% of the scene height, remaining visible while extending the freehand tracing range. A full finger-style trace to that point reached completion.
+Visual confirmation: the completed Day 2 freehand line reaches the extended lower visible endpoint while remaining inside the scene frame.
