@@ -35,7 +35,7 @@
     [[.49,.62],[.4,.59],[.25,.56],[.1,.55]],
   ];
   const daySixPoint = (branch, progress) => { const t = clamp(progress); const q = 1 - t; return { x: q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0], y: q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1] }; };
-  const DAY_TWO_ROOT_PATH = [[.508,.274],[.505,.286],[.501,.298],[.501,.318],[.508,.336],[.522,.354],[.536,.392],[.543,.430],[.541,.477],[.526,.523],[.506,.551],[.494,.588],[.492,.607],[.469,.626],[.443,.645],[.435,.664],[.447,.692],[.477,.710],[.480,.730],[.499,.767],[.512,.778],[.526,.788]];
+  const DAY_TWO_ROOT_PATH = [[.508,.274],[.505,.286],[.501,.298],[.501,.318],[.508,.336],[.522,.354],[.536,.392],[.543,.430],[.541,.477],[.526,.523],[.506,.551],[.494,.588],[.492,.607],[.505,.625],[.521,.646],[.535,.670],[.545,.695],[.553,.720],[.555,.745],[.550,.765]];
   const DAY_EIGHT_DETAILS = [
     { kind: 'needles', point: [.250, .508] },
     { kind: 'cone', point: [.426, .411] },
@@ -404,6 +404,7 @@
         if (inRootCorridor && (contact.phase === 'begin' || dy > .002)) {
           state.material.root = Math.max(state.material.root, reachedDepth);
           state.progress = Math.max(state.progress, reachedDepth);
+          if (reachedDepth >= .95) state.progress = 1;
         }
         break;
       }
