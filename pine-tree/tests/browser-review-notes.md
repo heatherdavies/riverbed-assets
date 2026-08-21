@@ -427,3 +427,11 @@ The Day 1 supporting sentence remains on one line and is now visibly much smalle
 ## 2026-08-21 — Day 1 restored supporting-prompt readability (port 4224)
 
 The one-line Day 1 supporting prompt remains secondary to the gold intention question but is easier to read than the prior reduction. Browser validation confirms its explicit computed font size is `14px`.
+
+## 2026-08-21 — Day 2 left-hand taproot route (port 4225)
+
+The Day 2 introduction opens with the rooted-seed photograph alone and no premature white guide. The photographed taproot remains visibly leftward through its lower curve; the revised guide will be validated after beginning practice.
+
+A full Day 2 trace was dispatched through the revised 22-point source path from the seed exit to the in-frame endpoint. The Day 2 source image was confirmed loaded at 1080×1920 before visual inspection of the rendered guide.
+
+Visual inspection of the completed Day 2 trace confirms the white guide follows the same left-hand photographed root curve from the seed through the visible endpoint, rather than taking the opposite right-hand fork.
