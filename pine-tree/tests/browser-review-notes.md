@@ -435,3 +435,11 @@ The Day 2 introduction opens with the rooted-seed photograph alone and no premat
 A full Day 2 trace was dispatched through the revised 22-point source path from the seed exit to the in-frame endpoint. The Day 2 source image was confirmed loaded at 1080×1920 before visual inspection of the rendered guide.
 
 Visual inspection of the completed Day 2 trace confirms the white guide follows the same left-hand photographed root curve from the seed through the visible endpoint, rather than taking the opposite right-hand fork.
+
+## 2026-08-21 — Day 2 final rightward taproot correction (port 4226)
+
+Fresh preview launched successfully. The Day 1 veil lifted normally, preparing the Day 2 practice for direct end-segment tracing against the visible rightward lower taproot.
+
+The fresh Day 2 introduction was dismissed and the active practice opened with no guide present before tracing. The photographed lower root visibly bends rightward from the divergence point.
+
+The Day 2 completion trace was rendered through the restored final rightward curve. Visual inspection confirms the guide takes the lower branch to the right from the divergence point and remains in frame through completion.
