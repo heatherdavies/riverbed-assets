@@ -470,3 +470,12 @@ A complete set of finger-style passes across the visible Day 3 soil footprint re
 The first proposed source endpoint at y=0.820 projected below the desktop scene frame, so the freehand extension must be shortened to the lower visible taproot endpoint before publication.
 The revised Day 2 endpoint at source y=0.720 projects to 95.5% of the scene height, remaining visible while extending the freehand tracing range. A full finger-style trace to that point reached completion.
 Visual confirmation: the completed Day 2 freehand line reaches the extended lower visible endpoint while remaining inside the scene frame.
+
+## 2026-08-21 — Day 2 matched image endpoint (port 4232)
+
+Fresh edited Day 2 scene loaded. A full freehand trace reached the existing in-frame completion endpoint for direct visual comparison with the shortened photographed taproot.
+
+## 2026-08-21 — Day 2 precise image endpoint (port 4233)
+
+The revised Day 2 photograph loaded and a full freehand trace again reached the same in-frame endpoint for final visual comparison with the matched root tip.
+Visual confirmation: the matched Day 2 photograph now ends its visible taproot at the completed freehand trace endpoint, with no root continuation visible below it.

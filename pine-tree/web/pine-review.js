@@ -3,7 +3,7 @@
 
   const DAYS = [
     ['Grounding & Anchoring', 'Planting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press it gently into the soil.', 'What intention are you ready to place in the soil?', 'PRESS INTO SOIL', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
-    ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor.webp'],
+    ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor-match-endpoint.webp'],
     ['Grounding & Anchoring', 'First Light', 'Celebrating the first signs of visible progress.', 'Brush loose soil slowly away from around the young seedling. Every cleared pass stays open.', 'A first green sign is enough.', 'BRUSH TO REVEAL', 'soft-brush', '../assets/day-03-seedling-reveal.png'],
     ['Structuring & Stretching', 'Developing Trunk', 'Reinforcing personal structure and integrity.', 'Trace steadily upward along the forming trunk.', 'Let your structure rise from what is grounded.', 'TRACE UPWARD', 'upward-trace', '../assets/day-04-developing-trunk.webp'],
     ['Structuring & Stretching', 'Stronger Structure', 'Cultivating flexible strength.', 'Begin at the gold point. Spiral slowly upward around the young trunk.', 'Layer by layer, the young trunk finds its strength.', 'SPIRAL UPWARD', 'upward-spiral', '../assets/day-05-stronger-structure.webp'],
@@ -292,7 +292,7 @@
       showCompletionState();
     }
     const config = current();
-    const sceneImageSrc = `${config.image}?v=20260820-day-scene-ready-2`;
+    const sceneImageSrc = `${config.image}?v=20260821-day2-root-match-2`;
     elements.image.classList.remove('loaded');
     elements.image.src = sceneImageSrc;
     if (state.day === 7) {
