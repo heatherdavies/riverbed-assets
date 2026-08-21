@@ -443,3 +443,12 @@ Fresh preview launched successfully. The Day 1 veil lifted normally, preparing t
 The fresh Day 2 introduction was dismissed and the active practice opened with no guide present before tracing. The photographed lower root visibly bends rightward from the divergence point.
 
 The Day 2 completion trace was rendered through the restored final rightward curve. Visual inspection confirms the guide takes the lower branch to the right from the divergence point and remains in frame through completion.
+
+## 2026-08-21 — Day 2 source-overlay calibration finding
+
+Direct source-image overlay inspection showed the previously sampled coordinate set tracked a narrower secondary root left of the prominent taproot. The rebuild must follow the thicker, continuous taproot immediately to its right from the seed exit; no further branch guesses will be used.
+Magnified source-crop inspection confirms the intended Day 2 taproot is the thick, continuous warm root emerging from the seed and curving from the upper-right through the lower-left bend before returning right. The new sampled centerline follows this thick root, while the earlier guide followed a thinner neighboring root.
+
+Fresh rebuilt preview opened successfully. Day 2 was entered programmatically with its introduction dismissed; the active practice began at zero progress before tracing the source-calibrated prominent taproot centerline.
+
+The full rebuilt Day 2 trace reached completion. Visual inspection of the fresh preview confirms the white guide now overlays the prominent thick photographed taproot from the seed through the selected in-frame endpoint, rather than the thinner secondary root.
