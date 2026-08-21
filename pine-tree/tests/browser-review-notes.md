@@ -458,3 +458,9 @@ The full rebuilt Day 2 trace reached completion. Visual inspection of the fresh 
 Fresh preview loaded, Day 2 opened with its introduction dismissed, and the practice began at zero progress with no pre-drawn root overlay present.
 
 A complete Day 2 touch stroke was dispatched through the root corridor. The new line rendered from the stored touch points (not from a pre-drawn guide) and the practice reached completion at the corridor endpoint.
+
+## 2026-08-21 — Day 3 finger-only clearing (port 4229)
+
+Fresh preview loaded and Day 3 began at zero progress with the full soil overlay visible before testing partial and complete brush coverage.
+A partial Day 3 stroke reached only 5.1% progress. Visual inspection confirmed the brushed channel opened while the remaining soil overlay stayed visible; no completion or automatic disappearance occurred.
+A complete set of finger-style passes across the visible Day 3 soil footprint reached full progress and completion. The seedling was fully revealed only after those passes; no untouched overlay was removed automatically during a partial interaction.

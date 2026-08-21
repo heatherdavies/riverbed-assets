@@ -431,7 +431,7 @@
       }
       case 3: {
         const brush = Math.abs(dx) + Math.abs(dy) + Math.min(.055, Math.abs(contact.vx) * .005 + Math.abs(contact.vy) * .005);
-        const inSeedlingPatch = contact.x > .25 && contact.x < .75 && contact.y > .52 && contact.y < .80;
+        const inSeedlingPatch = contact.x > .17 && contact.x < .83 && contact.y > .485 && contact.y < .855;
         const beginsBrush = contact.phase === 'begin';
         const movesBrush = contact.phase === 'move' && brush > .001;
         if (inSeedlingPatch && (beginsBrush || movesBrush)) {
@@ -440,11 +440,11 @@
             const amount = samples ? index / samples : 1;
             const x = contact.px + (contact.x - contact.px) * amount;
             const y = contact.py + (contact.y - contact.py) * amount;
-            if (x <= .25 || x >= .75 || y <= .52 || y >= .80) continue;
-            const key = `${Math.round(x * 16)}:${Math.round(y * 20)}`;
-            state.clearedSoil.set(key, { x, y, radius: .06 });
+            if (x <= .17 || x >= .83 || y <= .485 || y >= .855) continue;
+            const key = `${Math.round((x - .17) / .066)}:${Math.round((y - .485) / .04625)}`;
+            state.clearedSoil.set(key, { x, y, radius: .065 });
           }
-          state.material.soil = clamp(state.clearedSoil.size / 52);
+          state.material.soil = clamp(state.clearedSoil.size / 99);
           state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
           state.progress = Math.max(state.progress, state.material.soil);
         }
@@ -640,7 +640,7 @@
 
     } else if (state.day === 2 && !state.introVisible) {
       drawDayTwoFreehand(w, h);
-    } else if (state.day === 3 && !state.completed.has(3) && !state.pendingCompletion) {
+    } else if (state.day === 3 && !state.completed.has(3)) {
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
       const soilTexture = elements.dayThreeSoil;
