@@ -280,32 +280,34 @@
 
   function sceneImageSource(config) { return `${config.image}?v=20260821-day2-root-match-2`; }
 
-  function prepareDayThreeTransition() {
-    if (pendingDayTransition === 3) return;
-    pendingDayTransition = 3;
+  function prepareSceneTransition(nextDay) {
+    if (pendingDayTransition === nextDay) return;
+    const sourceDay = state.day;
+    pendingDayTransition = nextDay;
     const transitionToken = ++dayTransitionToken;
-    const dayThree = DAYS.find((entry) => entry.day === 3);
+    const nextConfig = DAYS.find((entry) => entry.day === nextDay);
     const preload = new Image();
     let settled = false;
-    const continueToDayThree = () => {
+    const continueToNextDay = () => {
       if (settled) return;
       settled = true;
-      if (transitionToken !== dayTransitionToken || pendingDayTransition !== 3 || state.day !== 2) return;
+      if (transitionToken !== dayTransitionToken || pendingDayTransition !== nextDay || state.day !== sourceDay) return;
       pendingDayTransition = null;
-      setDay(3, true);
+      setDay(nextDay, true);
     };
     preload.addEventListener('load', () => {
-      if (typeof preload.decode === 'function') preload.decode().catch(() => undefined).then(continueToDayThree);
-      else continueToDayThree();
+      if (typeof preload.decode === 'function') preload.decode().catch(() => undefined).then(continueToNextDay);
+      else continueToNextDay();
     }, { once: true });
-    preload.addEventListener('error', continueToDayThree, { once: true });
-    preload.src = sceneImageSource(dayThree);
+    preload.addEventListener('error', continueToNextDay, { once: true });
+    preload.src = sceneImageSource(nextConfig);
   }
 
   function setDay(day, scenePrepared = false) {
     const nextDay = clamp(Math.round(day), 1, 9);
-    if (state.day === 2 && nextDay === 3 && !scenePrepared) {
-      prepareDayThreeTransition();
+    const requiresPreparedScene = (state.day === 2 && nextDay === 3) || (state.day === 3 && nextDay === 4);
+    if (requiresPreparedScene && !scenePrepared) {
+      prepareSceneTransition(nextDay);
       return;
     }
     pendingDayTransition = null;
