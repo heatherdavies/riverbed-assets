@@ -4,3 +4,5 @@ A fresh Day 1 session contains no personal input, no second stream, and no perso
 
 After a Day 9 completion, the forest-only completion state reached `Mature.` normally. The next visual check confirms the new Day 9 guidance appears alongside the existing restart control and that no Personal Story UI remains.
 The Day 9 completion card presented the new `A SECOND WALK` guidance immediately beneath the existing restart choices. The guidance remained readable against the forest scene and there were no Personal Story entry points, saved words, or journey-stream controls.
+The revised build reached the normal Day 9 completed state from a fresh Day 1 session. The next visual check verifies that the invitation is evergreen rather than numbered.
+The Day 9 completion card now uses the evergreen heading `RETURN TO THE FOREST`. The invitation remains readable and clearly supports any future return to the forest, rather than implying a single second visit.
