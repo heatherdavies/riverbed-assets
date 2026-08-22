@@ -778,14 +778,6 @@
       ctx.arc(centreX, centreY, sceneRadius, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
-      if (reveal > .02) {
-        ctx.strokeStyle = `rgba(235,221,169,${Math.min(.42, reveal * .48)})`;
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.moveTo(centreX - sceneRadius * .72, centreY + sceneRadius * .08);
-        ctx.quadraticCurveTo(centreX, centreY - sceneRadius * .12, centreX + sceneRadius * .72, centreY - sceneRadius * .16);
-        ctx.stroke();
-      }
     }
     ctx.restore();
   }

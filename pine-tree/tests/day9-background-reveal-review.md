@@ -13,3 +13,7 @@ Because the instruction says to reveal the wider forest landscape, showing the w
 The user approved a smooth, swipe-gated forest reveal. The full scene image remains loaded underneath a dark, centre-opening canvas veil; this avoids any blank or delayed image state. The fresh cache-busted build loaded successfully before visual validation. At Day 9 opening, the mature pine is visible through a compact, soft circular opening while the wider forest remains held behind the veil.
 
 Four outward swipes advanced Day 9 to `0.5694` progress and visibly expanded the forest beyond the tree, confirming the foreground-to-landscape cause-and-effect. Four additional outward swipes reached progress `1`; the complete forest view remained visible and the normal `Mature.` completion card appeared.
+
+## Clean-reveal follow-up
+
+The user requested removal of the gold gesture trace entirely. A fresh cache-busted clean-reveal build loaded successfully before final visual validation. Day 9 reached its normal `Mature.` completion state with the full forest visible and no gold line crossing the tree.
