@@ -145,6 +145,7 @@
     branchTrace: 0,
     branchProgress: Array(9).fill(0),
     dayEightReveals: new Set(),
+    dayEightHintStartedAt: 0,
     dayTwoStrokes: [],
     dayTwoActive: new Map(),
     daySixStrokes: [],
@@ -237,6 +238,7 @@
     state.branchTrace = 0;
     state.branchProgress = Array(9).fill(0);
     state.dayEightReveals.clear();
+    state.dayEightHintStartedAt = 0;
     state.dayTwoStrokes = [];
     state.dayTwoActive.clear();
     state.daySixStrokes = [];
@@ -297,6 +299,7 @@
     if (!state.introVisible) return;
     state.introVisible = false;
     if (state.day !== 1) state.postBeginInstructionVisible = true;
+    if (state.day === 8) state.dayEightHintStartedAt = performance.now();
     updateDayOneIntro();
   }
 
@@ -773,15 +776,22 @@
       });
     } else if (state.day === 8) {
       const targets = DAY_EIGHT_DETAILS.map(({ point }) => projectScenePoint(point));
+      const hintStartedAt = state.dayEightHintStartedAt || t;
       targets.forEach(({ x, y }, index) => {
         const revealed = state.dayEightReveals.has(index);
-        ctx.strokeStyle = revealed ? 'rgba(240,214,134,.9)' : 'rgba(215,188,104,.5)';
-        ctx.lineWidth = revealed ? 1.7 : 1;
-        ctx.beginPath(); ctx.arc(w * x, h * y, revealed ? 13.5 : 12, 0, Math.PI * 2); ctx.stroke();
-        if (revealed) {
-          const glow = ctx.createRadialGradient(w * x, h * y, 0, w * x, h * y, 38);
-          glow.addColorStop(0, 'rgba(247,221,144,.82)'); glow.addColorStop(.32, 'rgba(216,177,91,.38)'); glow.addColorStop(1, 'rgba(216,177,91,0)');
-          ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(w * x, h * y, 38, 0, Math.PI * 2); ctx.fill();
+        const arrival = clamp((t - hintStartedAt - index * 180) / 620);
+        const breath = state.reducedMotion ? .45 : (Math.sin((t - hintStartedAt) / 680 - index * .78) + 1) * .5;
+        const hintStrength = revealed ? 0 : arrival * (.34 + breath * .38);
+        const ringRadius = revealed ? 13.5 : 12 + arrival * (1.2 + breath * 1.2);
+        ctx.strokeStyle = revealed ? 'rgba(240,214,134,.9)' : `rgba(222,196,110,${.28 + hintStrength})`;
+        ctx.lineWidth = revealed ? 1.7 : 1 + arrival * .45;
+        ctx.beginPath(); ctx.arc(w * x, h * y, ringRadius, 0, Math.PI * 2); ctx.stroke();
+        const haloRadius = revealed ? 38 : 22 + arrival * (13 + breath * 8);
+        const haloAlpha = revealed ? .82 : hintStrength * .58;
+        if (haloAlpha > .01) {
+          const glow = ctx.createRadialGradient(w * x, h * y, 0, w * x, h * y, haloRadius);
+          glow.addColorStop(0, `rgba(247,221,144,${haloAlpha})`); glow.addColorStop(.32, `rgba(216,177,91,${haloAlpha * .46})`); glow.addColorStop(1, 'rgba(216,177,91,0)');
+          ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(w * x, h * y, haloRadius, 0, Math.PI * 2); ctx.fill();
         }
       });
     } else if (state.day === 9) {
