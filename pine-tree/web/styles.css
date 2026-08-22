@@ -115,11 +115,10 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 .intro-instruction { max-width: 355px; margin: 13px 0 0; color: var(--muted-ivory); font-size: 13px; line-height: 1.48; }
 .intro-reflection-prompt { margin: 9px 0 0; color: rgba(245,240,221,.7); font-size: 12px; line-height: 1.35; }
 .intro-dismiss { appearance: none; display: inline-flex; margin-top: 14px; padding: 9px 12px; border: 1px solid rgba(230, 214, 153, .55); border-radius: 2px; background: rgba(19, 69, 48, .35); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
-.post-begin-instruction { position: absolute; top: calc(max(22px, env(safe-area-inset-top)) + 118px); left: 20px; right: 20px; z-index: 5; display: none; width: auto; padding: 13px 16px 12px; border: 1px solid rgba(212, 196, 131, .3); border-radius: 4px; background: linear-gradient(135deg, rgba(4, 31, 21, .84), rgba(5, 22, 15, .6)); box-shadow: 0 12px 30px rgba(0, 0, 0, .2); color: var(--ivory); cursor: pointer; text-align: left; backdrop-filter: blur(8px); animation: intro-arrive 520ms ease both; }
+.post-begin-instruction { position: absolute; left: 23px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 116px); z-index: 4; display: none; width: min(52vw, 230px); padding: 0; color: var(--ivory); pointer-events: none; text-align: left; text-shadow: 0 2px 12px rgba(0,0,0,.82); animation: intro-arrive 420ms ease both; }
 .post-begin-instruction.visible { display: block; }
-.post-begin-kicker, .post-begin-dismiss { display: block; color: var(--gilt); font-size: 9px; font-weight: 600; letter-spacing: .16em; }
-.post-begin-text { display: block; max-width: 355px; margin-top: 7px; color: rgba(245,240,221,.92); font-size: 14px; line-height: 1.4; }
-.post-begin-dismiss { margin-top: 9px; color: rgba(245,240,221,.66); font-size: 8px; }
+.post-begin-text { display: block; color: rgba(245,240,221,.84); font-size: 12px; line-height: 1.42; }
+.post-begin-dismiss { display: block; margin-top: 6px; color: rgba(226, 203, 121, .86); font-size: 8px; font-weight: 600; letter-spacing: .15em; }
 
 .menu-button { position: absolute; right: 23px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 9px); z-index: 4; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; color: var(--ivory); font-size: 30px; line-height: 1; box-shadow: 0 8px 22px rgba(0,0,0,.24), inset 0 0 24px rgba(87, 119, 69,.25); }
 .menu-button span[aria-hidden] { transform: rotate(-25deg); display: block; }

@@ -24,3 +24,13 @@ Day 1 was checked separately: the existing veil-to-action opening remained visib
 
 The cache-busted cue-revision build loaded successfully and reached the Day 5 opening state before checking the new immersive cue.
 The Day 5 post-Begin panel was visually checked with the revised cue. `WHEN YOU ARE READY, BEGIN` remains legible beneath the practical instruction and preserves the panel’s calm ritual tone.
+
+## Quiet-text placement review
+
+Day 2’s taproot runs through the centre of the scene and the existing control is bottom right. The clearest quiet-text space is the lower-left quadrant, above the `START AGAIN AT DAY 1` control and well away from the root’s start and central tracing path.
+
+## Quiet-text implementation validation
+
+The fresh cache-busted quiet-text build loaded and reached the Day 2 opening state before the lower-left guidance placement was checked.
+Day 2 was visually checked after Begin Practice. The quiet lower-left instruction and gold invitation remained clear of the taproot and left the central tracing path unobstructed.
+Day 7’s longer instruction was also checked after Begin Practice. It wrapped cleanly in the lower-left position and stayed separate from the `SWAY THE CANOPY` hint, while leaving the trunk and canopy fully visible.

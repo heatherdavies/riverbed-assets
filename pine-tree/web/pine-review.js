@@ -188,7 +188,6 @@
       case 'restartDayButton': return resetToDayOne();
       case 'returnToSeedButton': return resetToDayOne();
       case 'introDismiss': return dismissIntro();
-      case 'postBeginInstruction': return dismissPostBeginInstruction();
       case 'howToBeginButton': return liftVeil();
       case 'menuButton': return setPanel(true);
       case 'closePanelButton': return closePanel();
@@ -298,12 +297,6 @@
     if (!state.introVisible) return;
     state.introVisible = false;
     if (state.day !== 1) state.postBeginInstructionVisible = true;
-    updateDayOneIntro();
-  }
-
-  function dismissPostBeginInstruction() {
-    if (!state.postBeginInstructionVisible) return;
-    state.postBeginInstructionVisible = false;
     updateDayOneIntro();
   }
 
