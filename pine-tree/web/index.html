@@ -65,10 +65,15 @@
           <h1 id="introTitle"></h1>
           <p class="intro-intent" id="introIntent"></p>
           <p class="intro-reflection" id="introReflection"></p>
-          <p class="intro-instruction" id="introInstruction"></p>
           <p class="intro-reflection-prompt" id="introReflectionPrompt"></p>
           <button class="intro-dismiss" id="introDismiss" type="button">BEGIN PRACTICE</button>
         </section>
+
+        <button class="post-begin-instruction" id="postBeginInstruction" type="button" aria-live="polite" aria-label="Dismiss practice instruction">
+          <span class="post-begin-kicker">THE PRACTICE</span>
+          <span class="post-begin-text" id="postBeginInstructionText"></span>
+          <span class="post-begin-dismiss">TAP TO CONTINUE</span>
+        </button>
 
         <section class="ritual-copy" id="ritualCopy" aria-live="polite">
           <h1 id="titleText"></h1>
@@ -116,6 +121,6 @@
       </aside>
       <button class="scrim" id="scrim" type="button" aria-label="Close controls"></button>
     </main>
-    <script src="./pine-review.js?v=20260822-opening-reflections-1"></script>
+    <script src="./pine-review.js?v=20260822-post-begin-instructions-1"></script>
   </body>
 </html>

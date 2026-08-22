@@ -124,7 +124,7 @@
     scene: $('#scene'), image: $('#sceneImage'), dayTwoImage: $('#dayTwoSceneImage'), windImage: $('#windSceneImage'), buriedImage: $('#buriedSceneImage'), dayThreeSoil: $('#dayThreeSoilTexture'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
-    intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introReflection: $('#introReflection'), introInstruction: $('#introInstruction'), introReflectionPrompt: $('#introReflectionPrompt'), introDismiss: $('#introDismiss'),
+    intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introReflection: $('#introReflection'), introReflectionPrompt: $('#introReflectionPrompt'), introDismiss: $('#introDismiss'), postBeginInstruction: $('#postBeginInstruction'), postBeginInstructionText: $('#postBeginInstructionText'),
     veil: $('#dayOneVeil'), action: $('#dayOneAction'), actionInstruction: $('#dayOneActionInstruction'), howToBegin: $('#howToBeginButton'),
     dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
@@ -163,6 +163,7 @@
     audio: null,
     panelOpen: false,
     introVisible: true,
+    postBeginInstructionVisible: false,
     veilLifted: false,
     introTimer: null,
     quality: window.devicePixelRatio > 2 ? 'standard' : 'high',
@@ -187,6 +188,7 @@
       case 'restartDayButton': return resetToDayOne();
       case 'returnToSeedButton': return resetToDayOne();
       case 'introDismiss': return dismissIntro();
+      case 'postBeginInstruction': return dismissPostBeginInstruction();
       case 'howToBeginButton': return liftVeil();
       case 'menuButton': return setPanel(true);
       case 'closePanelButton': return closePanel();
@@ -246,6 +248,7 @@
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
     state.burialStartedAt = 0;
+    state.postBeginInstructionVisible = false;
     state.veilLifted = false;
     elements.scene.classList.remove('day-one-complete', 'day-one-buried', 'practice-complete');
     elements.copy.classList.remove('completed'); elements.completion.textContent = '';
@@ -269,12 +272,15 @@
     const showSharedIntro = state.introVisible && state.day !== 1;
     const showVeil = state.day === 1 && state.introVisible && !state.veilLifted;
     const showAction = state.day === 1 && state.veilLifted && !state.completed.has(1);
+    const showPostBeginInstruction = state.postBeginInstructionVisible && state.day !== 1 && !state.introVisible && !state.completed.has(state.day);
     elements.intro.classList.toggle('visible', showSharedIntro);
+    elements.postBeginInstruction.classList.toggle('visible', showPostBeginInstruction);
     elements.scene.classList.toggle('practice-intro-open', showSharedIntro || showVeil);
     elements.scene.classList.toggle('day-one-veil-active', showVeil);
     elements.scene.classList.toggle('day-one-action-open', showAction);
     elements.veil.setAttribute('aria-hidden', String(!showVeil));
     elements.action.setAttribute('aria-hidden', String(!showAction));
+    elements.postBeginInstruction.setAttribute('aria-hidden', String(!showPostBeginInstruction));
     clearTimeout(state.introTimer);
     state.introTimer = null;
   }
@@ -291,6 +297,13 @@
     if (state.day === 1 && !state.veilLifted) return liftVeil();
     if (!state.introVisible) return;
     state.introVisible = false;
+    if (state.day !== 1) state.postBeginInstructionVisible = true;
+    updateDayOneIntro();
+  }
+
+  function dismissPostBeginInstruction() {
+    if (!state.postBeginInstructionVisible) return;
+    state.postBeginInstructionVisible = false;
     updateDayOneIntro();
   }
 
@@ -383,7 +396,7 @@
     elements.introTitle.textContent = config.title;
     elements.introIntent.textContent = config.intent;
     elements.introReflection.textContent = config.openingReflection;
-    elements.introInstruction.textContent = config.instruction;
+    elements.postBeginInstructionText.textContent = config.instruction;
     elements.introReflectionPrompt.textContent = state.day === 1 ? '' : DAY_OPENING_REFLECTION_PROMPT;
     if (state.day === 1) elements.actionInstruction.innerHTML = '<span>Rest your finger on the seed,</span><span>then press it gently into the soil.</span>';
     else elements.actionInstruction.textContent = config.instruction;
