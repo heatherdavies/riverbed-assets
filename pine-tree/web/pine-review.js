@@ -127,7 +127,9 @@
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introReflection: $('#introReflection'), introReflectionPrompt: $('#introReflectionPrompt'), introDismiss: $('#introDismiss'), postBeginInstruction: $('#postBeginInstruction'), postBeginInstructionText: $('#postBeginInstructionText'),
     veil: $('#dayOneVeil'), action: $('#dayOneAction'), actionInstruction: $('#dayOneActionInstruction'), howToBegin: $('#howToBeginButton'),
     dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
+    personalInvite: $('#personalStoryInvite'), personalInviteCopy: $('#personalStoryInviteCopy'), personalReturn: $('#personalStoryReturn'), personalStoryIntention: $('#personalStoryIntention'), personalStoryThread: $('#personalStoryThread'), personalWordButton: $('#personalWordButton'), personalWordForm: $('#personalWordForm'), personalWordInput: $('#personalWordInput'), personalWordSave: $('#personalWordSave'), personalIntentionEntry: $('#personalIntentionEntry'), personalIntentionInput: $('#personalIntentionInput'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
+    storyStreamSection: $('#storyStreamSection'), forestStream: $('#forestStreamButton'), personalStream: $('#personalStreamButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
     haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
   };
@@ -167,16 +169,33 @@
     postBeginInstructionVisible: false,
     veilLifted: false,
     introTimer: null,
+    personalStoryMode: localStorage.getItem('pine-review-stream') === 'personal',
+    personalStoryAvailable: localStorage.getItem('pine-review-personal-unlocked') === 'true',
+    personalStory: { intention: '', words: {} },
     quality: window.devicePixelRatio > 2 ? 'standard' : 'high',
   };
+  try {
+    const storedStory = JSON.parse(localStorage.getItem('pine-review-personal-story') || '{}');
+    state.personalStory = { intention: typeof storedStory.intention === 'string' ? storedStory.intention : '', words: storedStory.words && typeof storedStory.words === 'object' ? storedStory.words : {} };
+  } catch (_) { /* invalid local review data falls back to a blank story */ }
+  state.personalStoryAvailable ||= state.completed.has(9);
+  if (state.personalStoryMode && !state.personalStoryAvailable) state.personalStoryMode = false;
   let dayTransitionToken = 0;
   let pendingDayTransition = null;
 
   function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
   function completionThreshold() { if (state.day === 5) return DAY_FIVE_COMPLETION_THRESHOLD; return state.day === 9 ? DAY_NINE_COMPLETION_THRESHOLD : .999; }
 
+  function restartJourney() {
+    state.completed.clear();
+    persist();
+    setDay(1);
+  }
   function resetToDayOne() {
     state.completed.clear();
+    state.personalStoryMode = false;
+    state.personalStoryAvailable = false;
+    state.personalStory = { intention: '', words: {} };
     persist();
     setDay(1);
   }
@@ -185,9 +204,14 @@
     if (button.dataset.day) return setDay(Number(button.dataset.day));
     switch (button.id) {
       case 'assistButton': return assistedAdvance();
-      case 'nextDayButton': return state.day < 9 ? setDay(state.day + 1) : resetToDayOne();
-      case 'restartDayButton': return resetToDayOne();
-      case 'returnToSeedButton': return resetToDayOne();
+      case 'nextDayButton': return state.day < 9 ? setDay(state.day + 1) : restartJourney();
+      case 'restartDayButton': return restartJourney();
+      case 'returnToSeedButton': return restartJourney();
+      case 'personalStoryInvite': return beginPersonalStory();
+      case 'forestStreamButton': return chooseForestJourney();
+      case 'personalStreamButton': return beginPersonalStory();
+      case 'personalWordButton': return openPersonalWordCapture();
+      case 'personalWordSave': return savePersonalWord();
       case 'introDismiss': return dismissIntro();
       case 'howToBeginButton': return liftVeil();
       case 'menuButton': return setPanel(true);
@@ -228,6 +252,9 @@
     localStorage.setItem('pine-review-sound', state.sound ? 'on' : 'off');
     localStorage.setItem('pine-review-haptics', state.haptics);
     localStorage.setItem('pine-review-motion', state.reducedMotion ? 'on' : 'off');
+    localStorage.setItem('pine-review-stream', state.personalStoryMode ? 'personal' : 'forest');
+    localStorage.setItem('pine-review-personal-unlocked', state.personalStoryAvailable ? 'true' : 'false');
+    localStorage.setItem('pine-review-personal-story', JSON.stringify(state.personalStory));
   }
   function resetMaterial() {
     state.contacts.clear(); state.progress = 0;
@@ -256,6 +283,33 @@
   }
   function current() { return DAYS[state.day - 1]; }
 
+  function storyWords() { return Object.entries(state.personalStory.words).filter(([, value]) => typeof value === 'string' && value.trim()).sort(([a], [b]) => Number(a) - Number(b)).map(([, value]) => value.trim()); }
+  function updatePersonalStoryUI() {
+    const isPersonal = state.personalStoryMode;
+    const hasCompletedDay = state.completed.has(state.day);
+    const showIntention = isPersonal && state.day === 1 && state.introVisible && !state.veilLifted && !hasCompletedDay;
+    const showInvite = state.day === 9 && hasCompletedDay && !isPersonal;
+    const hasReturn = state.day === 9 && hasCompletedDay && isPersonal && (state.personalStory.intention.trim() || storyWords().length);
+    const canKeepWord = isPersonal && state.day >= 2 && state.day <= 8 && hasCompletedDay;
+    elements.personalIntentionEntry.hidden = !showIntention;
+    if (showIntention && elements.personalIntentionInput.value !== state.personalStory.intention) elements.personalIntentionInput.value = state.personalStory.intention;
+    elements.storyStreamSection.hidden = !state.personalStoryAvailable;
+    elements.forestStream.classList.toggle('active', !isPersonal);
+    elements.personalStream.classList.toggle('active', isPersonal);
+    elements.personalInvite.hidden = !showInvite;
+    elements.personalInviteCopy.hidden = !showInvite;
+    elements.personalReturn.hidden = !hasReturn;
+    if (hasReturn) {
+      const intention = state.personalStory.intention.trim();
+      elements.personalStoryIntention.hidden = !intention;
+      elements.personalStoryIntention.textContent = intention ? `“${intention}”` : '';
+      const words = storyWords();
+      elements.personalStoryThread.hidden = !words.length;
+      elements.personalStoryThread.textContent = words.length ? words.join('  ·  ') : '';
+    }
+    elements.personalWordButton.hidden = !canKeepWord;
+    if (!canKeepWord) elements.personalWordForm.hidden = true;
+  }
   function showCompletionState() {
     const [title, reflection] = COMPLETIONS[state.day - 1];
     const next = DAYS[state.day];
@@ -267,9 +321,11 @@
     elements.restartDay.textContent = state.day === 1 ? 'START AGAIN AT DAY 1' : 'START THE JOURNEY AGAIN';
     elements.scene.classList.add('practice-complete');
     if (state.day === 1) elements.scene.classList.add('day-one-complete', 'day-one-buried');
+    updatePersonalStoryUI();
   }
 
   function updateDayOneIntro() {
+    updatePersonalStoryUI();
     const showSharedIntro = state.introVisible && state.day !== 1;
     const showVeil = state.day === 1 && state.introVisible && !state.veilLifted;
     const showAction = state.day === 1 && state.veilLifted && !state.completed.has(1);
@@ -286,8 +342,14 @@
     state.introTimer = null;
   }
 
+  function capturePersonalIntention() {
+    if (!state.personalStoryMode || state.day !== 1) return;
+    state.personalStory.intention = elements.personalIntentionInput.value.trim().slice(0, 56);
+    persist();
+  }
   function liftVeil() {
     if (state.day !== 1 || state.completed.has(1) || state.veilLifted) return;
+    capturePersonalIntention();
     state.veilLifted = true;
     state.introVisible = false;
     updateDayOneIntro();
@@ -310,6 +372,35 @@
       const done = state.completed.has(day.day);
       return `<button type="button" class="day-button ${active}" data-day="${day.day}"><span class="day-num">${String(day.day).padStart(2, '0')}</span><span class="day-title">${day.title}</span><span class="day-state">${done ? '✓' : day.day === state.day ? 'NOW' : ''}</span></button>`;
     }).join('');
+    updatePersonalStoryUI();
+  }
+
+  function chooseForestJourney() {
+    state.personalStoryMode = false;
+    state.completed.clear();
+    persist();
+    setDay(1);
+  }
+  function beginPersonalStory() {
+    if (!state.personalStoryAvailable) return;
+    state.personalStoryMode = true;
+    state.completed.clear();
+    persist();
+    setDay(1);
+  }
+  function openPersonalWordCapture() {
+    if (!state.personalStoryMode || state.day < 2 || state.day > 8 || !state.completed.has(state.day)) return;
+    elements.personalWordForm.hidden = false;
+    elements.personalWordInput.value = state.personalStory.words[state.day] || '';
+    requestAnimationFrame(() => elements.personalWordInput.focus({ preventScroll: true }));
+  }
+  function savePersonalWord() {
+    const word = elements.personalWordInput.value.trim().slice(0, 24);
+    if (word) state.personalStory.words[state.day] = word;
+    else delete state.personalStory.words[state.day];
+    elements.personalWordForm.hidden = true;
+    persist();
+    updatePersonalStoryUI();
   }
 
   function sceneImageSource(config) { return `${config.image}?v=20260821-day2-root-match-2`; }
@@ -405,6 +496,7 @@
     requestAnimationFrame(positionSeedTarget);
     renderNavigation();
     updateDayOneIntro();
+    updatePersonalStoryUI();
     closePanel();
   }
 
@@ -627,6 +719,7 @@
     state.progress = 1;
     if (newlyCompleted) {
       state.completed.add(state.day);
+      if (state.day === 9) state.personalStoryAvailable = true;
       persist();
       renderNavigation();
     }
@@ -826,7 +919,7 @@
   }
 
   function bind() {
-    const preserveControls = (event) => Boolean(event.target.closest('button'));
+    const preserveControls = (event) => Boolean(event.target.closest('button, input'));
     const blockNativeSceneGesture = (event) => { if (!preserveControls(event)) event.preventDefault(); };
     elements.scene.addEventListener('contextmenu', blockNativeSceneGesture);
     elements.scene.addEventListener('dragstart', blockNativeSceneGesture);
