@@ -339,7 +339,7 @@
 
   function setDay(day, scenePrepared = false) {
     const nextDay = clamp(Math.round(day), 1, 9);
-    const requiresPreparedScene = (state.day === 2 && nextDay === 3) || (state.day === 3 && nextDay === 4) || (state.day === 4 && nextDay === 5);
+    const requiresPreparedScene = nextDay === state.day + 1 && state.day >= 1 && state.day < 9;
     if (requiresPreparedScene && !scenePrepared) {
       prepareSceneTransition(nextDay);
       return;
