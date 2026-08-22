@@ -126,7 +126,7 @@
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
     intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introReflection: $('#introReflection'), introReflectionPrompt: $('#introReflectionPrompt'), introDismiss: $('#introDismiss'), postBeginInstruction: $('#postBeginInstruction'), postBeginInstructionText: $('#postBeginInstructionText'),
     veil: $('#dayOneVeil'), action: $('#dayOneAction'), actionInstruction: $('#dayOneActionInstruction'), howToBegin: $('#howToBeginButton'),
-    dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), secondJourneyGuidance: $('#secondJourneyGuidance'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
+    dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), journeyReflection: $('#journeyReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), secondJourneyGuidance: $('#secondJourneyGuidance'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
     haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
@@ -272,6 +272,7 @@
     elements.completionTitle.textContent = title;
     elements.completionReflection.textContent = reflection;
     elements.completionReflection.hidden = !reflection;
+    elements.journeyReflection.hidden = state.day !== 9;
     elements.nextDay.disabled = false;
     elements.nextDay.textContent = next ? `CONTINUE TO ${next.title.toUpperCase()}` : 'RETURN TO DAY 1';
     elements.restartDay.textContent = state.day === 1 ? 'START AGAIN AT DAY 1' : 'START THE JOURNEY AGAIN';
@@ -441,6 +442,7 @@
     requestAnimationFrame(positionSeedTarget);
     renderNavigation();
     updateDayOneIntro();
+    elements.journeyReflection.hidden = true;
     elements.secondJourneyGuidance.hidden = true;
     if (state.day < DAYS.length) warmSceneTransition(state.day + 1);
     closePanel();

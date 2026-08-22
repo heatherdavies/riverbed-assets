@@ -158,3 +158,8 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 .second-journey-guidance p { margin: 0 !important; color: rgba(245, 240, 221, .72) !important; font-size: 15px !important; line-height: 1.28 !important; }
 .second-journey-guidance .second-journey-kicker { margin-bottom: 8px !important; color: var(--gilt) !important; font-family: inherit !important; font-size: 8px !important; font-style: normal !important; font-weight: 600; letter-spacing: .16em; }
 @media (max-height: 690px) { .day-one-veil-copy { top: 43%; } .second-journey-guidance p { font-size: 14px !important; } }
+
+/* Day 9: a quiet reflection before returning to the forest */
+.journey-reflection[hidden] { display: none !important; }
+.journey-reflection { margin: 14px 0 2px !important; color: rgba(245, 240, 221, .82) !important; font-family: "Cormorant Garamond", Georgia, serif; font-size: 18px !important; font-style: italic; line-height: 1.2 !important; }
+@media (max-height: 690px) { .journey-reflection { font-size: 16px !important; } }
