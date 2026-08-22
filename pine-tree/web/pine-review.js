@@ -68,9 +68,9 @@
     { kind: 'sap', point: [.676, .560] },
   ];
   const AMBIENCE_SOURCES = {
-    roots: '../assets/audio/root-and-soil-forest-air.mp3',
-    boughs: '../assets/audio/trunk-and-bough-forest-air.mp3',
-    vista: '../assets/audio/weather-and-vista-forest-air.mp3',
+    roots: '../assets/audio/root-and-soil-forest-wash.mp3',
+    boughs: '../assets/audio/trunk-and-bough-forest-wash.mp3',
+    vista: '../assets/audio/weather-and-vista-forest-wash.mp3',
   };
   const COIL_HAPTIC_LANDMARKS = [.18, .36, .54, .70];
   const BRANCH_HAPTIC_LANDMARKS = [.24, .48, .72];
