@@ -46,6 +46,7 @@
     '2:7', '3:7', '4:7', '5:7', '6:7', '7:7', '8:7',
   ]);
   const DAY_THREE_CLEAR_CELL_TARGET = Math.ceil(DAY_THREE_VISIBLE_SOIL_CELLS.size * .9);
+  const DAY_FIVE_COMPLETION_THRESHOLD = .74;
   const DAY_NINE_COMPLETION_THRESHOLD = .65;
   const DAY_EIGHT_DETAILS = [
     { kind: 'needles', point: [.250, .508] },
@@ -157,7 +158,7 @@
   let pendingDayTransition = null;
 
   function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
-  function completionThreshold() { return state.day === 9 ? DAY_NINE_COMPLETION_THRESHOLD : .999; }
+  function completionThreshold() { if (state.day === 5) return DAY_FIVE_COMPLETION_THRESHOLD; return state.day === 9 ? DAY_NINE_COMPLETION_THRESHOLD : .999; }
 
   function resetToDayOne() {
     state.completed.clear();
