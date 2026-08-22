@@ -67,11 +67,6 @@
     { kind: 'sap', point: [.713, .372] },
     { kind: 'sap', point: [.676, .560] },
   ];
-  const AMBIENCE_SOURCES = {
-    roots: '../assets/audio/root-and-soil-forest-wash.mp3',
-    boughs: '../assets/audio/trunk-and-bough-forest-wash.mp3',
-    vista: '../assets/audio/weather-and-vista-forest-wash.mp3',
-  };
   const COIL_HAPTIC_LANDMARKS = [.18, .36, .54, .70];
   const BRANCH_HAPTIC_LANDMARKS = [.24, .48, .72];
   function projectScenePoint(point, image = elements.image) {
@@ -134,7 +129,7 @@
     veil: $('#dayOneVeil'), action: $('#dayOneAction'), actionInstruction: $('#dayOneActionInstruction'), howToBegin: $('#howToBeginButton'),
     dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), journeyReflection: $('#journeyReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), secondJourneyGuidance: $('#secondJourneyGuidance'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
-    journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
+    journey: $('#journeyList'), panelDay: $('#panelDayValue'),
     motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
   };
   const canvas = elements.canvas;
@@ -162,11 +157,8 @@
     completionTimer: null,
     burialStartedAt: 0,
     seedPoint: { x: 0.51, y: 0.562 },
-    sound: localStorage.getItem('pine-review-sound') === 'on',
     reducedMotion: localStorage.getItem('pine-review-motion') === 'on',
     lastTick: performance.now(),
-    audio: null,
-    ambience: { players: new Map(), active: null, unlocked: false, fadeFrame: 0 },
     tactileMarks: new Set(),
     firstTouchAcknowledged: false,
     panelOpen: false,
@@ -209,8 +201,6 @@
       case 'menuButton': return setPanel(true);
       case 'closePanelButton': return closePanel();
       case 'scrim': return closePanel();
-      case 'soundButton':
-      case 'panelSoundButton': return toggleSound();
       case 'motionButton': state.reducedMotion = !state.reducedMotion; updateSettings(); return persist();
       case 'resetButton': return resetToDayOne();
       case 'homeButton': return setDay(1);
@@ -240,7 +230,7 @@
 
   function persist() {
     localStorage.setItem('pine-review-completed', JSON.stringify([...state.completed]));
-    localStorage.setItem('pine-review-sound', state.sound ? 'on' : 'off');
+    localStorage.removeItem('pine-review-sound');
     localStorage.removeItem('pine-review-haptics');
     localStorage.setItem('pine-review-motion', state.reducedMotion ? 'on' : 'off');
   }
@@ -310,7 +300,6 @@
     if (state.day !== 1 || state.completed.has(1) || state.veilLifted) return;
     state.veilLifted = true;
     state.introVisible = false;
-    unlockAmbience();
     updateDayOneIntro();
     requestAnimationFrame(positionSeedTarget);
   }
@@ -319,7 +308,6 @@
     if (state.day === 1 && !state.veilLifted) return liftVeil();
     if (!state.introVisible) return;
     state.introVisible = false;
-    unlockAmbience();
     if (state.day !== 1) state.postBeginInstructionVisible = true;
     if (state.day === 8) state.dayEightHintStartedAt = performance.now();
     updateDayOneIntro();
@@ -362,64 +350,6 @@
     });
     warmedSceneTransitions.set(nextDay, warmed);
     return warmed;
-  }
-
-  function ambienceKeyForDay(day = state.day) { return day <= 3 ? 'roots' : day <= 6 ? 'boughs' : 'vista'; }
-  function ambiencePlayer(key) {
-    const existing = state.ambience.players.get(key);
-    if (existing) return existing;
-    const player = new Audio(AMBIENCE_SOURCES[key]);
-    player.loop = true;
-    player.preload = 'auto';
-    player.volume = 0;
-    player.setAttribute('playsinline', '');
-    state.ambience.players.set(key, player);
-    return player;
-  }
-  function fadeAmbience() {
-    cancelAnimationFrame(state.ambience.fadeFrame);
-    const activeKey = state.sound && state.ambience.unlocked ? state.ambience.active : null;
-    const startedAt = performance.now();
-    const frame = (time) => {
-      const blend = clamp((time - startedAt) / 1200);
-      let settling = false;
-      state.ambience.players.forEach((player, key) => {
-        const target = key === activeKey ? .115 : 0;
-        const next = player.volume + (target - player.volume) * Math.min(1, blend * .2 + .08);
-        player.volume = next;
-        if (key !== activeKey && next < .004) { player.volume = 0; player.pause(); }
-        if (Math.abs(target - player.volume) > .003) settling = true;
-      });
-      if (settling) state.ambience.fadeFrame = requestAnimationFrame(frame);
-    };
-    state.ambience.fadeFrame = requestAnimationFrame(frame);
-  }
-  function silenceAmbience() {
-    cancelAnimationFrame(state.ambience.fadeFrame);
-    state.ambience.active = null;
-    state.ambience.players.forEach((player) => {
-      player.volume = 0;
-      player.pause();
-      try { player.currentTime = 0; } catch (_) { /* stream may not be seekable yet */ }
-    });
-  }
-  function unlockAmbience() {
-    if (!state.sound) return;
-    state.ambience.unlocked = true;
-    const key = ambienceKeyForDay();
-    const player = ambiencePlayer(key);
-    state.ambience.active = key;
-    player.play().catch(() => undefined);
-    fadeAmbience();
-  }
-  function syncAmbienceForDay() {
-    if (!state.sound || !state.ambience.unlocked) return;
-    const key = ambienceKeyForDay();
-    if (state.ambience.active !== key) {
-      state.ambience.active = key;
-      ambiencePlayer(key).play().catch(() => undefined);
-    }
-    fadeAmbience();
   }
 
   function prepareSceneTransition(nextDay) {
@@ -513,7 +443,6 @@
     elements.journeyReflection.hidden = true;
     elements.secondJourneyGuidance.hidden = true;
     if (state.day < DAYS.length) warmSceneTransition(state.day + 1);
-    syncAmbienceForDay();
     closePanel();
   }
 
@@ -756,45 +685,9 @@
     if (newlyCompleted) markTactile(`day-${state.day}-completion`, .9, 'completion');
   }
 
-  function markTactile(mark, strength = .5, kind = mark) {
+  function markTactile(mark) {
     if (state.tactileMarks.has(mark)) return;
     state.tactileMarks.add(mark);
-    if (state.sound) playTone(kind, strength);
-  }
-
-  function playTone(kind, strength) {
-    try {
-      const Context = window.AudioContext || window.webkitAudioContext; if (!Context) return;
-      state.audio ||= new Context(); if (state.audio.state === 'suspended') state.audio.resume();
-      const now = state.audio.currentTime;
-      const profiles = {
-        'first-touch': { base: 112, end: 92, type: 'sine', duration: .18 },
-        'root-arrive': { base: 74, end: 54, type: 'sine', duration: .34 },
-        'trunk-arrive': { base: 132, end: 104, type: 'triangle', duration: .28 },
-        'coil-turn': { base: 168, end: 142, type: 'triangle', duration: .19 },
-        branch: { base: 196, end: 240, type: 'sine', duration: .21 },
-        'wind-crest': { base: 224, end: 176, type: 'triangle', duration: .32 },
-        'detail-found': { base: 318, end: 372, type: 'sine', duration: .23 },
-        completion: { base: state.day >= 7 ? 212 : state.day <= 2 ? 86 : 144, end: state.day >= 7 ? 318 : state.day <= 2 ? 66 : 196, type: 'sine', duration: state.day === 9 ? .62 : .38 },
-      };
-      const profile = profiles[kind] || profiles['first-touch'];
-      const oscillator = state.audio.createOscillator();
-      const gain = state.audio.createGain();
-      oscillator.type = profile.type;
-      oscillator.frequency.setValueAtTime(profile.base, now);
-      oscillator.frequency.exponentialRampToValueAtTime(profile.end, now + profile.duration);
-      gain.gain.setValueAtTime(.0001, now);
-      gain.gain.exponentialRampToValueAtTime(.0105 * strength, now + .018);
-      gain.gain.exponentialRampToValueAtTime(.0001, now + profile.duration);
-      oscillator.connect(gain).connect(state.audio.destination);
-      oscillator.start(now); oscillator.stop(now + profile.duration + .02);
-      if (kind === 'completion' && state.day === 9) {
-        const overtone = state.audio.createOscillator(); const overtoneGain = state.audio.createGain();
-        overtone.type = 'sine'; overtone.frequency.setValueAtTime(profile.base * 1.5, now + .16);
-        overtoneGain.gain.setValueAtTime(.0001, now); overtoneGain.gain.exponentialRampToValueAtTime(.0045, now + .2); overtoneGain.gain.exponentialRampToValueAtTime(.0001, now + .66);
-        overtone.connect(overtoneGain).connect(state.audio.destination); overtone.start(now + .15); overtone.stop(now + .7);
-      }
-    } catch (_) { /* browser may block audio; stay silent */ }
   }
 
   function advanceStationarySeedHold(timestamp) {
@@ -970,16 +863,13 @@
     elements.scene.addEventListener('selectstart', blockNativeSceneGesture);
     elements.scene.addEventListener('touchstart', blockNativeSceneGesture, { passive: false });
     elements.scene.addEventListener('touchmove', blockNativeSceneGesture, { passive: false });
-    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible && !state.veilLifted) return; unlockAmbience(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
+    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible && !state.veilLifted) return; try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); if (!state.contacts.size && state.pendingCompletion) scheduleCompletion(); }));
     bindPrimaryControls();
     window.addEventListener('resize', resize);
   }
-  function toggleSound() { state.sound = !state.sound; if (state.sound) unlockAmbience(); else silenceAmbience(); updateSettings(); persist(); }
   function updateSettings() {
-    elements.sound.textContent = `SOUND ${state.sound ? 'ON' : 'OFF'}`; elements.sound.setAttribute('aria-pressed', String(state.sound));
-    elements.panelSound.textContent = state.sound ? 'ON' : 'OFF'; elements.panelSound.setAttribute('aria-pressed', String(state.sound));
     elements.motion.textContent = state.reducedMotion ? 'ON' : 'OFF'; elements.motion.setAttribute('aria-pressed', String(state.reducedMotion));
   }
 

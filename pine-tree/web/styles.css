@@ -77,9 +77,6 @@ button:focus-visible { outline: 1px solid var(--gilt); outline-offset: 4px; }
 .brand-lockup { display: grid; gap: 1px; justify-self: start; text-shadow: 0 1px 12px rgba(0,0,0,.65); }
 .brand-lockup span, .panel-kicker, .eyebrow, .section-heading, .day-button small { font-size: 10px; letter-spacing: .18em; font-weight: 600; color: var(--gilt); }
 .brand-lockup strong { font-family: "Cormorant Garamond", Georgia, serif; font-size: 20px; font-weight: 500; line-height: 1; }
-.sound-toggle { appearance: none; border: 0; background: transparent; padding: 8px 0 8px 8px; cursor: pointer; color: var(--muted-ivory); font-size: 10px; letter-spacing: .14em; }
-.sound-toggle[aria-pressed="true"] { color: var(--gilt); }
-
 .stage-strip { position: absolute; top: calc(max(22px, env(safe-area-inset-top)) + 56px); left: 22px; right: 22px; z-index: 3; margin: 0; color: var(--gilt); font-size: 9px; font-weight: 600; letter-spacing: .17em; text-align: center; text-shadow: 0 1px 12px rgba(0, 0, 0, .72); }
 .day-rail { position: absolute; top: calc(max(22px, env(safe-area-inset-top)) + 82px); left: 22px; right: 22px; display: flex; justify-content: space-between; align-items: center; z-index: 3; opacity: .9; }
 .day-rail::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(239, 233, 206, .22); z-index: -1; }
