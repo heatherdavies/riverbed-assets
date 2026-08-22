@@ -135,7 +135,7 @@
     dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), journeyReflection: $('#journeyReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), secondJourneyGuidance: $('#secondJourneyGuidance'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
     journey: $('#journeyList'), panelDay: $('#panelDayValue'), sound: $('#soundButton'), panelSound: $('#panelSoundButton'),
-    haptic: $('#hapticButton'), motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
+    motion: $('#motionButton'), reset: $('#resetButton'), home: $('#homeButton'),
   };
   const canvas = elements.canvas;
   const ctx = canvas.getContext('2d');
@@ -163,10 +163,8 @@
     burialStartedAt: 0,
     seedPoint: { x: 0.51, y: 0.562 },
     sound: localStorage.getItem('pine-review-sound') === 'on',
-    haptics: localStorage.getItem('pine-review-haptics') || 'subtle',
     reducedMotion: localStorage.getItem('pine-review-motion') === 'on',
     lastTick: performance.now(),
-    lastHaptic: 0,
     audio: null,
     ambience: { players: new Map(), active: null, unlocked: false, fadeFrame: 0 },
     tactileMarks: new Set(),
@@ -213,7 +211,6 @@
       case 'scrim': return closePanel();
       case 'soundButton':
       case 'panelSoundButton': return toggleSound();
-      case 'hapticButton': state.haptics = state.haptics === 'off' ? 'subtle' : state.haptics === 'subtle' ? 'on' : 'off'; updateSettings(); return persist();
       case 'motionButton': state.reducedMotion = !state.reducedMotion; updateSettings(); return persist();
       case 'resetButton': return resetToDayOne();
       case 'homeButton': return setDay(1);
@@ -244,7 +241,7 @@
   function persist() {
     localStorage.setItem('pine-review-completed', JSON.stringify([...state.completed]));
     localStorage.setItem('pine-review-sound', state.sound ? 'on' : 'off');
-    localStorage.setItem('pine-review-haptics', state.haptics);
+    localStorage.removeItem('pine-review-haptics');
     localStorage.setItem('pine-review-motion', state.reducedMotion ? 'on' : 'off');
   }
   function resetMaterial() {
@@ -763,17 +760,6 @@
     if (state.tactileMarks.has(mark)) return;
     state.tactileMarks.add(mark);
     if (state.sound) playTone(kind, strength);
-    if (state.haptics === 'off' || !navigator.vibrate) return;
-    const now = performance.now();
-    if (now - state.lastHaptic < 105 && kind !== 'completion') return;
-    state.lastHaptic = now;
-    const factor = state.haptics === 'on' ? 1 : .62;
-    const pulse = Math.max(5, Math.round((9 + strength * 13) * factor));
-    let pattern = [pulse];
-    if (kind === 'detail-found') pattern = [pulse, 34, pulse];
-    if (kind === 'wind-crest') pattern = [pulse + 4, 48, pulse];
-    if (kind === 'completion') pattern = state.day === 9 ? [pulse + 9, 64, pulse + 3] : [pulse + 4];
-    try { navigator.vibrate(pattern); } catch (_) { /* visual feedback remains */ }
   }
 
   function playTone(kind, strength) {
@@ -994,7 +980,6 @@
   function updateSettings() {
     elements.sound.textContent = `SOUND ${state.sound ? 'ON' : 'OFF'}`; elements.sound.setAttribute('aria-pressed', String(state.sound));
     elements.panelSound.textContent = state.sound ? 'ON' : 'OFF'; elements.panelSound.setAttribute('aria-pressed', String(state.sound));
-    elements.haptic.textContent = state.haptics.toUpperCase(); elements.haptic.classList.toggle('active', state.haptics !== 'off');
     elements.motion.textContent = state.reducedMotion ? 'ON' : 'OFF'; elements.motion.setAttribute('aria-pressed', String(state.reducedMotion));
   }
 
