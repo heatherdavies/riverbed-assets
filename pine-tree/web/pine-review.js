@@ -36,7 +36,16 @@
   ];
   const daySixPoint = (branch, progress) => { const t = clamp(progress); const q = 1 - t; return { x: q*q*q*branch[0][0] + 3*q*q*t*branch[1][0] + 3*q*t*t*branch[2][0] + t*t*t*branch[3][0], y: q*q*q*branch[0][1] + 3*q*q*t*branch[1][1] + 3*q*t*t*branch[2][1] + t*t*t*branch[3][1] }; };
   const DAY_TWO_ROOT_PATH = [[.5093,.2740],[.5157,.2854],[.5185,.2995],[.5213,.3177],[.5259,.3385],[.5296,.3620],[.5315,.3865],[.5333,.4115],[.5333,.4365],[.5324,.4615],[.5296,.4865],[.5259,.5104],[.5185,.5339],[.5093,.5563],[.4981,.5781],[.4852,.5979],[.4722,.6146],[.4602,.6292],[.4537,.6417],[.4574,.6510],[.4676,.6615],[.4815,.6729],[.4954,.6849],[.505,.720]];
-  const DAY_THREE_CLEAR_CELL_TARGET = 88;
+  const DAY_THREE_VISIBLE_SOIL_CELLS = new Set([
+    '3:1', '4:1', '5:1', '6:1', '7:1', '8:1',
+    '2:2', '3:2', '4:2', '5:2', '6:2', '7:2', '8:2', '9:2',
+    '1:3', '2:3', '3:3', '4:3', '5:3', '6:3', '7:3', '8:3', '9:3',
+    '1:4', '2:4', '3:4', '4:4', '5:4', '6:4', '7:4', '8:4', '9:4',
+    '1:5', '2:5', '3:5', '4:5', '5:5', '6:5', '7:5', '8:5', '9:5', '10:5',
+    '1:6', '2:6', '3:6', '4:6', '5:6', '6:6', '7:6', '8:6', '9:6',
+    '2:7', '3:7', '4:7', '5:7', '6:7', '7:7', '8:7',
+  ]);
+  const DAY_THREE_CLEAR_CELL_TARGET = Math.ceil(DAY_THREE_VISIBLE_SOIL_CELLS.size * .9);
   const DAY_EIGHT_DETAILS = [
     { kind: 'needles', point: [.250, .508] },
     { kind: 'cone', point: [.426, .411] },
@@ -479,9 +488,9 @@
             if (x <= .17 || x >= .83 || y <= .485 || y >= .855) continue;
             const key = `${Math.round((x - .17) / .066)}:${Math.round((y - .485) / .04625)}`;
             state.brushes.push({ x, y, radius: .065 });
-            state.clearedSoil.add(key);
+            if (DAY_THREE_VISIBLE_SOIL_CELLS.has(key)) state.clearedSoil.add(key);
           }
-          state.material.soil = clamp(state.clearedSoil.size / 99);
+          state.material.soil = clamp(state.clearedSoil.size / DAY_THREE_VISIBLE_SOIL_CELLS.size);
           state.material.needles = Math.max(state.material.needles, .12 + state.material.soil * .68);
           state.progress = Math.max(state.progress, clamp(state.clearedSoil.size / DAY_THREE_CLEAR_CELL_TARGET));
         }
