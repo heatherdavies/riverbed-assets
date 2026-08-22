@@ -19,3 +19,8 @@ The Day 5 instruction panel was tapped and dismissed successfully, leaving the c
 Day 7 was loaded sequentially and its reflective opening remained concise and readable before Begin Practice, even with the longer gold reflection.
 After Day 7 Begin Practice, the longer canopy instruction appeared in the post-Begin panel, wrapped cleanly, and retained the `TAP TO CONTINUE` dismissal cue alongside the existing `SWAY THE CANOPY` gesture hint.
 Day 1 was checked separately: the existing veil-to-action opening remained visible and the new post-Begin instruction panel stayed hidden.
+
+## Cue refinement validation
+
+The cache-busted cue-revision build loaded successfully and reached the Day 5 opening state before checking the new immersive cue.
+The Day 5 post-Begin panel was visually checked with the revised cue. `WHEN YOU ARE READY, BEGIN` remains legible beneath the practical instruction and preserves the panel’s calm ritual tone.
