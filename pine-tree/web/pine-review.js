@@ -64,10 +64,16 @@
   const DAY_EIGHT_DETAILS = [
     { kind: 'needles', point: [.250, .508] },
     { kind: 'cone', point: [.426, .411] },
-    { kind: 'cone', point: [.852, .492] },
     { kind: 'sap', point: [.713, .372] },
     { kind: 'sap', point: [.676, .560] },
   ];
+  const AMBIENCE_SOURCES = {
+    roots: '../assets/audio/root-and-soil-ambience.mp3',
+    boughs: '../assets/audio/trunk-and-bough-ambience.mp3',
+    vista: '../assets/audio/weather-and-vista-ambience.mp3',
+  };
+  const COIL_HAPTIC_LANDMARKS = [.18, .36, .54, .70];
+  const BRANCH_HAPTIC_LANDMARKS = [.24, .48, .72];
   function projectScenePoint(point, image = elements.image) {
     const rect = elements.scene.getBoundingClientRect();
     if (!rect.width || !rect.height || !image.naturalWidth || !image.naturalHeight) return { x: point[0], y: point[1] };
@@ -162,6 +168,9 @@
     lastTick: performance.now(),
     lastHaptic: 0,
     audio: null,
+    ambience: { players: new Map(), active: null, unlocked: false, fadeFrame: 0 },
+    tactileMarks: new Set(),
+    firstTouchAcknowledged: false,
     panelOpen: false,
     introVisible: true,
     postBeginInstructionVisible: false,
@@ -258,6 +267,8 @@
     state.pendingCompletion = false;
     clearTimeout(state.completionTimer); state.completionTimer = null;
     state.burialStartedAt = 0;
+    state.tactileMarks.clear();
+    state.firstTouchAcknowledged = false;
     state.postBeginInstructionVisible = false;
     state.veilLifted = false;
     elements.scene.classList.remove('day-one-complete', 'day-one-buried', 'practice-complete');
@@ -302,6 +313,7 @@
     if (state.day !== 1 || state.completed.has(1) || state.veilLifted) return;
     state.veilLifted = true;
     state.introVisible = false;
+    unlockAmbience();
     updateDayOneIntro();
     requestAnimationFrame(positionSeedTarget);
   }
@@ -310,6 +322,7 @@
     if (state.day === 1 && !state.veilLifted) return liftVeil();
     if (!state.introVisible) return;
     state.introVisible = false;
+    unlockAmbience();
     if (state.day !== 1) state.postBeginInstructionVisible = true;
     if (state.day === 8) state.dayEightHintStartedAt = performance.now();
     updateDayOneIntro();
@@ -352,6 +365,55 @@
     });
     warmedSceneTransitions.set(nextDay, warmed);
     return warmed;
+  }
+
+  function ambienceKeyForDay(day = state.day) { return day <= 3 ? 'roots' : day <= 6 ? 'boughs' : 'vista'; }
+  function ambiencePlayer(key) {
+    const existing = state.ambience.players.get(key);
+    if (existing) return existing;
+    const player = new Audio(AMBIENCE_SOURCES[key]);
+    player.loop = true;
+    player.preload = 'auto';
+    player.volume = 0;
+    player.setAttribute('playsinline', '');
+    state.ambience.players.set(key, player);
+    return player;
+  }
+  function fadeAmbience() {
+    cancelAnimationFrame(state.ambience.fadeFrame);
+    const activeKey = state.sound && state.ambience.unlocked ? state.ambience.active : null;
+    const startedAt = performance.now();
+    const frame = (time) => {
+      const blend = clamp((time - startedAt) / 1200);
+      let settling = false;
+      state.ambience.players.forEach((player, key) => {
+        const target = key === activeKey ? .115 : 0;
+        const next = player.volume + (target - player.volume) * Math.min(1, blend * .2 + .08);
+        player.volume = next;
+        if (key !== activeKey && next < .004) { player.volume = 0; player.pause(); }
+        if (Math.abs(target - player.volume) > .003) settling = true;
+      });
+      if (settling) state.ambience.fadeFrame = requestAnimationFrame(frame);
+    };
+    state.ambience.fadeFrame = requestAnimationFrame(frame);
+  }
+  function unlockAmbience() {
+    if (!state.sound) return;
+    state.ambience.unlocked = true;
+    const key = ambienceKeyForDay();
+    const player = ambiencePlayer(key);
+    state.ambience.active = key;
+    player.play().catch(() => undefined);
+    fadeAmbience();
+  }
+  function syncAmbienceForDay() {
+    if (!state.sound || !state.ambience.unlocked) return;
+    const key = ambienceKeyForDay();
+    if (state.ambience.active !== key) {
+      state.ambience.active = key;
+      ambiencePlayer(key).play().catch(() => undefined);
+    }
+    fadeAmbience();
   }
 
   function prepareSceneTransition(nextDay) {
@@ -445,6 +507,7 @@
     elements.journeyReflection.hidden = true;
     elements.secondJourneyGuidance.hidden = true;
     if (state.day < DAYS.length) warmSceneTransition(state.day + 1);
+    syncAmbienceForDay();
     closePanel();
   }
 
@@ -537,7 +600,7 @@
         if (inRootCorridor && (contact.phase === 'begin' || dy > .002)) {
           state.material.root = Math.max(state.material.root, reachedDepth);
           state.progress = Math.max(state.progress, reachedDepth);
-          if (reachedDepth >= .95) state.progress = 1;
+          if (reachedDepth >= .95) { state.progress = 1; markTactile('root-arrive', .72); }
         }
         break;
       }
@@ -569,6 +632,7 @@
         if (inTrunkCorridor && (contact.phase === 'begin' || dy < -.002)) {
           state.material.bark = Math.max(state.material.bark, reachedHeight);
           state.progress = Math.max(state.progress, reachedHeight);
+          if (reachedHeight >= .95) markTactile('trunk-arrive', .68);
         }
         break;
       }
@@ -578,6 +642,7 @@
         if (inCoilZone && contact.phase === 'move' && coilTravel > .003) {
           state.material.bough = clamp(state.material.bough + coilTravel * .34);
           state.progress = Math.max(state.progress, state.material.bough);
+          COIL_HAPTIC_LANDMARKS.forEach((landmark, index) => { if (before < landmark && state.progress >= landmark) markTactile(`coil-turn-${index}`, .45, 'coil-turn'); });
         }
         break;
       }
@@ -597,6 +662,7 @@
               stroke.length += segment;
               state.material.bough = state.daySixStrokes.reduce((sum, path) => sum + path.length, 0);
               state.progress = clamp(state.material.bough / 2.45);
+              BRANCH_HAPTIC_LANDMARKS.forEach((landmark, index) => { if (before < landmark && state.progress >= landmark) markTactile(`branch-waypoint-${index}`, .42, 'branch'); });
             }
           }
         } else if (contact.phase === 'end' || contact.phase === 'cancel') {
@@ -614,6 +680,7 @@
             state.windLean = clamp(state.windLean + dx * 1.8, -.82, .82);
             applyWindTransform();
           }
+          if (before < .76 && state.progress >= .76) markTactile('wind-crest', .56, 'wind-crest');
         }
         break;
       }
@@ -629,12 +696,16 @@
           state.dayEightReveals.add(closest.index);
           state.material.bark = Math.max(state.material.bark, .22 + pressure * .12);
           state.progress = state.dayEightReveals.size / DAY_EIGHT_DETAILS.length;
+          markTactile(`detail-found-${closest.index}`, .58, 'detail-found');
         }
         break;
       }
       case 9: { const out = Math.abs(dx) + Math.abs(dy) + speed * .03; state.progress = clamp(state.progress + out * .32); break; }
     }
-    if (state.progress > before + .015 || contact.phase === 'begin') respond('contact', Math.max(move, speed, .18));
+    if (!state.firstTouchAcknowledged && (state.progress > before + .015 || contact.phase === 'begin')) {
+      state.firstTouchAcknowledged = true;
+      markTactile('first-touch', Math.max(move, speed, .18), 'first-touch');
+    }
     if (state.progress >= completionThreshold()) queueCompletion();
   }
 
@@ -659,7 +730,7 @@
 
   function assistedAdvance() {
     state.progress = clamp(state.progress + .16); state.material.soil = Math.max(state.material.soil, state.progress * .75); state.material.root = Math.max(state.material.root, state.progress * .75); state.material.bark = Math.max(state.material.bark, state.progress * .35); state.material.bough = Math.max(state.material.bough, state.progress * .3); state.material.needles = Math.max(state.material.needles, .16 + state.progress * .18);
-    respond('movement', .35); if (state.progress >= completionThreshold()) queueCompletion();
+    markTactile('guided-movement', .35, 'first-touch'); if (state.progress >= completionThreshold()) queueCompletion();
   }
 
   function completeDay() {
@@ -676,27 +747,58 @@
     if (state.day === 4) state.material.bark = 1;
     elements.scene.classList.remove('settling-completion');
     showCompletionState();
-    if (newlyCompleted) respond('completion', .9);
+    if (newlyCompleted) markTactile(`day-${state.day}-completion`, .9, 'completion');
   }
 
-  function respond(kind, strength) {
+  function markTactile(mark, strength = .5, kind = mark) {
+    if (state.tactileMarks.has(mark)) return;
+    state.tactileMarks.add(mark);
     if (state.sound) playTone(kind, strength);
     if (state.haptics === 'off' || !navigator.vibrate) return;
-    const now = performance.now(); if (now - state.lastHaptic < 115 && kind !== 'completion') return;
+    const now = performance.now();
+    if (now - state.lastHaptic < 105 && kind !== 'completion') return;
     state.lastHaptic = now;
-    const day = state.day; const base = day <= 2 ? 17 : day <= 6 ? 10 : 7; const factor = state.haptics === 'on' ? 1 : .64;
-    const duration = Math.max(5, Math.round(base * factor * (.75 + strength)));
-    try { navigator.vibrate(kind === 'completion' ? [duration + 13, 40, duration] : [duration]); } catch (_) { /* visual feedback remains */ }
+    const factor = state.haptics === 'on' ? 1 : .62;
+    const pulse = Math.max(5, Math.round((9 + strength * 13) * factor));
+    let pattern = [pulse];
+    if (kind === 'detail-found') pattern = [pulse, 34, pulse];
+    if (kind === 'wind-crest') pattern = [pulse + 4, 48, pulse];
+    if (kind === 'completion') pattern = state.day === 9 ? [pulse + 9, 64, pulse + 3] : [pulse + 4];
+    try { navigator.vibrate(pattern); } catch (_) { /* visual feedback remains */ }
   }
 
   function playTone(kind, strength) {
     try {
       const Context = window.AudioContext || window.webkitAudioContext; if (!Context) return;
       state.audio ||= new Context(); if (state.audio.state === 'suspended') state.audio.resume();
-      const now = state.audio.currentTime; const oscillator = state.audio.createOscillator(); const gain = state.audio.createGain();
-      const base = state.day <= 2 ? 54 : state.day >= 7 ? 240 : 120;
-      oscillator.type = state.day <= 2 ? 'sine' : state.day >= 7 ? 'triangle' : 'sine'; oscillator.frequency.setValueAtTime(base * (kind === 'completion' ? 1.5 : 1), now); oscillator.frequency.exponentialRampToValueAtTime(Math.max(30, base * .76), now + .23);
-      gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(.011 * strength, now + .02); gain.gain.exponentialRampToValueAtTime(.0001, now + .28); oscillator.connect(gain).connect(state.audio.destination); oscillator.start(now); oscillator.stop(now + .3);
+      const now = state.audio.currentTime;
+      const profiles = {
+        'first-touch': { base: 112, end: 92, type: 'sine', duration: .18 },
+        'root-arrive': { base: 74, end: 54, type: 'sine', duration: .34 },
+        'trunk-arrive': { base: 132, end: 104, type: 'triangle', duration: .28 },
+        'coil-turn': { base: 168, end: 142, type: 'triangle', duration: .19 },
+        branch: { base: 196, end: 240, type: 'sine', duration: .21 },
+        'wind-crest': { base: 224, end: 176, type: 'triangle', duration: .32 },
+        'detail-found': { base: 318, end: 372, type: 'sine', duration: .23 },
+        completion: { base: state.day >= 7 ? 212 : state.day <= 2 ? 86 : 144, end: state.day >= 7 ? 318 : state.day <= 2 ? 66 : 196, type: 'sine', duration: state.day === 9 ? .62 : .38 },
+      };
+      const profile = profiles[kind] || profiles['first-touch'];
+      const oscillator = state.audio.createOscillator();
+      const gain = state.audio.createGain();
+      oscillator.type = profile.type;
+      oscillator.frequency.setValueAtTime(profile.base, now);
+      oscillator.frequency.exponentialRampToValueAtTime(profile.end, now + profile.duration);
+      gain.gain.setValueAtTime(.0001, now);
+      gain.gain.exponentialRampToValueAtTime(.0105 * strength, now + .018);
+      gain.gain.exponentialRampToValueAtTime(.0001, now + profile.duration);
+      oscillator.connect(gain).connect(state.audio.destination);
+      oscillator.start(now); oscillator.stop(now + profile.duration + .02);
+      if (kind === 'completion' && state.day === 9) {
+        const overtone = state.audio.createOscillator(); const overtoneGain = state.audio.createGain();
+        overtone.type = 'sine'; overtone.frequency.setValueAtTime(profile.base * 1.5, now + .16);
+        overtoneGain.gain.setValueAtTime(.0001, now); overtoneGain.gain.exponentialRampToValueAtTime(.0045, now + .2); overtoneGain.gain.exponentialRampToValueAtTime(.0001, now + .66);
+        overtone.connect(overtoneGain).connect(state.audio.destination); overtone.start(now + .15); overtone.stop(now + .7);
+      }
     } catch (_) { /* browser may block audio; stay silent */ }
   }
 
@@ -873,13 +975,13 @@
     elements.scene.addEventListener('selectstart', blockNativeSceneGesture);
     elements.scene.addEventListener('touchstart', blockNativeSceneGesture, { passive: false });
     elements.scene.addEventListener('touchmove', blockNativeSceneGesture, { passive: false });
-    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible && !state.veilLifted) return; try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
+    elements.scene.addEventListener('pointerdown', (event) => { if (state.panelOpen || preserveControls(event)) return; event.preventDefault(); if (state.day === 1 && state.introVisible && !state.veilLifted) return; unlockAmbience(); try { elements.scene.setPointerCapture?.(event.pointerId); } catch (_) { /* synthetic or unsupported capture: continue with the contact */ } const c = contactFrom(event, 'begin'); contactResponse(c); });
     elements.scene.addEventListener('pointermove', (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, 'move'); contactResponse(c); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => elements.scene.addEventListener(name, (event) => { if (!state.contacts.has(event.pointerId)) return; const c = contactFrom(event, name === 'pointercancel' ? 'cancel' : 'end'); contactResponse(c); if (!state.contacts.size && state.pendingCompletion) scheduleCompletion(); }));
     bindPrimaryControls();
     window.addEventListener('resize', resize);
   }
-  function toggleSound() { state.sound = !state.sound; updateSettings(); persist(); }
+  function toggleSound() { state.sound = !state.sound; if (state.sound) unlockAmbience(); else { state.ambience.active = null; fadeAmbience(); } updateSettings(); persist(); }
   function updateSettings() {
     elements.sound.textContent = `SOUND ${state.sound ? 'ON' : 'OFF'}`; elements.sound.setAttribute('aria-pressed', String(state.sound));
     elements.panelSound.textContent = state.sound ? 'ON' : 'OFF'; elements.panelSound.setAttribute('aria-pressed', String(state.sound));
