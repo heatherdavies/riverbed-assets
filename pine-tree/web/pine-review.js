@@ -60,7 +60,7 @@
   ]);
   const DAY_THREE_CLEAR_CELL_TARGET = Math.ceil(DAY_THREE_VISIBLE_SOIL_CELLS.size * .9);
   const DAY_FIVE_COMPLETION_THRESHOLD = .74;
-  const DAY_NINE_COMPLETION_THRESHOLD = .65;
+  const DAY_NINE_COMPLETION_THRESHOLD = .48;
   const DAY_EIGHT_DETAILS = [
     { kind: 'needles', point: [.250, .508] },
     { kind: 'cone', point: [.426, .411] },
@@ -182,6 +182,7 @@
   if (state.personalStoryMode && !state.personalStoryAvailable) state.personalStoryMode = false;
   let dayTransitionToken = 0;
   let pendingDayTransition = null;
+  const warmedSceneTransitions = new Map();
 
   function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
   function completionThreshold() { if (state.day === 5) return DAY_FIVE_COMPLETION_THRESHOLD; return state.day === 9 ? DAY_NINE_COMPLETION_THRESHOLD : .999; }
@@ -317,6 +318,7 @@
     elements.completionTitle.textContent = title;
     elements.completionReflection.textContent = reflection;
     elements.completionReflection.hidden = !reflection;
+    elements.nextDay.disabled = false;
     elements.nextDay.textContent = next ? `CONTINUE TO ${next.title.toUpperCase()}` : 'RETURN TO DAY 1';
     elements.restartDay.textContent = state.day === 1 ? 'START AGAIN AT DAY 1' : 'START THE JOURNEY AGAIN';
     elements.scene.classList.add('practice-complete');
@@ -405,27 +407,52 @@
 
   function sceneImageSource(config) { return `${config.image}?v=20260821-day2-root-match-2`; }
 
+  function warmSceneTransition(nextDay) {
+    if (nextDay < 1 || nextDay > DAYS.length) return null;
+    const existing = warmedSceneTransitions.get(nextDay);
+    if (existing) return existing;
+    const nextConfig = DAYS.find((entry) => entry.day === nextDay);
+    const preload = new Image();
+    const warmed = { ready: false, promise: null };
+    warmed.promise = new Promise((resolve) => {
+      let settled = false;
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        warmed.ready = true;
+        resolve();
+      };
+      const decodeAndSettle = () => {
+        if (typeof preload.decode === 'function') preload.decode().catch(() => undefined).then(settle);
+        else settle();
+      };
+      preload.addEventListener('load', decodeAndSettle, { once: true });
+      preload.addEventListener('error', settle, { once: true });
+      preload.src = sceneImageSource(nextConfig);
+      if (preload.complete) decodeAndSettle();
+    });
+    warmedSceneTransitions.set(nextDay, warmed);
+    return warmed;
+  }
+
   function prepareSceneTransition(nextDay) {
     if (pendingDayTransition === nextDay) return;
     const sourceDay = state.day;
     pendingDayTransition = nextDay;
     const transitionToken = ++dayTransitionToken;
-    const nextConfig = DAYS.find((entry) => entry.day === nextDay);
-    const preload = new Image();
-    let settled = false;
+    const warmed = warmSceneTransition(nextDay);
+    if (warmed && !warmed.ready) {
+      elements.nextDay.disabled = true;
+      elements.nextDay.textContent = 'PREPARING NEXT DAY…';
+    }
     const continueToNextDay = () => {
-      if (settled) return;
-      settled = true;
       if (transitionToken !== dayTransitionToken || pendingDayTransition !== nextDay || state.day !== sourceDay) return;
       pendingDayTransition = null;
+      elements.nextDay.disabled = false;
       setDay(nextDay, true);
     };
-    preload.addEventListener('load', () => {
-      if (typeof preload.decode === 'function') preload.decode().catch(() => undefined).then(continueToNextDay);
-      else continueToNextDay();
-    }, { once: true });
-    preload.addEventListener('error', continueToNextDay, { once: true });
-    preload.src = sceneImageSource(nextConfig);
+    if (warmed) warmed.promise.then(continueToNextDay);
+    else continueToNextDay();
   }
 
   function setDay(day, scenePrepared = false) {
@@ -497,6 +524,7 @@
     renderNavigation();
     updateDayOneIntro();
     updatePersonalStoryUI();
+    if (state.day < DAYS.length) warmSceneTransition(state.day + 1);
     closePanel();
   }
 
@@ -888,7 +916,7 @@
         }
       });
     } else if (state.day === 9) {
-      const reveal = clamp(state.progress);
+      const reveal = clamp(state.progress / DAY_NINE_COMPLETION_THRESHOLD);
       const centreX = w * .53;
       const centreY = h * .53;
       const sceneRadius = Math.hypot(w, h) * (.17 + reveal * .92);
