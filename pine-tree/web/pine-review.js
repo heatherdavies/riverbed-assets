@@ -68,9 +68,9 @@
     { kind: 'sap', point: [.676, .560] },
   ];
   const AMBIENCE_SOURCES = {
-    roots: '../assets/audio/root-and-soil-ambience.mp3',
-    boughs: '../assets/audio/trunk-and-bough-ambience.mp3',
-    vista: '../assets/audio/weather-and-vista-ambience.mp3',
+    roots: '../assets/audio/root-and-soil-forest-air.mp3',
+    boughs: '../assets/audio/trunk-and-bough-forest-air.mp3',
+    vista: '../assets/audio/weather-and-vista-forest-air.mp3',
   };
   const COIL_HAPTIC_LANDMARKS = [.18, .36, .54, .70];
   const BRANCH_HAPTIC_LANDMARKS = [.24, .48, .72];
@@ -396,6 +396,15 @@
       if (settling) state.ambience.fadeFrame = requestAnimationFrame(frame);
     };
     state.ambience.fadeFrame = requestAnimationFrame(frame);
+  }
+  function silenceAmbience() {
+    cancelAnimationFrame(state.ambience.fadeFrame);
+    state.ambience.active = null;
+    state.ambience.players.forEach((player) => {
+      player.volume = 0;
+      player.pause();
+      try { player.currentTime = 0; } catch (_) { /* stream may not be seekable yet */ }
+    });
   }
   function unlockAmbience() {
     if (!state.sound) return;
@@ -981,7 +990,7 @@
     bindPrimaryControls();
     window.addEventListener('resize', resize);
   }
-  function toggleSound() { state.sound = !state.sound; if (state.sound) unlockAmbience(); else { state.ambience.active = null; fadeAmbience(); } updateSettings(); persist(); }
+  function toggleSound() { state.sound = !state.sound; if (state.sound) unlockAmbience(); else silenceAmbience(); updateSettings(); persist(); }
   function updateSettings() {
     elements.sound.textContent = `SOUND ${state.sound ? 'ON' : 'OFF'}`; elements.sound.setAttribute('aria-pressed', String(state.sound));
     elements.panelSound.textContent = state.sound ? 'ON' : 'OFF'; elements.panelSound.setAttribute('aria-pressed', String(state.sound));
