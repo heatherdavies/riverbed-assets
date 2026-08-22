@@ -46,6 +46,7 @@
     '2:7', '3:7', '4:7', '5:7', '6:7', '7:7', '8:7',
   ]);
   const DAY_THREE_CLEAR_CELL_TARGET = Math.ceil(DAY_THREE_VISIBLE_SOIL_CELLS.size * .9);
+  const DAY_NINE_COMPLETION_THRESHOLD = .65;
   const DAY_EIGHT_DETAILS = [
     { kind: 'needles', point: [.250, .508] },
     { kind: 'cone', point: [.426, .411] },
@@ -156,6 +157,7 @@
   let pendingDayTransition = null;
 
   function clamp(value, min = 0, max = 1) { return Math.max(min, Math.min(max, value)); }
+  function completionThreshold() { return state.day === 9 ? DAY_NINE_COMPLETION_THRESHOLD : .999; }
 
   function resetToDayOne() {
     state.completed.clear();
@@ -568,7 +570,7 @@
       case 9: { const out = Math.abs(dx) + Math.abs(dy) + speed * .03; state.progress = clamp(state.progress + out * .32); break; }
     }
     if (state.progress > before + .015 || contact.phase === 'begin') respond('contact', Math.max(move, speed, .18));
-    if (state.progress >= .999) queueCompletion();
+    if (state.progress >= completionThreshold()) queueCompletion();
   }
 
   function queueCompletion() {
@@ -592,7 +594,7 @@
 
   function assistedAdvance() {
     state.progress = clamp(state.progress + .16); state.material.soil = Math.max(state.material.soil, state.progress * .75); state.material.root = Math.max(state.material.root, state.progress * .75); state.material.bark = Math.max(state.material.bark, state.progress * .35); state.material.bough = Math.max(state.material.bough, state.progress * .3); state.material.needles = Math.max(state.material.needles, .16 + state.progress * .18);
-    respond('movement', .35); if (state.progress >= .999) queueCompletion();
+    respond('movement', .35); if (state.progress >= completionThreshold()) queueCompletion();
   }
 
   function completeDay() {
@@ -640,7 +642,7 @@
     const hold = clamp(elapsed / 3200);
     state.material.soil = Math.max(state.material.soil, hold * (.56 + (contact.pressure || .42) * .3));
     state.progress = Math.max(state.progress, hold);
-    if (state.progress >= .999) queueCompletion();
+    if (state.progress >= completionThreshold()) queueCompletion();
   }
 
   function draw(timestamp) {
