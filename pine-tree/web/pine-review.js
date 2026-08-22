@@ -761,7 +761,31 @@
         }
       });
     } else if (state.day === 9) {
-      ctx.fillStyle = `rgba(227,235,222,${state.progress * .12})`; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = `rgba(235,221,169,${state.progress * .42})`; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(w * (.5 - state.progress * .25), h * .57); ctx.quadraticCurveTo(w*.5,h*.5,w*(.5 + state.progress*.27),h*.47); ctx.stroke();
+      const reveal = clamp(state.progress);
+      const centreX = w * .53;
+      const centreY = h * .53;
+      const sceneRadius = Math.hypot(w, h) * (.17 + reveal * .92);
+      ctx.fillStyle = 'rgba(3, 21, 15, .84)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      const opening = ctx.createRadialGradient(centreX, centreY, sceneRadius * .54, centreX, centreY, sceneRadius);
+      opening.addColorStop(0, 'rgba(0,0,0,.99)');
+      opening.addColorStop(.72, 'rgba(0,0,0,.92)');
+      opening.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = opening;
+      ctx.beginPath();
+      ctx.arc(centreX, centreY, sceneRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      if (reveal > .02) {
+        ctx.strokeStyle = `rgba(235,221,169,${Math.min(.42, reveal * .48)})`;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(centreX - sceneRadius * .72, centreY + sceneRadius * .08);
+        ctx.quadraticCurveTo(centreX, centreY - sceneRadius * .12, centreX + sceneRadius * .72, centreY - sceneRadius * .16);
+        ctx.stroke();
+      }
     }
     ctx.restore();
   }
