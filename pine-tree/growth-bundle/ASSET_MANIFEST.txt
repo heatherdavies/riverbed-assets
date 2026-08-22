@@ -1,0 +1,12 @@
+growth-bundle/assets/day-01-rooting-the-seed.webp
+growth-bundle/assets/day-01-seed-buried.png
+growth-bundle/assets/day-02-deep-anchor.webp
+growth-bundle/assets/day-03-first-light.webp
+growth-bundle/assets/day-03-loose-soil-overlay-clean.webp
+growth-bundle/assets/day-03-seedling-reveal.png
+growth-bundle/assets/day-04-developing-trunk.webp
+growth-bundle/assets/day-05-stronger-structure.webp
+growth-bundle/assets/day-06-branching-out.webp
+growth-bundle/assets/day-07-weathering-growth.webp
+growth-bundle/assets/day-08-forming-features.webp
+growth-bundle/assets/day-09-full-maturity.webp

@@ -1,0 +1,50 @@
+{
+  "name": "pine-tree-growth-module",
+  "version": "1.0.0-growth-handoff",
+  "private": true,
+  "entrypoint": "src/index.ts",
+  "platforms": ["ios", "android"],
+  "peerDependencies": {
+    "expo": "SDK-compatible",
+    "expo-gl": "SDK-compatible",
+    "expo-haptics": "SDK-compatible",
+    "react": "SDK-compatible",
+    "react-native": "SDK-compatible",
+    "react-native-gesture-handler": "SDK-compatible"
+  },
+  "assets": {
+    "sceneImages": [
+      "assets/day-01-rooting-the-seed.webp",
+      "assets/day-02-deep-anchor.webp",
+      "assets/day-03-first-light.webp",
+      "assets/day-04-developing-trunk.webp",
+      "assets/day-05-stronger-structure.webp",
+      "assets/day-06-branching-out.webp",
+      "assets/day-07-weathering-growth.webp",
+      "assets/day-08-forming-features.webp",
+      "assets/day-09-full-maturity.webp"
+    ],
+    "overlays": [
+      "assets/day-01-seed-buried.png",
+      "assets/day-03-loose-soil-overlay-clean.webp",
+      "assets/day-03-seedling-reveal.png"
+    ]
+  },
+  "sensory": {
+    "nativeHaptics": "included",
+    "nativeAudio": "deferred_no_assets_included",
+    "browserAudio": "not_included"
+  },
+  "rendering": {
+    "nativeScreenShell": "included",
+    "glRendererLifecycleSeam": "included",
+    "productionMaterialRenderer": "integration_stage"
+  },
+  "excluded": [
+    "browser_review",
+    "review_server",
+    "browser_audio",
+    "generated_ambience_experiments",
+    "browser_haptic_fallback"
+  ]
+}
