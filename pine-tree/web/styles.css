@@ -111,8 +111,10 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(46px, 9
 .practice-intro.visible { display: block; animation: intro-arrive 700ms ease both; }
 .practice-intro h1 { margin: 0; max-width: 320px; color: var(--ivory); font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(36px, 9vw, 52px); font-weight: 400; letter-spacing: -.035em; line-height: .9; }
 .intro-intent { margin: 9px 0 0; color: rgba(245,240,221,.88); font-family: "Cormorant Garamond", Georgia, serif; font-size: 20px; font-style: italic; }
+.intro-reflection { max-width: 360px; margin: 14px 0 0; color: rgba(230, 205, 119, .98); font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(20px, 5.1vw, 24px); font-style: italic; font-weight: 500; line-height: 1.05; letter-spacing: -.012em; text-shadow: 0 2px 14px rgba(0,0,0,.48); }
 .intro-instruction { max-width: 355px; margin: 13px 0 0; color: var(--muted-ivory); font-size: 13px; line-height: 1.48; }
-.intro-dismiss { appearance: none; display: inline-flex; margin-top: 16px; padding: 9px 12px; border: 1px solid rgba(230, 214, 153, .55); border-radius: 2px; background: rgba(19, 69, 48, .35); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
+.intro-reflection-prompt { margin: 9px 0 0; color: rgba(245,240,221,.7); font-size: 12px; line-height: 1.35; }
+.intro-dismiss { appearance: none; display: inline-flex; margin-top: 14px; padding: 9px 12px; border: 1px solid rgba(230, 214, 153, .55); border-radius: 2px; background: rgba(19, 69, 48, .35); color: var(--ivory); cursor: pointer; font-size: 9px; font-weight: 600; letter-spacing: .14em; }
 
 .menu-button { position: absolute; right: 23px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 9px); z-index: 4; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; color: var(--ivory); font-size: 30px; line-height: 1; box-shadow: 0 8px 22px rgba(0,0,0,.24), inset 0 0 24px rgba(87, 119, 69,.25); }
 .menu-button span[aria-hidden] { transform: rotate(-25deg); display: block; }

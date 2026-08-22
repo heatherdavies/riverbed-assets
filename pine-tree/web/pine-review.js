@@ -1,6 +1,19 @@
 (() => {
   'use strict';
 
+  const DAY_OPENING_REFLECTIONS = [
+    'What intention are you ready to place in the soil?',
+    'What holds you steady when the ground beneath you shifts?',
+    'What quiet beginning is ready to meet the light?',
+    'What in you is ready to rise with quiet strength?',
+    'Where might yielding become a deeper kind of strength?',
+    'What within you is ready to turn toward the light?',
+    'How might you bend with the wind and remain rooted?',
+    'What quiet wisdom in you is asking to be seen?',
+    'What horizon opens when you let yourself widen?',
+  ];
+  const DAY_OPENING_REFLECTION_PROMPT = 'Let the thought settle, then press Begin Practice.';
+
   const DAYS = [
     ['Grounding & Anchoring', 'Planting the Seed', 'Planting a purpose or intention.', 'Rest your finger on the seed, then press it gently into the soil.', 'What intention are you ready to place in the soil?', 'PRESS INTO SOIL', 'press-hold', '../assets/day-01-rooting-the-seed.webp'],
     ['Grounding & Anchoring', 'Deep Anchor', 'Building foundational strength.', 'Draw one unhurried line down the taproot’s path.', 'Strength begins below the surface.', 'DRAW DOWNWARD', 'downward-drag', '../assets/day-02-deep-anchor-match-endpoint.webp'],
@@ -12,7 +25,7 @@
     ['Weathering & Completing', 'Forming Features', 'Integrating wisdom and complexity.', 'Touch five warm points of sap or young cones. Each touch will reveal a quiet glow.', 'Detail holds a living history.', 'TOUCH 5 DETAILS', 'feature-touch', '../assets/day-08-forming-features.webp'],
     ['Weathering & Completing', 'Full Maturity', 'Completed growth, peace, and deep rootedness.', 'Sweep outward from the trunk to reveal the tree’s wider forest landscape.', 'You are rooted, complete, and still becoming.', 'OPEN THE FOREST', 'landscape-release', '../assets/day-09-full-maturity.webp'],
   ].map(([stage, title, intent, instruction, contemplation, prompt, gesture, image], index) => ({
-    day: index + 1, stage, title, intent, instruction, contemplation, prompt, gesture, image,
+    day: index + 1, stage, title, intent, instruction, contemplation, prompt, gesture, image, openingReflection: DAY_OPENING_REFLECTIONS[index],
   }));
 
   const COMPLETIONS = [
@@ -111,7 +124,7 @@
     scene: $('#scene'), image: $('#sceneImage'), dayTwoImage: $('#dayTwoSceneImage'), windImage: $('#windSceneImage'), buriedImage: $('#buriedSceneImage'), dayThreeSoil: $('#dayThreeSoilTexture'), canvas: $('#materialCanvas'), rail: $('#dayRail'), target: $('.seed-target'),
     stage: $('#stageText'), title: $('#titleText'), intent: $('#intentText'), instruction: $('#instructionText'),
     prompt: $('#gesturePromptText'), copy: $('#ritualCopy'), completion: $('#completionText'), assist: $('#assistButton'), returnToSeed: $('#returnToSeedButton'),
-    intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introInstruction: $('#introInstruction'), introDismiss: $('#introDismiss'),
+    intro: $('#dayOneIntro'), introTitle: $('#introTitle'), introIntent: $('#introIntent'), introReflection: $('#introReflection'), introInstruction: $('#introInstruction'), introReflectionPrompt: $('#introReflectionPrompt'), introDismiss: $('#introDismiss'),
     veil: $('#dayOneVeil'), action: $('#dayOneAction'), actionInstruction: $('#dayOneActionInstruction'), howToBegin: $('#howToBeginButton'),
     dayOneCompletion: $('#dayOneCompletion'), completionKicker: $('#completionKicker'), completionTitle: $('#completionTitle'), completionReflection: $('#completionReflection'), nextDay: $('#nextDayButton'), restartDay: $('#restartDayButton'), gestureHint: $('#gestureHint'), gestureHintText: $('#gestureHintText'),
     menu: $('#menuButton'), panel: $('#sidePanel'), scrim: $('#scrim'), closePanel: $('#closePanelButton'),
@@ -369,7 +382,9 @@
     elements.instruction.textContent = config.instruction;
     elements.introTitle.textContent = config.title;
     elements.introIntent.textContent = config.intent;
+    elements.introReflection.textContent = config.openingReflection;
     elements.introInstruction.textContent = config.instruction;
+    elements.introReflectionPrompt.textContent = state.day === 1 ? '' : DAY_OPENING_REFLECTION_PROMPT;
     if (state.day === 1) elements.actionInstruction.innerHTML = '<span>Rest your finger on the seed,</span><span>then press it gently into the soil.</span>';
     else elements.actionInstruction.textContent = config.instruction;
     elements.introDismiss.textContent = state.day === 1 ? 'BEGIN WITH THE SEED' : 'BEGIN PRACTICE';
