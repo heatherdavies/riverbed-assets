@@ -4782,14 +4782,24 @@ No matching component was found for:
   // Bilinear state reads prevent an angled sub-texel advection step from
   // creating the staircase artifacts that nearest render-target reads would
   // otherwise introduce. This remains the same live height/velocity state.
+  // Only the horizontal axis is periodic. A wave that reaches one side
+  // continues at the other, preventing left/right reflection or pinning.
+  // The y axis deliberately retains its inlet/outlet behavior.
+  vec2 horizontalWrap(vec2 p) {
+    return vec2(
+      fract(p.x),
+      clamp(p.y, uTexel.y * 1.5, 1.0 - uTexel.y * 1.5)
+    );
+  }
   vec4 sampleState(vec2 p) {
-    vec2 grid = p / uTexel - 0.5;
+    vec2 wrapped = horizontalWrap(p);
+    vec2 grid = wrapped / uTexel - 0.5;
     vec2 cell = floor(grid);
     vec2 fraction = fract(grid);
-    vec2 a = (cell + vec2(0.5, 0.5)) * uTexel;
-    vec2 b = (cell + vec2(1.5, 0.5)) * uTexel;
-    vec2 c = (cell + vec2(0.5, 1.5)) * uTexel;
-    vec2 d = (cell + vec2(1.5, 1.5)) * uTexel;
+    vec2 a = horizontalWrap((cell + vec2(0.5, 0.5)) * uTexel);
+    vec2 b = horizontalWrap((cell + vec2(1.5, 0.5)) * uTexel);
+    vec2 c = horizontalWrap((cell + vec2(0.5, 1.5)) * uTexel);
+    vec2 d = horizontalWrap((cell + vec2(1.5, 1.5)) * uTexel);
     vec4 ab = mix(texture2D(uPrev, a), texture2D(uPrev, b), fraction.x);
     vec4 cd = mix(texture2D(uPrev, c), texture2D(uPrev, d), fraction.x);
     return mix(ab, cd, fraction.y);
@@ -4800,10 +4810,9 @@ No matching component was found for:
     // A small upper-left read offset carries real state features toward the
     // lower-right in the next frame. Every surface cue still comes from this
     // live height-and-velocity buffer; the bed itself is never shifted.
-    vec2 advectedUv = clamp(
-      uv + uFlowStep,
-      uTexel * 1.5,
-      vec2(1.0) - uTexel * 1.5
+    vec2 advectedUv = vec2(
+      fract(uv.x + uFlowStep.x),
+      clamp(uv.y + uFlowStep.y, uTexel.y * 1.5, 1.0 - uTexel.y * 1.5)
     );
     vec4 current = sampleState(advectedUv);
     float h = current.r;
@@ -5014,3 +5023,5 @@ No matching component was found for:
 /* FLOW_VARIED_TOP_INLET_EXPERIMENT */
 
 /* FLOW_TUNED_VARIED_TOP_INLET */
+
+/* FLOW_SEAMLESS_HORIZONTAL_BOUNDARY_EXPERIMENT */

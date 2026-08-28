@@ -11,3 +11,7 @@ Replacing the uniform source with top-edge local impulses successfully concentra
 ## Tuned top-impulse observation
 
 After widening and spacing the hidden-top impulses and increasing vertical transport, the visible field receives a clearer sequence of individually generated wave structures. New energy remains traceable to the upper entry region, and older structures continue toward the lower field while the riverbed landmarks remain stationary. The animation intentionally retains variable wave shapes rather than imposing a uniform repeating band.
+
+## Seamless horizontal-boundary validation
+
+The horizontal sampler now wraps the live simulation state rather than clamping it at the left and right edges. The two preview frames show that side-edge state remains continuous while top-originated disturbances retain the vertical travel model. The top inlet and lower outlet are still the only intentional directional boundaries, and the underlying riverbed remains stationary.
