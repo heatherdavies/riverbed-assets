@@ -4809,13 +4809,14 @@ No matching component was found for:
     h *= mix(1.0, mix(0.970, 1.0, edge), uContained);
     h += ambient * uCurrentStrength * mix(1.0, edge, uContained);
 
-    // Broad, low-amplitude crests are a second live forcing term in the same
-    // height field. In Flow's UV orientation, the positive time phase carries
-    // the crests visually from the top of the screen down toward the bottom.
-    float rollingPhase = uv.y * 28.0 + uTime * 2.45
-                       + sin(uv.x * 5.0 + uTime * 0.20) * 0.62;
-    float rollingCurrent = sin(rollingPhase + h * 2100.0);
-    h += rollingCurrent * 0.000055 * mix(1.0, edge, uContained);
+    // Source-of-truth directional crest field. In Flow's UV orientation, the
+    // positive time phase carries each broad leading crest from top to bottom.
+    // The small x component merely keeps the live water organic; it cannot
+    // compete with or obscure the downward crest direction.
+    float downwardPhase = uv.y * 17.5 + uTime * 3.10
+                        + sin(uv.x * 2.2 + uTime * 0.14) * 0.15;
+    float downwardCrest = sin(downwardPhase + h * 1600.0);
+    h += downwardCrest * 0.000090 * mix(1.0, edge, uContained);
 
     if (uPointerDown > 0.5) {
       float distanceToStroke = segmentDistance(uv, uPrevPointer, uPointer);
@@ -4887,17 +4888,18 @@ No matching component was found for:
     vec2 broadGradient = vec2(hL - hR, hD - hU) * (38.0 * uReadability);
     float travel = uDirection * uTime;
 
-    // These crests share the live solver's height and time state. The nearly
-    // horizontal bands progress top-to-bottom, with modest cross-current
-    // meander so they read as rolling shallow-water waves—not a uniform shine.
-    float rollPhase = uv.y * 28.0 + travel * 2.45
-                    + sin(uv.x * 5.0 + travel * 0.20) * 0.62
-                    + h * 4600.0;
-    float rollDetail = uv.y * 61.0 + uv.x * 7.0 + travel * 4.60 + h * 6100.0;
-    float rollCrest = sin(rollPhase);
+    // Downward travelling, nearly horizontal crest faces dominate the water
+    // read. The narrow leading crest has only a slight x meander, while small
+    // height-coupled detail keeps the bands from becoming graphic stripes.
+    float downPhase = uv.y * 17.5 + travel * 3.10
+                    + sin(uv.x * 2.2 + travel * 0.14) * 0.15
+                    + h * 3400.0;
+    float crestWave = sin(downPhase);
+    float leadingCrest = pow(max(crestWave, 0.0), 1.65);
+    float trailingDetail = sin(uv.y * 56.0 + uv.x * 3.0 + travel * 4.1 + h * 5600.0);
     vec2 fineRipple = vec2(
-      cos(rollPhase + uv.x * 2.8) * 0.017 + sin(rollDetail) * 0.008,
-      rollCrest * 0.066 + sin(rollDetail) * 0.020
+      cos(downPhase) * 0.008 + trailingDetail * 0.003,
+      crestWave * 0.105 + trailingDetail * 0.009
     ) * uReadability;
     vec2 surfaceSlope = broadGradient * 0.55 + fineRipple;
     float slope = length(surfaceSlope);
@@ -4978,3 +4980,5 @@ No matching component was found for:
 /* FLOW_CURRENT_REFERENCE_INTEGRATED */
 
 /* FLOW_TOP_TO_BOTTOM_ROLLING_WAVES */
+
+/* FLOW_DOMINANT_DOWNWARD_CRESTS */

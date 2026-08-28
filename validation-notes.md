@@ -37,3 +37,13 @@ The updated public preview rendered successfully in two captures taken roughly s
 ## Source and runtime checks
 
 The refined bundle passes JavaScript syntax validation. The rolling-wave patch is idempotent, and the bundle retains the explicit current-texture display binding and ping-pong target swap. It contains the intended low-amplitude solver injection and top-to-bottom display crest phase, while the previously removed independently scrolling wind field, time-scrolling caustic sparkle field, and contour diagnostic code remain absent. Browser-console review after the refinement returned no errors.
+
+# Dominant top-to-bottom crest validation
+
+## Two-frame public-preview check
+
+The refined public preview rendered correctly in two captures taken approximately twenty-seven seconds apart. The stones and riverbed landmarks remain fixed, while the more widely spaced, nearly horizontal crest faces visibly shift downward. The reduced lateral meander makes the intended top-to-bottom travel clearer than the preceding version, without introducing a scrolling image layer, contour field, or large cellular pattern.
+
+## Source and runtime checks
+
+The refined bundle and its repeatable patch script pass syntax validation. The implementation preserves the explicit ping-pong swap and per-frame rebound of the current read texture to the display shader. The source contains the required downward-phase live solver forcing and height-derived crest normal, while independently scrolling wind noise, time-scrolling sparkle caustics, and contour diagnostics remain absent. The browser console reported no runtime or shader errors.
