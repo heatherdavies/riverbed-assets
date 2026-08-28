@@ -57,3 +57,13 @@ The corrected preview rendered successfully in two captures separated by roughly
 ## Source and runtime checks
 
 The browser console reported no errors. The final bundle and cleanup script pass JavaScript syntax validation, and the cleanup patch is idempotent. The solver contains the corrected negative-time downward phase and the display uses that same phase family. The former trailing-detail term, high-frequency secondary vertical layer, stronger ambiguous crest amplitude, independently scrolling wind field, scrolling sparkle layer, and contour diagnostic code are absent. The ping-pong swap and per-frame current-texture rebound remain in place.
+
+# Reviewed downstream-advection validation
+
+## Two-frame public-preview check
+
+The reviewed downstream-advection implementation loaded successfully in the public preview. Across two frames captured nineteen seconds apart, the same riverbed landmarks remain stable and clear while the water-surface response changes without the former broad multi-directional refraction dominating the image. The water reads as a quieter, directional shallow current rather than as a boiling set of competing crests.
+
+## Source and runtime checks
+
+The direct integration passes JavaScript syntax validation and reports no browser-console errors. The live simulation now samples the prior ping-pong state at an upstream offset on every pass and receives a small frame-delta-scaled downstream step. The display still binds the swapped read texture every frame, but now uses a reduced broad-gradient gain and reduced refraction scale. The former multi-layer crest details remain absent, and the stationary riverbed is not independently translated or scrolled.

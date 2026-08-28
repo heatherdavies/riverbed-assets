@@ -37,7 +37,7 @@ Flow starts in the **open current** configuration. The retained containment cont
 
 The display shader samples a stationary riverbed image and derives its response from the current height texture. It includes the reference’s amplified broad height gradient, a low-amplitude live rolling-wave field travelling visually from top to bottom, small height-phased ripple detail, a small refraction offset, non-scrolling caustic flecks warped by the live height/slope field, and restrained glints.
 
-The final crest treatment injects **one sparse, nearly horizontal live crest family** into the existing height-and-velocity solver and renders it through the height-derived normal. Its visual phase is calibrated to travel from the top of the screen toward the bottom. Lateral meander and trailing ripple layers are deliberately negligible, because competing bright crest directions make the water’s overall flow ambiguous. The crests are not an animated background layer or a scrolling texture. The display intentionally excludes animated background images, contour diagnostics, independently scrolling caustics, broad cellular patterns, and moving topographic-line treatments.
+The final treatment **advects the previous height-and-velocity state downstream** on every ping-pong simulation pass. This carries real solver features—including touch ripples and the ambient current—in one direction, rather than placing a directional animation over an isotropic field. The sparse, nearly horizontal crest family is a low-amplitude reinforcement of that same transport. Its display response uses restrained broad-gradient refraction so the stationary stones remain clear instead of exposing multi-directional solver noise. Lateral meander and trailing ripple layers are deliberately negligible, because competing bright crest directions make the water’s overall flow ambiguous. The crests are not an animated background layer or a scrolling texture. The display intentionally excludes animated background images, contour diagnostics, independently scrolling caustics, broad cellular patterns, and moving topographic-line treatments.
 
 The default background is the validated natural-riverbed asset at:
 
@@ -55,6 +55,7 @@ The repository currently contains the shipped web bundle rather than the origina
 | `scripts/install-reference-riverbed.js` | Copies the validated stationary riverbed asset into the web bundle and ensures the default scene uses it. |
 | `scripts/patch-rolling-waves.js` | Adds restrained top-to-bottom rolling crests to the existing live height field and its height-derived display response. |
 | `scripts/patch-dominant-downward-crests.js` | Strengthens the broad crest direction in the live solver and display response. |
-| `scripts/patch-unidirectional-downward-flow.js` | Final directional cleanup: reverses the visually upward broad phase and removes conflicting lateral/trailing crest layers. |
+| `scripts/patch-unidirectional-downward-flow.js` | Initial directional cleanup that removes conflicting lateral/trailing crest layers. |
+| `scripts/apply-reviewed-advected-flow.js` | Final root correction: advects the live height-and-velocity state downstream and reduces isotropic refraction so the physical flow direction is readable. |
 
 After reapplying a bundle patch, launch the local Flow web bundle and confirm that the stones remain stationary while top-to-bottom rolling crests, small refractive distortions, fine ripples, and glints visibly evolve. Touch-drag should add a local ripple without suppressing the ambient current.
