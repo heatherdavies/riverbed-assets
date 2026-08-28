@@ -47,3 +47,13 @@ The refined public preview rendered correctly in two captures taken approximatel
 ## Source and runtime checks
 
 The refined bundle and its repeatable patch script pass syntax validation. The implementation preserves the explicit ping-pong swap and per-frame rebound of the current read texture to the display shader. The source contains the required downward-phase live solver forcing and height-derived crest normal, while independently scrolling wind noise, time-scrolling sparkle caustics, and contour diagnostics remain absent. The browser console reported no runtime or shader errors.
+
+# Unidirectional downward-flow cleanup validation
+
+## Two-frame public-preview check
+
+The corrected preview rendered successfully in two captures separated by roughly eighteen seconds. The display has been simplified to sparse, soft horizontal surface crests over a stable, recognizable riverbed. The prior competing lateral/trailing crest texture is no longer visually dominant, and the remaining live distortion is consistent with a single top-to-bottom flow direction.
+
+## Source and runtime checks
+
+The browser console reported no errors. The final bundle and cleanup script pass JavaScript syntax validation, and the cleanup patch is idempotent. The solver contains the corrected negative-time downward phase and the display uses that same phase family. The former trailing-detail term, high-frequency secondary vertical layer, stronger ambiguous crest amplitude, independently scrolling wind field, scrolling sparkle layer, and contour diagnostic code are absent. The ping-pong swap and per-frame current-texture rebound remain in place.
