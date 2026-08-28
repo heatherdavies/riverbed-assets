@@ -4782,24 +4782,24 @@ No matching component was found for:
   // Bilinear state reads prevent an angled sub-texel advection step from
   // creating the staircase artifacts that nearest render-target reads would
   // otherwise introduce. This remains the same live height/velocity state.
-  // Only the horizontal axis is periodic. A wave that reaches one side
-  // continues at the other, preventing left/right reflection or pinning.
-  // The y axis deliberately retains its inlet/outlet behavior.
-  vec2 horizontalWrap(vec2 p) {
+  // State samples at the sides clamp only to the nearest valid cell. A
+  // broad sponge layer below removes outgoing energy before it reaches this
+  // edge, so waves leave rather than reflecting or returning from the other.
+  vec2 openBoundaryUv(vec2 p) {
     return vec2(
-      fract(p.x),
+      clamp(p.x, uTexel.x * 1.5, 1.0 - uTexel.x * 1.5),
       clamp(p.y, uTexel.y * 1.5, 1.0 - uTexel.y * 1.5)
     );
   }
   vec4 sampleState(vec2 p) {
-    vec2 wrapped = horizontalWrap(p);
-    vec2 grid = wrapped / uTexel - 0.5;
+    vec2 openUv = openBoundaryUv(p);
+    vec2 grid = openUv / uTexel - 0.5;
     vec2 cell = floor(grid);
     vec2 fraction = fract(grid);
-    vec2 a = horizontalWrap((cell + vec2(0.5, 0.5)) * uTexel);
-    vec2 b = horizontalWrap((cell + vec2(1.5, 0.5)) * uTexel);
-    vec2 c = horizontalWrap((cell + vec2(0.5, 1.5)) * uTexel);
-    vec2 d = horizontalWrap((cell + vec2(1.5, 1.5)) * uTexel);
+    vec2 a = openBoundaryUv((cell + vec2(0.5, 0.5)) * uTexel);
+    vec2 b = openBoundaryUv((cell + vec2(1.5, 0.5)) * uTexel);
+    vec2 c = openBoundaryUv((cell + vec2(0.5, 1.5)) * uTexel);
+    vec2 d = openBoundaryUv((cell + vec2(1.5, 1.5)) * uTexel);
     vec4 ab = mix(texture2D(uPrev, a), texture2D(uPrev, b), fraction.x);
     vec4 cd = mix(texture2D(uPrev, c), texture2D(uPrev, d), fraction.x);
     return mix(ab, cd, fraction.y);
@@ -4811,7 +4811,7 @@ No matching component was found for:
     // lower-right in the next frame. Every surface cue still comes from this
     // live height-and-velocity buffer; the bed itself is never shifted.
     vec2 advectedUv = vec2(
-      fract(uv.x + uFlowStep.x),
+      clamp(uv.x + uFlowStep.x, uTexel.x * 1.5, 1.0 - uTexel.x * 1.5),
       clamp(uv.y + uFlowStep.y, uTexel.y * 1.5, 1.0 - uTexel.y * 1.5)
     );
     vec4 current = sampleState(advectedUv);
@@ -4848,6 +4848,13 @@ No matching component was found for:
       h += lip * uDropCrater * 0.35;
     }
 
+    // Soft open side exits: outgoing surface energy is absorbed over an 11%
+    // buffer on either side. This prevents a standing edge or rebound while
+    // leaving the central riverbed and vertical current visually untouched.
+    float sideExit = smoothstep(0.0, 0.11, uv.x)
+                   * smoothstep(0.0, 0.11, 1.0 - uv.x);
+    h *= mix(0.74, 1.0, sideExit);
+    v *= mix(0.58, 1.0, sideExit);
     gl_FragColor = vec4(h, v, 0.0, 1.0);
   }
 `;function kX(o=1){const{gl:e}=tT(),t=ee.useRef(o);t.current=o;const a=JI,l=Math.round(JI/Math.max(o,.1)),u=ee.useMemo(()=>{const re={type:Vc,format:Qa,minFilter:Ni,magFilter:Ni,wrapS:Za,wrapT:Za,depthBuffer:!1,stencilBuffer:!1};let ce=new zo(a,l,re),te=new zo(a,l,re);const K=new kM,le=new rg(-1,1,1,-1,0,1),se=new xs({vertexShader:OX,fragmentShader:LX,uniforms:{uPrev:{value:ce.texture},uTexel:{value:new st(1/a,1/l)},uDamping:{value:.9965},uWaveSpeed:{value:.22},uFlowStep:{value:new st(0,0)},uTime:{value:0},uCurrentStrength:{value:.00035},uDirection:{value:1},uContained:{value:0},uPointer:{value:new st(.5,.5)},uPrevPointer:{value:new st(.5,.5)},uPointerDown:{value:0},uPointerRadius:{value:.07},uPointerStrength:{value:.05},uDropActive:{value:0},uDropPos:{value:new st(.5,.5)},uDropRadius:{value:0},uDropWidth:{value:.02},uDropCrater:{value:0},uDropRing:{value:0},uAspect:{value:new st(1,1)},uBoundaryAbsorb:{value:1}}}),Te=new Pr(new eg(2,2),se);return K.add(Te),{rtA:ce,rtB:te,scene:K,camera:le,material:se}},[]),f=ee.useRef(new st(.5,.5)),p=ee.useRef(new st(.5,.5)),m=ee.useRef(!1),v=ee.useRef(0),_=ee.useRef(.6),x=ee.useRef(!1),w=ee.useRef(!1),S=ee.useRef(0),T=ee.useRef(0),D=ee.useRef(1),R=ee.useRef(!1),A=ee.useRef(0),P=ee.useRef(0),inletTimerRef=ee.useRef(.18),I=ee.useRef([]),k=re=>{_.current=Math.max(0,Math.min(1,re))},H=re=>{x.current=re},B=re=>{w.current=re},W=re=>{R.current=re},L=re=>{A.current=Math.max(0,re)},z=(re,ce,te)=>{te&&!m.current&&(v.current=0,p.current.set(re,ce)),f.current.set(re,ce),m.current=te},j=(re,ce,te=1,K=1)=>{I.current.push({x:re,y:ce,scale:te,force:K}),I.current.length>40&&I.current.splice(0,I.current.length-40)},J=(re,ce,te,K)=>{j(re,ce,K?K/.03:1,te/.03)},Z=ee.useRef(u.rtA.texture);return rN((re,ce)=>{const{material:te,scene:K,camera:le}=u,se=Math.min(ce,.05);te.uniforms.uTime.value+=se,te.uniforms.uFlowStep.value.set(0,se*.032),te.uniforms.uCurrentStrength.value=.00035,te.uniforms.uDirection.value=1,te.uniforms.uContained.value=0;
@@ -5025,3 +5032,5 @@ No matching component was found for:
 /* FLOW_TUNED_VARIED_TOP_INLET */
 
 /* FLOW_SEAMLESS_HORIZONTAL_BOUNDARY_EXPERIMENT */
+
+/* FLOW_OPEN_HORIZONTAL_EXIT_EXPERIMENT */

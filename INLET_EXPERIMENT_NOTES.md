@@ -15,3 +15,7 @@ After widening and spacing the hidden-top impulses and increasing vertical trans
 ## Seamless horizontal-boundary validation
 
 The horizontal sampler now wraps the live simulation state rather than clamping it at the left and right edges. The two preview frames show that side-edge state remains continuous while top-originated disturbances retain the vertical travel model. The top inlet and lower outlet are still the only intentional directional boundaries, and the underlying riverbed remains stationary.
+
+## Open horizontal-exit validation
+
+The periodic left/right wrap has been removed. The latest two-frame preview shows no opposite-side re-entry cue: lateral wave energy enters a broad absorbing side buffer and decays rather than returning into the field. The vertical source remains above the display sample and the lower outflow remains in place, so the only intended directional transport is from top to bottom.
