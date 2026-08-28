@@ -77,3 +77,13 @@ The display-only overscan rendered successfully in two public-preview captures s
 ## Source and runtime checks
 
 The final bundle and repeatable overscan patch pass syntax validation, and the patch is idempotent. The display samples `uHeight` only through the bounded interior `simUv`, while the refraction lookup for the stationary riverbed remains based on the original screen `uv`. The live read-target binding and ping-pong target swap remain present. The browser console reported no errors.
+
+# Gentle downstream styling validation
+
+## Two-frame public-preview check
+
+The display-only styling cue rendered successfully in two captures taken seventeen seconds apart. The stationary riverbed remains natural and legible. The added crest light remains restrained rather than forming graphic bands; it follows the existing live downward crest phase and does not introduce a separate moving image, directional texture layer, or upper-edge conflict.
+
+## Source and runtime checks
+
+The styled bundle and its repeatable patch script pass JavaScript syntax validation. The cue is inserted only in the final display-lighting stage after the existing live height-derived color and lighting have been assembled. The source retains the frame-delta downstream-advection update, live swapped-texture rebound, presentation overscan, and original stationary riverbed coordinates. Browser-console review reported no errors.

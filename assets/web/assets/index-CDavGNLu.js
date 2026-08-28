@@ -4961,6 +4961,15 @@ No matching component was found for:
       color = max(color, boosted * uLightning);
     }
 
+    // Gentle downstream-facing crest light. This is display-only: the moving
+    // crest phase is already part of the live height field, and the riverbed
+    // remains sampled at its original, stationary screen coordinates.
+    float crestMask = pow(max(crestWave, 0.0), 3.4);
+    float downstreamFace = smoothstep(0.004, 0.030, -surfaceSlope.y);
+    float surfaceDetail = smoothstep(0.006, 0.045, slope);
+    float flowLight = crestMask * mix(0.38, 1.0, downstreamFace) * surfaceDetail;
+    color += vec3(0.028, 0.067, 0.052) * flowLight * uReadability;
+
     float vignette = 1.0 - smoothstep(0.34, 0.82, length(uv - 0.5));
     color *= 0.72 + vignette * 0.28;
     gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
@@ -5000,3 +5009,5 @@ No matching component was found for:
 /* FLOW_REVIEWED_ADVECTED_DOWNSTREAM_FLOW */
 
 /* FLOW_CLEAN_ENTRY_PRESENTATION_OVERSCAN */
+
+/* FLOW_GENTLE_DOWNSTREAM_STYLING */
