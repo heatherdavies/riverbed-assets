@@ -23,3 +23,17 @@ The rendered canvas is present at 1280 × 1100 pixels. The browser console conta
 ## Interaction check
 
 A synthetic touch-drag was delivered to the live water canvas. The Flow pointer handler accepted the event sequence, and the subsequent rendered frame retained the directional, height-driven water movement while showing local additional surface disturbance. This confirms the required touch ripple path remains present without replacing the ambient current.
+
+# Rolling-wave refinement validation
+
+## Original checkpoint
+
+The previously approved implementation was preserved before refinement as the annotated Git tag `Original`, pointing to commit `170d00b` (`Integrate validated live water current`). The checkpoint tag was also published to the remote repository.
+
+## Public-preview visual check
+
+The updated public preview rendered successfully in two captures taken roughly sixteen seconds apart. The river stones remain recognizable and fixed in place, while low-amplitude, broadly horizontal crest bands travel visually from the top of the screen toward the bottom. Their cross-current meander is subtle and height-coupled; the scene continues to read as shallow water rather than as a scrolling image, a cellular pattern, or a contour map.
+
+## Source and runtime checks
+
+The refined bundle passes JavaScript syntax validation. The rolling-wave patch is idempotent, and the bundle retains the explicit current-texture display binding and ping-pong target swap. It contains the intended low-amplitude solver injection and top-to-bottom display crest phase, while the previously removed independently scrolling wind field, time-scrolling caustic sparkle field, and contour diagnostic code remain absent. Browser-console review after the refinement returned no errors.

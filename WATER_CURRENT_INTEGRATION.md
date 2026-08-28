@@ -35,9 +35,9 @@ Flow starts in the **open current** configuration. The retained containment cont
 
 ## Transferred display behavior
 
-The display shader samples a stationary riverbed image and derives its response from the current height texture. It includes the reference’s amplified broad height gradient, height-phased fine directional ripples, small refraction offset, non-scrolling caustic flecks warped by the live height/slope field, and restrained glints.
+The display shader samples a stationary riverbed image and derives its response from the current height texture. It includes the reference’s amplified broad height gradient, a low-amplitude live rolling-wave field travelling visually from top to bottom, small height-phased ripple detail, a small refraction offset, non-scrolling caustic flecks warped by the live height/slope field, and restrained glints.
 
-It intentionally excludes animated background images, contour diagnostics, independently scrolling caustics, broad cellular patterns, and moving topographic-line treatments.
+The rolling bands are injected into the existing height-and-velocity solver and then rendered through the height-derived normal. They are not an animated background layer or a scrolling texture. The display intentionally excludes animated background images, contour diagnostics, independently scrolling caustics, broad cellular patterns, and moving topographic-line treatments.
 
 The default background is the validated natural-riverbed asset at:
 
@@ -53,5 +53,6 @@ The repository currently contains the shipped web bundle rather than the origina
 |---|---|
 | `scripts/patch-water-current.js` | Replaces the existing current simulation and presentation shader strings with the validated implementation and adds the required per-frame uniforms. |
 | `scripts/install-reference-riverbed.js` | Copies the validated stationary riverbed asset into the web bundle and ensures the default scene uses it. |
+| `scripts/patch-rolling-waves.js` | Adds restrained top-to-bottom rolling crests to the existing live height field and its height-derived display response. |
 
-After reapplying a bundle patch, launch the local Flow web bundle and confirm that the stones remain stationary while small refractive distortions, fine ripples, and glints visibly evolve. Touch-drag should add a local ripple without suppressing the ambient current.
+After reapplying a bundle patch, launch the local Flow web bundle and confirm that the stones remain stationary while top-to-bottom rolling crests, small refractive distortions, fine ripples, and glints visibly evolve. Touch-drag should add a local ripple without suppressing the ambient current.
