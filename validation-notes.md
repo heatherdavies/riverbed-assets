@@ -77,3 +77,7 @@ The display-only overscan rendered successfully in two public-preview captures s
 ## Source and runtime checks
 
 The final bundle and repeatable overscan patch pass syntax validation, and the patch is idempotent. The display samples `uHeight` only through the bounded interior `simUv`, while the refraction lookup for the stationary riverbed remains based on the original screen `uv`. The live read-target binding and ping-pong target swap remain present. The browser console reported no errors.
+
+# Gentle styling discard validation
+
+The optional display-only crest-light layer was reverted in commit `0539f40`. The restored clean-entry advected current loads in the public preview, keeps the riverbed stationary and recognizable, and reports no browser-console errors. No simulation, advection, overscan, or current-texture handoff code was altered during this revert.
