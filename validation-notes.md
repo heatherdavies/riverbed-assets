@@ -67,3 +67,13 @@ The reviewed downstream-advection implementation loaded successfully in the publ
 ## Source and runtime checks
 
 The direct integration passes JavaScript syntax validation and reports no browser-console errors. The live simulation now samples the prior ping-pong state at an upstream offset on every pass and receives a small frame-delta-scaled downstream step. The display still binds the swapped read texture every frame, but now uses a reduced broad-gradient gain and reduced refraction scale. The former multi-layer crest details remain absent, and the stationary riverbed is not independently translated or scrolled.
+
+# Clean-entry presentation overscan validation
+
+## Two-frame public-preview check
+
+The display-only overscan rendered successfully in two public-preview captures separated by twenty-one seconds. The upper visible edge no longer exposes the sharp source-like disturbance seen in the supplied recording; the same stationary stone riverbed is visible from the top of the frame while the live water response appears to continue through it. The lower edge likewise presents a clean continuation rather than a visible simulation boundary.
+
+## Source and runtime checks
+
+The final bundle and repeatable overscan patch pass syntax validation, and the patch is idempotent. The display samples `uHeight` only through the bounded interior `simUv`, while the refraction lookup for the stationary riverbed remains based on the original screen `uv`. The live read-target binding and ping-pong target swap remain present. The browser console reported no errors.

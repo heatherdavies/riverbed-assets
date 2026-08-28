@@ -4887,13 +4887,19 @@ No matching component was found for:
 
   void main() {
     vec2 uv = vUv;
-    float h = texture2D(uHeight, uv).r;
-    float hL = texture2D(uHeight, uv - vec2(uTexel.x, 0.0)).r;
-    float hR = texture2D(uHeight, uv + vec2(uTexel.x, 0.0)).r;
-    float hD = texture2D(uHeight, uv - vec2(0.0, uTexel.y)).r;
-    float hU = texture2D(uHeight, uv + vec2(0.0, uTexel.y)).r;
 
-    // The gentle solver field is amplified only at display time, where it
+    // Display only the settled vertical interior of the same live height map.
+    // With Flow's screen UV layout, y=1 is the visible top and y=0 the bottom.
+    // The top 7.5% and bottom 7.5% of the simulator therefore remain beyond
+    // the viewport, letting already-formed current enter above and leave below.
+    // The background riverbed deliberately keeps using the original screen coordinates later in the shader.
+    vec2 simUv = vec2(uv.x, mix(0.075, 0.925, uv.y));
+    float h = texture2D(uHeight, simUv).r;
+    float hL = texture2D(uHeight, simUv - vec2(uTexel.x, 0.0)).r;
+    float hR = texture2D(uHeight, simUv + vec2(uTexel.x, 0.0)).r;
+    float hD = texture2D(uHeight, simUv - vec2(0.0, uTexel.y)).r;
+    float hU = texture2D(uHeight, simUv + vec2(0.0, uTexel.y)).r;
+
     // The full simulation remains visible, but its isotropic normal
     // response is deliberately restrained so downstream transport is legible.
     vec2 broadGradient = vec2(hL - hR, hD - hU) * (14.0 * uReadability);
@@ -4992,3 +4998,5 @@ No matching component was found for:
 /* FLOW_UNIDIRECTIONAL_DOWNWARD_FLOW */
 
 /* FLOW_REVIEWED_ADVECTED_DOWNSTREAM_FLOW */
+
+/* FLOW_CLEAN_ENTRY_PRESENTATION_OVERSCAN */
